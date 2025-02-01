@@ -24,15 +24,18 @@ Route::get('/', function () {
 
 
 // Auth Routes
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
+
+Route::get('register', [AuthController::class, 'showRegisterForm']);
+Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Mitra Routes
-Route::get('/register/mitra', [MitraController::class, 'showRegisterMitraForm'])->name('register.mitra');
-Route::post('/register/mitra', [MitraController::class, 'registerMitra']);
+Route::middleware(['auth'])->group(function () {
+    Route::get('/register/mitra', [MitraController::class, 'showRegisterMitraForm'])->name('register.mitra');
+    Route::post('/register/mitra', [MitraController::class, 'registerMitra']);
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
