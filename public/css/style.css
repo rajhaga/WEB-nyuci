@@ -26,3 +26,15 @@
 footer {
     background-color: #343a40;
 }
+
+.mitra-registration {
+    background-color: #f8f9fa;
+    padding: 40px 0;
+}
+.mitra-registration h2 {
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+.mitra-registration .form-label {
+    font-weight: bold;
+}
