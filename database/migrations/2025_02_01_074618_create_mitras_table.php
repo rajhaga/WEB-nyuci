@@ -1,40 +1,31 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateMitrasTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
         Schema::create('mitras', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('nama_pemilik');
-            $table->string('nomor_hp');
-            $table->string('nama_laundry');
-            $table->text('alamat');
-            $table->string('jam_operasional');
-            $table->text('layanan');
-            $table->string('harga');
-            $table->string('metode_pembayaran');
-            $table->text('deskripsi');
-            $table->string('foto_tempat')->nullable();
-            $table->string('foto_bukti')->nullable();
-            $table->string('lokasi')->nullable();
-            $table->timestamps();
+            $table->id(); // Kolom ID (primary key)
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
+            $table->string('nama_laundry'); // Nama usaha laundry
+            $table->text('alamat'); // Alamat lengkap
+            $table->string('jam_operasional'); // Jam operasional
+            $table->text('layanan'); // Layanan yang disediakan
+            $table->string('harga'); // Harga per kg atau per item
+            $table->string('metode_pembayaran'); // Metode pembayaran
+            $table->text('deskripsi'); // Deskripsi singkat
+            $table->string('foto_tempat')->nullable(); // Foto tempat usaha (opsional)
+            $table->string('foto_bukti')->nullable(); // Foto bukti kepemilikan (opsional)
+            $table->string('lokasi')->nullable(); // Lokasi usaha (opsional)
+            $table->timestamps(); // Kolom created_at dan updated_at
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('mitras');
+        Schema::dropIfExists('mitras'); // Hapus tabel jika migration di-rollback
     }
-};
+}
