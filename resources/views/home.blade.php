@@ -1,44 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nyuci - Home</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Nyuci</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    @auth
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle"></i> {{ Auth::user()->username }}
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                                <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                            </ul>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-primary" href="/register">Register</a>
-                        </li>
-                    @endauth
-                </ul>
-            </div>
-        </div>
-    </nav>
+<!-- resources/views/home.blade.php -->
+@extends('layouts.app')
 
+@section('title', 'Nyuci - Home')
+
+@section('content')
     <!-- Hero Section -->
     <section class="hero-section text-center py-5 bg-light">
         <div class="container">
@@ -47,6 +12,17 @@
             <a href="/packages" class="btn btn-success btn-lg">Go to Packages</a>
         </div>
     </section>
+
+    <!-- Display Error Alert -->
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <!-- Features Section -->
     <section class="features-section py-5">
@@ -71,13 +47,100 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-4">
-        <p>&copy; 2023 Nyuci. All rights reserved.</p>
-    </footer>
+    <!-- Mitra Registration Section -->
+    <section class="mitra-registration">
+        <div class="container">
+            <h2 class="text-center">Daftar Menjadi Mitra Laundry</h2>
+            <form action="{{ route('register.mitra') }}" method="POST" enctype="multipart/form-data">
+                @csrf
 
-    <!-- Bootstrap JS and Font Awesome -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-</body>
-</html>
+                <!-- Informasi Pemilik -->
+                <div class="mb-4">
+                    <h3>Informasi Pemilik</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="nama_pemilik" class="form-label">Nama Pemilik</label>
+                            <input type="text" name="nama_pemilik" class="form-control" 
+                                value="{{ Auth::check() ? Auth::user()->username : '' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="nomor_hp" class="form-label">Nomor HP/WhatsApp</label>
+                            <input type="tel" name="nomor_hp" class="form-control" 
+                                value="{{ Auth::check() ? Auth::user()->phone : '' }}" 
+                                pattern="[0-9]{10,15}" required
+                                title="Masukkan nomor HP yang valid (10-15 digit angka)">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" 
+                                value="{{ Auth::check() ? Auth::user()->email : '' }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informasi Usaha Laundry -->
+                <div class="mb-4">
+                    <h3>Informasi Usaha Laundry</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="nama_laundry" class="form-label">Nama Laundry</label>
+                            <input type="text" name="nama_laundry" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="alamat" class="form-label">Alamat Lengkap</label>
+                            <input type="text" name="alamat" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="jam_operasional" class="form-label">Jam Operasional</label>
+                            <input type="text" name="jam_operasional" class="form-control" placeholder="08:00 - 21:00" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="layanan" class="form-label">Layanan yang Disediakan</label>
+                            <input type="text" name="layanan" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="harga" class="form-label">Harga per Kg atau per Item</label>
+                            <input type="number" name="harga" class="form-control" min="1000" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="metode_pembayaran" class="form-label">Metode Pembayaran</label>
+                            <input type="text" name="metode_pembayaran" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label for="deskripsi" class="form-label">Deskripsi Singkat</label>
+                            <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dokumen Pendukung -->
+                <div class="mb-4">
+                    <h3>Dokumen Pendukung</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="foto_tempat" class="form-label">Foto Tempat Usaha</label>
+                            <input type="file" name="foto_tempat" class="form-control" accept="image/*" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="foto_bukti" class="form-label">Foto Bukti Kepemilikan</label>
+                            <input type="file" name="foto_bukti" class="form-control" accept="image/*" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tombol Submit -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Daftar sebagai Mitra</button>
+                </div>
+            </form>
+        </div>
+    </section>
+@endsection
