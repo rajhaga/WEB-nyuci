@@ -21,23 +21,21 @@ class AuthController extends Controller
             'username' => 'required|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed|min:6',
-        ], [
-            'required' => 'Kolom :attribute wajib diisi.',
-            'unique' => ':attribute sudah digunakan.',
-            'email' => 'Harap masukkan email yang valid.',
-            'confirmed' => 'Konfirmasi password tidak sesuai.',
+            'phone' => 'required|unique:users',
         ]);
 
-        User::create([
+        $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'pembeli',
+            'phone' => $request->phone,
         ]);
 
-        return redirect('/login')->with('success', 'Registrasi berhasil! Silakan login.');
-    }
+        Auth::login($user);
 
+        return redirect('/profile')->with('success', 'Registrasi berhasil!');
+    }
     // Menampilkan form login
     public function showLoginForm()
     {
@@ -50,18 +48,15 @@ class AuthController extends Controller
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
-        ], [
-            'required' => 'Kolom :attribute wajib diisi.',
         ]);
 
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
-            $user = Auth::user();
-            return redirect()->intended($user->role === 'admin' ? '/admin/dashboard' : '/profile');
+            return redirect()->intended('/profile');
         }
 
         return back()->withErrors([
             'username' => 'Username atau password salah.',
-        ])->withInput($request->only('username'));
+        ]);
     }
 
     // Logout
