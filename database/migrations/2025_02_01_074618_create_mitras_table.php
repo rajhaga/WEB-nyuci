@@ -1,31 +1,37 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMitrasTable extends Migration
-{
+return new class extends Migration {
     public function up()
     {
-        Schema::create('mitras', function (Blueprint $table) {
-            $table->id(); // Kolom ID (primary key)
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
-            $table->string('nama_laundry'); // Nama usaha laundry
-            $table->text('alamat'); // Alamat lengkap
-            $table->string('jam_operasional'); // Jam operasional
-            $table->text('layanan'); // Layanan yang disediakan
-            $table->string('harga'); // Harga per kg atau per item
-            $table->string('metode_pembayaran'); // Metode pembayaran
-            $table->text('deskripsi'); // Deskripsi singkat
-            $table->string('foto_tempat')->nullable(); // Foto tempat usaha (opsional)
-            $table->string('foto_bukti')->nullable(); // Foto bukti kepemilikan (opsional)
-            $table->string('lokasi')->nullable(); // Lokasi usaha (opsional)
-            $table->timestamps(); // Kolom created_at dan updated_at
+        Schema::create('mitra', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('nama_pemilik');
+            $table->string('nomor_hp');
+            $table->string('nama_laundry');
+            $table->text('alamat');
+            $table->string('jam_operasional');
+            $table->text('layanan');
+            $table->decimal('harga', 10, 2);
+            $table->string('metode_pembayaran');
+            $table->text('deskripsi');
+            $table->string('foto_tempat')->nullable();
+            $table->string('foto_bukti')->nullable();
+            $table->enum('kategori_layanan', ['cuci', 'setrika', 'cuci dan setrika']);
+            $table->decimal('rating', 3, 2)->default(0);
+            $table->integer('jumlah_ulasan')->default(0);
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+            $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('mitras'); // Hapus tabel jika migration di-rollback
+        Schema::dropIfExists('mitra');
     }
-}
+};
