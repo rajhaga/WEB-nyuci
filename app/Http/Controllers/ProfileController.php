@@ -12,7 +12,11 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
+        $mitra = auth()->user()->mitra;
+        $jenisPakaian = $mitra ? $mitra->jenisPakaian : [];
         return view('profile', compact('user'));
+        return view('profile', compact('jenisPakaian'));
+
     }
 
     // Menampilkan halaman edit profil

@@ -5,6 +5,8 @@
 
 @section('content')
     <!-- Hero Section -->
+
+
     <section class="hero-section text-center py-5 bg-light">
         <div class="container">
             <h1 class="display-4">Welcome to Nyuci</h1>
@@ -71,13 +73,6 @@
                                 title="Masukkan nomor HP yang valid (10-15 digit angka)">
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" 
-                                value="{{ Auth::check() ? Auth::user()->email : '' }}" required>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Informasi Usaha Laundry -->
@@ -103,6 +98,43 @@
                             <input type="text" name="layanan" class="form-control" required>
                         </div>
                     </div>
+
+                    <div class="mb-4">
+                        <h3>Pilih Paket Layanan</h3>
+                        <select name="kategori_layanan" class="form-select" required>
+                            <option value="cuci">Cuci</option>
+                            <option value="setrika">Setrika</option>
+                            <option value="cuci dan setrika">Cuci dan Setrika</option>
+                        </select>                        
+                    </div>
+            
+                    
+                            <!-- Pilihan Jenis Pakaian (Checkbox) -->
+                            <div class="mb-4">
+                                <label for="jenis_pakaian" class="form-label">Jenis Pakaian</label>
+                                <div>
+                                    @foreach ($jenis_pakaian as $pakaian)
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="jenis_pakaian[]" value="{{ $pakaian->id }}" id="jenis_pakaian_{{ $pakaian->id }}">
+                                            <label class="form-check-label" for="jenis_pakaian_{{ $pakaian->id }}">
+                                                {{ $pakaian->nama }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            
+            
+                    <!-- Metode Pembayaran -->
+                    {{-- <div class="mb-4">
+                        <h3>Metode Pembayaran</h3>
+                        <select name="metode_pembayaran" class="form-select" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="E-Wallet">E-Wallet (Gopay, OVO, Dana)</option>
+                        </select>
+                    </div> --}}
+
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <label for="harga" class="form-label">Harga per Kg atau per Item</label>

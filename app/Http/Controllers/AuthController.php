@@ -5,13 +5,20 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\JenisPakaian;
 
 class AuthController extends Controller
 {
     // Menampilkan form register pembeli
+    
     public function showRegisterForm()
     {
         return view('auth.register');
+    }
+
+    public function pakaian(){
+        $jenis_pakaian = JenisPakaian::all(); // Ambil semua jenis pakaian dari database
+        return view('home',compact('jenis_pakaian'));
     }
 
     // Proses register pembeli

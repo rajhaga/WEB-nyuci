@@ -64,6 +64,20 @@
                             <a href="/profile/edit" class="btn btn-primary">Edit Profile</a>
                         </div>
                     </div>
+                    @if(auth()->user()->role == 'mitra')
+                        <h3>Detail Akun Mitra</h3>
+                        <p>Nama Laundry: {{ auth()->user()->mitra->nama_laundry }}</p>
+                        <p>Alamat: {{ auth()->user()->mitra->alamat }}</p>
+                        <p>Jam Operasional: {{ auth()->user()->mitra->jam_operasional }}</p>
+                        <p>Metode Pembayaran: {{ auth()->user()->mitra->metode_pembayaran }}</p>
+                        <p>Kategori Layanan: {{ auth()->user()->mitra->kategori_layanan }}</p>
+                        <p>Jenis Pakaian yang Diterima:</p>
+                        <ul>
+                            @foreach(auth()->user()->mitra->jenisPakaian as $jenis)
+                                <li>{{ $jenis->nama }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
                 </div>
             </div>
         </div>
