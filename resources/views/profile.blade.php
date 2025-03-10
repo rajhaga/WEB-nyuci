@@ -18,7 +18,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i> {{ Auth::user()->username }}
+                            <i class="fas fa-user-circle"></i> {{ Auth::user()->nama }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/profile">Profile</a></li>
@@ -44,8 +44,8 @@
                         </div>
                         <table class="table table-bordered">
                             <tr>
-                                <th>Username</th>
-                                <td>{{ $user->username }}</td>
+                                <th>nama</th>
+                                <td>{{ $user->nama }}</td>
                             </tr>
                             <tr>
                                 <th>Email</th>
@@ -65,19 +65,35 @@
                         </div>
                     </div>
                     @if(auth()->user()->role == 'mitra')
-                        <h3>Detail Akun Mitra</h3>
-                        <p>Nama Laundry: {{ auth()->user()->mitra->nama_laundry }}</p>
-                        <p>Alamat: {{ auth()->user()->mitra->alamat }}</p>
-                        <p>Jam Operasional: {{ auth()->user()->mitra->jam_operasional }}</p>
-                        <p>Metode Pembayaran: {{ auth()->user()->mitra->metode_pembayaran }}</p>
-                        <p>Kategori Layanan: {{ auth()->user()->mitra->kategori_layanan }}</p>
-                        <p>Jenis Pakaian yang Diterima:</p>
-                        <ul>
-                            @foreach(auth()->user()->mitra->jenisPakaian as $jenis)
-                                <li>{{ $jenis->nama }}</li>
-                            @endforeach
-                        </ul>
-                    @endif
+    <h3>Detail Akun Mitra</h3>
+    <p>Nama Laundry: {{ auth()->user()->mitra->nama_laundry }}</p>
+    <p>Alamat: {{ auth()->user()->mitra->alamat }}</p>
+    <p>Jam Operasional: {{ auth()->user()->mitra->jam_operasional }}</p>
+    <p>Metode Pembayaran: {{ auth()->user()->mitra->metode_pembayaran }}</p>
+    <p>Kategori Layanan: {{ auth()->user()->mitra->kategori_layanan }}</p>
+
+    <p>Jenis Pakaian yang Diterima:</p>
+    <ul>
+        @foreach(auth()->user()->mitra->paketPakaian as $paket)
+            <h4>{{ $paket->nama }}</h4>
+            <ul>
+                @foreach($paket->jenisPakaian as $jenis)
+                    <li>
+                        {{ $jenis->nama }} - Rp{{ number_format($jenis->pivot->price, 0, ',', '.') }}
+                        <form action="{{ route('mitra.updatePrice', $jenis->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="number" name="price" value="{{ $jenis->pivot->price }}" class="form-control mb-2" required>
+                            <button type="submit" class="btn btn-success">Update Price</button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        @endforeach
+    </ul>
+@endif
+
+
                 </div>
             </div>
         </div>

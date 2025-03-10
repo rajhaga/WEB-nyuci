@@ -7,20 +7,34 @@ use Illuminate\Database\Eloquent\Model;
 class Mitra extends Model
 {
     use HasFactory;
-    protected $table = 'mitra'; // Pastikan ini ada
 
+    protected $table = 'mitras'; // Pastikan nama tabel sesuai dengan database Anda
+
+    // Daftar field yang dapat diisi
     protected $fillable = [
-        'user_id', 'nama_pemilik', 'nomor_hp','nama_laundry', 'alamat', 'jam_operasional', 
-        'layanan', 'harga', 'metode_pembayaran', 'deskripsi', 
-        'foto_tempat', 'foto_bukti', 'lokasi', 'kategori_layanan',
-        'rating', 'jumlah_ulasan', 'latitude', 'longitude'
+        'user_id', 'nama_pemilik', 'nomor_hp', 'nama_laundry', 'alamat', 
+        'jam_operasional', 'layanan', 'harga', 'metode_pembayaran', 'deskripsi',
+        'foto_tempat', 'foto_bukti', 'kategori_layanan', 'status_registration_mitra',
+        'latitude', 'longitude', 'rating', 'jumlah_ulasan'
     ];
 
-    // app/Models/Mitra.php
+    // Relasi One-to-Many dengan User
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
-public function jenisPakaian()
+    // Relasi Many-to-Many dengan PaketPakaian
+    public function paketPakaian()
+    {
+        return $this->belongsToMany(PaketPakaian::class, 'mitra_paket_pakaian', 'mitra_id', 'paket_pakaian_id');
+    }
+
+    // Relasi Many-to-Many dengan JenisPakaian
+    public function jenisPakaian()
 {
-    return $this->belongsToMany(JenisPakaian::class, 'mitra_jenis_pakaian', 'mitra_id', 'jenis_pakaian_id');
+    return $this->belongsToMany(JenisPakaian::class, 'paket_jenis_pakaian', 'paket_pakaian_id', 'jenis_pakaian_id')
+                ->withPivot('price'); // Include price in the pivot table
 }
 
 

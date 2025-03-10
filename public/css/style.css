@@ -38,3 +38,99 @@ footer {
 .mitra-registration .form-label {
     font-weight: bold;
 }
+.navbar {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.navbar .nav-link {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.navbar .nav-link.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.navbar .nav-link.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.navbar .dropdown-menu {
+    min-width: 200px;
+}
+
+.navbar .dropdown-item {
+    font-size: 1.1rem;
+}
+
+.navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand img {
+    width: 80px; /* Adjust the size of the logo */
+}
+
+.navbar-nav .nav-link {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff;
+}
+
+.navbar-nav .btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.navbar-nav .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.navbar .dropdown-menu {
+    min-width: 200px;
+}
+
+.navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand img {
+    width: 80px; /* Adjust the size of the logo */
+}
+
+.navbar-nav .nav-link {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff;
+}
+
+.navbar-nav .btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.navbar-nav .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.navbar .dropdown-menu {
+    min-width: 200px;
+}

@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -9,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 class MitraController extends Controller
 {
-    // Menampilkan form register mitra
     public function registerMitra(Request $request)
     {
         // Cek apakah user sudah login
@@ -19,35 +19,35 @@ class MitraController extends Controller
 
         // Validasi input
         $request->validate([
-            'jenis_pakaian' => 'required|array',
-            'jenis_pakaian.*' => 'integer', // Memastikan semua data ID adalah integer
-            'nama_pemilik' => 'required',
-            'nomor_hp' => 'required|regex:/[0-9]{10,15}/',
-            'nama_laundry' => 'required',
-            'alamat' => 'required',
-            'jam_operasional' => 'required',
-            'layanan' => 'required',
+            'nama_pemilik' => 'required|string|max:255',
+            'nomor_hp' => 'required|string|regex:/^\d{10,15}$/',
+            'nama_laundry' => 'required|string|max:255',
+            'alamat' => 'required|string|max:255',
+            'jam_operasional' => 'required|string|max:255',
+            'layanan' => 'required|string',
             'harga' => 'required|numeric|min:1000',
-            'metode_pembayaran' => 'required',
-            'deskripsi' => 'required',
-            'foto_tempat' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'foto_bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'kategori_layanan' => 'required',
-            'jenis_pakaian' => 'required|array',
+            'metode_pembayaran' => 'required|string',
+            'deskripsi' => 'required|string',
+            'foto_tempat' => 'required|image|max:2048',
+            'foto_bukti' => 'required|image|max:2048',
+            'kategori_layanan' => 'required|in:cuci,setrika,cuci dan setrika',
+            'paket_pakaian' => 'required|array',  // Menjamin bahwa paket yang dipilih adalah array
+            'paket_pakaian.*' => 'exists:paket_pakaians,id', // Memastikan ID paket yang dipilih valid
         ]);
 
-        // Update role user menjadi mitra
+        // Ambil user yang sedang login
         $user = auth()->user();
-        $user->update(['role' => 'mitra']);
-        
 
-        // Simpan file jika ada
-        $fotoTempat = $request->file('foto_tempat') ? $request->file('foto_tempat')->store('mitra') : null;
-        $fotoBukti = $request->file('foto_bukti') ? $request->file('foto_bukti')->store('mitra') : null;
+        // Set status user menjadi 'pending'
+        $user->update(['status' => 'pending']);
+
+        // Simpan file foto
+        $fotoTempat = $request->file('foto_tempat') ? $request->file('foto_tempat')->store('mitra', 'public') : null;
+        $fotoBukti = $request->file('foto_bukti') ? $request->file('foto_bukti')->store('mitra', 'public') : null;
 
         // Simpan data mitra
         $mitra = Mitra::create([
-            'user_id' => $user->id,
+            'user_id' => $user->id, 
             'nama_pemilik' => $request->nama_pemilik,
             'nomor_hp' => $request->nomor_hp,
             'nama_laundry' => $request->nama_laundry,
@@ -60,11 +60,76 @@ class MitraController extends Controller
             'foto_tempat' => $fotoTempat,
             'foto_bukti' => $fotoBukti,
             'kategori_layanan' => $request->kategori_layanan,
+            'rating' => 0, // Default
+            'jumlah_ulasan' => 0, // Default
+            'latitude' => $request->latitude ?? null,
+            'longitude' => $request->longitude ?? null,
         ]);
 
-        $mitra->jenisPakaian()->sync($request->jenis_pakaian);
+        // Sinkronisasi jenis pakaian yang dipilih
+        // $mitra->jenisPakaian()->sync($request->jenis_pakaian);
+        $mitra->paketPakaian()->sync($request->paket_pakaian);
 
-
-        return redirect()->route('profile')->with('success', 'Pendaftaran mitra berhasil.');
+        return redirect()->route('profile')->with('success', 'Pendaftaran mitra berhasil, menunggu verifikasi.');
     }
+
+    // Fungsi untuk verifikasi mitra oleh admin
+    public function verifikasi($id)
+    {
+        $mitra = Mitra::find($id);
+        if ($mitra) {
+            // Ubah status pendaftaran menjadi 'approved'
+            $mitra->user->update(['status' => 'approved']);
+            return redirect()->route('admin.dashboard')->with('success', 'Mitra berhasil diverifikasi.');
+        }
+        
+        return redirect()->route('admin.dashboard')->with('error', 'Mitra tidak ditemukan.');
+    }
+    public function catalog(Request $request)
+{
+    // Start the query for Mitra
+    $query = Mitra::query();
+
+    // Filter by 'kategori_layanan' if provided
+    if ($request->has('kategori_layanan') && $request->kategori_layanan != 'semua') {
+        $query->where('kategori_layanan', $request->kategori_layanan);
+    }
+
+    // Filter by 'paket_layanan' if provided
+    if ($request->has('paket_layanan') && $request->paket_layanan != 'semua') {
+        $query->whereHas('paketPakaian', function ($q) use ($request) {
+            // Filter by paket_pakaian id from request
+            $q->where('paket_pakaians.id', $request->paket_layanan);
+        });
+    }
+    $mitras = $query->with('jenisPakaian')->get();
+
+    // Get the filtered and sorted Mitra results
+
+    // Send the data to the view
+    return view('katalog.catalog', compact('mitras'));
 }
+public function updatePrice(Request $request, $jenisPakaianId)
+{
+    // Validate the price input
+    $request->validate([
+        'price' => 'required|numeric|min:0',
+    ]);
+
+    // Find the clothing item (jenis pakaian) and the associated mitra
+    $jenisPakaian = JenisPakaian::findOrFail($jenisPakaianId);
+
+    // Get the authenticated user's mitra
+    $mitra = auth()->user()->mitra;
+
+    // Update the price in the pivot table
+    $mitra->jenisPakaian()->updateExistingPivot($jenisPakaianId, [
+        'price' => $request->price
+    ]);
+
+    // Redirect back to the profile page with a success message
+    return redirect()->route('profile')->with('success', 'Price updated successfully!');
+}
+
+}
+

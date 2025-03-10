@@ -26,8 +26,8 @@
                 <form action="{{ route('register') }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" required minlength="3" maxlength="50">
+                        <label for="nama" class="form-label">Username</label>
+                        <input type="text" name="nama" class="form-control" required minlength="3" maxlength="50">
                         <div class="form-text">Username should be between 3 and 50 characters.</div>
                     </div>
                     <div class="mb-3">

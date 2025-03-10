@@ -14,10 +14,17 @@ class JenisPakaian extends Model
     protected $fillable = ['nama'];
 
 
-public function mitras()
+    public function mitra()
 {
-    return $this->belongsToMany(Mitra::class, 'mitra_jenis_pakaian', 'jenis_pakaian_id', 'mitra_id');
+    return $this->belongsToMany(Mitra::class, 'paket_jenis_pakaian', 'jenis_pakaian_id', 'paket_pakaian_id')
+                ->withPivot('price'); // Include price in the pivot table
 }
 
+public function pesananItems()
+    {
+        return $this->hasMany(PesananItem::class, 'item_id');
+    }
+
+    
 
 }

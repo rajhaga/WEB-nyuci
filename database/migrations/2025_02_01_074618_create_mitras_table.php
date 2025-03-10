@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('mitra', function (Blueprint $table) {
+        Schema::create('mitras', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('pengguna')->onDelete('cascade'); // Foreign key linking to 'pengguna' table
             $table->string('nama_pemilik');
             $table->string('nomor_hp');
             $table->string('nama_laundry');

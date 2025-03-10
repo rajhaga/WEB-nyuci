@@ -1,10 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PackageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\LaundryController;
+use App\Http\Controllers\PesananController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,18 +34,58 @@ Route::get('register', [AuthController::class, 'showRegisterForm']);
 Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/', [AuthController::class, 'pakaian']);
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/');
+})->name('logout');
+
+Route::get('/', [AuthController::class, 'home'])->name('home');
+
 
 // Mitra Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/register/mitra', [MitraController::class, 'showRegisterMitraForm'])->name('register.mitra');
     Route::post('/register/mitra', [MitraController::class, 'registerMitra']);
-});
-
-Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+
+// Route::get('/checkout/{mitraId}', [PesananController::class, 'showCheckout'])->name('checkout');
+// Route::post('/laundry/order/{mitraId}', [PesananController::class, 'placeOrder'])->name('laundry.placeOrder');
+
+
+
+Route::get('/catalog', [MitraController::class, 'catalog'])->name('catalog');
+
+
+// Route::get('/laundry/{id}', [LaundryController::class, 'showDetail'])->name('laundry.detail');
+
+// Route::post('/laundry/order/{mitraId}', [PesananController::class, 'store'])->name('laundry.order');
+// Route::post('/laundry/order/{mitraId}', [PesananController::class, 'placeOrder'])->name('laundry.order');
+
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('admin/approve/{id}', [AdminController::class, 'approveUser'])->name('admin.approve');
+    Route::get('admin/reject/{id}', [AdminController::class, 'rejectUser'])->name('admin.reject');
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/mitra/verifikasi/{id}', [MitraController::class, 'verifikasi'])->name('admin.mitra.verifikasi');
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+});
+   
+// Route::put('/mitra/jenis-pakaian/{id}/update-price', [MitraController::class, 'updatePrice'])->name('mitra.updatePrice');
+// // Route::post('/laundry/order/{mitraId}', [PesananController::class, 'store'])->name('laundry.order');
+// // Route::get('/checkout/{mitraId}/{pesananId}', [PesananController::class, 'showCheckout'])->name('laundry.ShowCheckout');
+// Route::post('/laundry/order/{mitraId}', [PesananController::class, 'storeAndCheckout'])->name('laundry.storeAndCheckout');
+
+use App\Http\Controllers\KatalogController;
+
+Route::get('katalog', [KatalogController::class, 'index'])->name('katalog.index'); // Display catalog (Step 1)
+Route::get('katalog/{mitra}/detail', [KatalogController::class, 'showKatalogDetail'])->name('katalog.detail'); // Show laundry details (Step 2)
+Route::post('katalog/{mitra}/checkout', [KatalogController::class, 'storeAndCheckout'])->name('katalog.storeAndCheckout'); // Handle the checkout (Step 3)
+Route::post('katalog/{mitra}/placeOrder', [KatalogController::class, 'placeOrder'])->name('katalog.placeOrder'); // Place the order (Step 4)
+Route::get('/laundry/{pesanan}/orderConfirmation', [KatalogController::class, 'orderConfirmation'])->name('katalog.orderConfirmation'); // Order confirmation (Step 5)
+
+Route::get('/lacak-pesanan', [PesananController::class, 'index'])->name('lacak.pesanan');
