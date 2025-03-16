@@ -15,7 +15,7 @@ return new class extends Migration{
             $table->enum('role', ['pembeli', 'mitra', 'admin'])->default('pembeli'); // Role field with default 'pembeli'
             $table->string('phone')->unique(); // Phone number, unique
             $table->rememberToken(); // Used for "remember me" functionality
-            $table->enum('status', ['pending', 'verified', 'ditolak'])->default('pending'); // Status field
+            $table->enum('status', ['pending', 'verified', 'ditolak'])->nullable(); // Status field, nullable
             $table->timestamps(); // Created at and updated at timestamps
         });
     }

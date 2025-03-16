@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\JenisPakaian;
 use App\Models\PaketPakaian;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthController extends Controller
 {
@@ -28,24 +30,25 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'nama' => 'required|unique:pengguna', // Change users to pengguna
-            'email' => 'required|email|unique:pengguna', // Change users to pengguna
-            'password' => 'required|confirmed|min:6',
-            'phone' => 'required|unique:pengguna', // Change users to pengguna
+            'nama' => 'required|unique:pengguna', // Ensure unique 'nama' in 'pengguna' table
+            'email' => 'required|email|unique:pengguna', // Ensure unique email
+            'password' => 'required|confirmed|min:6', // Password must be confirmed
+            'phone' => 'required|unique:pengguna', // Ensure unique phone number
         ]);
 
         $user = User::create([  // Use Pengguna model instead of User
-            'nama' => $request->nama, // Using 'nama' instead of 'nama'
+            'nama' => $request->nama,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'pembeli',
+            'role' => 'pembeli', // Default role as 'pembeli'
             'phone' => $request->phone,
         ]);
 
-        Auth::login($user);
+        Auth::login($user);  // Automatically log in the new user
 
-        return redirect('/profile')->with('success', 'Registrasi berhasil!');
+        return redirect('/login')->with('success', 'Registrasi berhasil!');  // Redirect to profile page
     }
+
 
     // Menampilkan form login
     public function showLoginForm()
@@ -53,29 +56,34 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // Proses login
     public function login(Request $request)
     {
+        // Validate the request data
         $request->validate([
-            'nama' => 'required|string',
-            'password' => 'required|string',
+            'nama' => 'required|string',  // Ensure 'nama' is required
+            'password' => 'required|string',  // Ensure 'password' is required
         ]);
 
-        if (Auth::attempt(['nama' => $request->nama, 'password' => $request->password])) { // Use 'nama' instead of 'nama'
-            $user = Auth::user(); // Ambil data user yang login
+        // Attempt to authenticate the user using 'nama' and 'password'
+        if (Auth::attempt(['nama' => $request->nama, 'password' => $request->password])) {
+            $user = Auth::user();  // Get the authenticated user
 
-            // Cek role
+            // Check the user's role and redirect accordingly
             if ($user->role === 'admin') {
-                return redirect()->intended('/admin/dashboard'); // Redirect ke dashboard admin
+                return redirect()->route('admin.dashboard');  // Redirect to admin dashboard
+            } elseif ($user->role === 'mitra') {
+                return redirect()->route('mitra.dashboard');  // Redirect to Mitra dashboard
+            } else {
+                return redirect()->route('profile');  // Default redirect for regular users
             }
-
-            return redirect()->intended('/profile'); // Redirect untuk user biasa
         }
 
+        // If authentication fails, return back with error
         return back()->withErrors([
-            'nama' => 'nama atau password salah.',
+            'nama' => 'Nama atau password salah.',  // Error message in Indonesian
         ]);
     }
+
 
     // Logout
     public function logout(Request $request)

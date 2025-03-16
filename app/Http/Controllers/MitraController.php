@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Storage;
 
 class MitraController extends Controller
 {
+    public function dashboard()
+    {
+        return view('mitra.dashboard');
+    }
+
     public function registerMitra(Request $request)
     {
         // Cek apakah user sudah login

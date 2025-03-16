@@ -31,7 +31,7 @@ Route::get('/', function () {
 // Auth Routes
 
 Route::get('register', [AuthController::class, 'showRegisterForm']);
-Route::post('register', [AuthController::class, 'register'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', function () {
@@ -46,16 +46,28 @@ Route::get('/', [AuthController::class, 'home'])->name('home');
 Route::middleware(['auth'])->group(function () {
     Route::get('/register/mitra', [MitraController::class, 'showRegisterMitraForm'])->name('register.mitra');
     Route::post('/register/mitra', [MitraController::class, 'registerMitra']);
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 
 
 // Route::get('/checkout/{mitraId}', [PesananController::class, 'showCheckout'])->name('checkout');
 // Route::post('/laundry/order/{mitraId}', [PesananController::class, 'placeOrder'])->name('laundry.placeOrder');
 
+Route::middleware(['auth'])->group(function () {
+    // Register Mitra Route
+    Route::post('/mitra/register', [MitraController::class, 'registerMitra'])->name('mitra.register');
 
+    // Update Price Route
+    Route::put('/mitra/updatePrice/{jenisPakaianId}', [MitraController::class, 'updatePrice'])->name('mitra.updatePrice');
+
+    // Catalog Route (for filtering and viewing mitra catalog)
+    Route::get('/catalog', [MitraController::class, 'catalog'])->name('catalog');
+
+    // Verifikasi Mitra Route
+    Route::put('/mitra/verifikasi/{id}', [MitraController::class, 'verifikasi'])->name('mitra.verifikasi');
+});
 
 Route::get('/catalog', [MitraController::class, 'catalog'])->name('catalog');
 
@@ -71,10 +83,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/reject/{id}', [AdminController::class, 'rejectUser'])->name('admin.reject');
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/mitra/verifikasi/{id}', [MitraController::class, 'verifikasi'])->name('admin.mitra.verifikasi');
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
 });
    
+Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+Route::get('/mitra/dashboard', [MitraController::class, 'dashboard'])->name('mitra.dashboard');
 // Route::put('/mitra/jenis-pakaian/{id}/update-price', [MitraController::class, 'updatePrice'])->name('mitra.updatePrice');
 // // Route::post('/laundry/order/{mitraId}', [PesananController::class, 'store'])->name('laundry.order');
 // // Route::get('/checkout/{mitraId}/{pesananId}', [PesananController::class, 'showCheckout'])->name('laundry.ShowCheckout');
