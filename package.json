@@ -10,8 +10,9 @@
         "axios": "^1.6.4",
         "laravel-vite-plugin": "^1.0.0",
         "postcss": "^8.5.3",
+        "rollup": "^4.36.0",
         "tailwindcss": "^4.0.14",
-        "vite": "^6.2.1"
+        "vite": "^6.2.2"
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.0.14"
