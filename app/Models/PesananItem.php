@@ -13,11 +13,8 @@ class PesananItem extends Model
     public $timestamps = false; // Disable timestamps
 
     // Fillable attributes
-    protected $fillable = [
-        'pesanan_id',  // Foreign key to the 'pesanan' table
-        'item_id',     // Foreign key to the 'jenis_pakaian' table
-        'jumlah',      // Quantity of the item
-    ];
+    protected $fillable = ['pesanan_id', 'item_id', 'jumlah', 'harga_total'];
+
 
     // Relationship with Pesanan (Order)
     public function pesanan()

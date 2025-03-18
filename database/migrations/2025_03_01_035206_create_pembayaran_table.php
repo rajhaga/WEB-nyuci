@@ -1,31 +1,31 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
-        Schema::create('pembayaran', function (Blueprint $table) {
+        // Drop the pesanan table
+        Schema::dropIfExists('pesanan');
+
+        // Recreate the pesanan table
+        Schema::create('pesanan', function (Blueprint $table) {
             $table->id(); // Auto-incremented ID
-            $table->foreignId('pesanan_id')->constrained('pesanan')->onDelete('cascade'); // Foreign key referencing 'pesanan' table
+            $table->foreignId('pembeli_id')->constrained('pengguna')->onDelete('cascade');
+            $table->foreignId('mitra_id')->constrained('mitras')->onDelete('cascade');
+            $table->decimal('total_harga', 10, 2);
+            $table->enum('status', ['Pending', 'Dibayar', 'Diproses', 'Selesai', 'Dibatalkan'])->default('Pending');
             $table->enum('metode', ['cash', 'qris']); // Payment method (Cash or QRIS)
-            $table->enum('status', ['Belum Dibayar', 'Dibayar'])->default('Belum Dibayar'); // Payment status
-            $table->timestamp('paid_at')->nullable(); // Timestamp for when the payment was made
-            $table->timestamps(); // Created at and updated at timestamps
+            $table->string('kode_referral')->nullable();
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('pembayaran');
+        // Drop the pesanan table if needed
+        Schema::dropIfExists('pesanan');
     }
 };

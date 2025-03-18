@@ -102,3 +102,11 @@ Route::post('katalog/{mitra}/placeOrder', [KatalogController::class, 'placeOrder
 Route::get('/laundry/{pesanan}/orderConfirmation', [KatalogController::class, 'orderConfirmation'])->name('katalog.orderConfirmation'); // Order confirmation (Step 5)
 
 Route::get('/lacak-pesanan', [PesananController::class, 'index'])->name('lacak.pesanan');
+Route::get('kelola-pesanan', [MitraController::class, 'kelolaPesanan'])->name('mitra.kelolaPesanan');
+
+// Group route khusus mitra dengan autentikasi
+Route::get('/mitra/payment', [MitraController::class, 'pembayaran'])->name('mitra.pembayaran');
+Route::post('/mitra/payment/confirm/{id}', [MitraController::class, 'konfirmasiPembayaran'])->name('mitra.konfirmasiPembayaran');
+Route::get('/mitra/payment/confirm/{id}', [MitraController::class, 'showKonfirmasiPembayaran'])->name('mitra.showKonfirmasiPembayaran');
+Route::get('/pesanan/qris/{pesanan}', [PesananController::class, 'showQRIS'])->name('pesanan.qris');
+Route::post('/pesanan/konfirmasi/{pesanan}', [PesananController::class, 'konfirmasiPembayaran'])->name('pesanan.konfirmasi');

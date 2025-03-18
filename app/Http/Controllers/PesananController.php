@@ -3,25 +3,47 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pesanan;
+use Illuminate\Support\Facades\Auth;
 
 class PesananController extends Controller
 {
     public function index(Request $request)
     {
-        // Get the status from the query parameter, default to null (show all orders)
+        // Ambil ID pengguna yang sedang login
+        $userId = Auth::id();
+
+        // Ambil status dari request jika ada
         $status = $request->get('status');
 
-        // If a specific status is provided, filter by that status; otherwise, get all orders
+        // Query hanya pesanan milik pengguna yang sedang login
+        $query = Pesanan::with(['mitra', 'pesananItems.jenisPakaian'])
+                        ->where('pembeli_id', $userId);
+
+        // Jika ada filter status, tambahkan ke query
         if ($status) {
-            // Get orders with the selected status
-            $pesanan = Pesanan::with(['mitra', 'pesananItems.jenisPakaian'])
-                ->where('status', $status)
-                ->get();
-        } else {
-            // Get all orders
-            $pesanan = Pesanan::with(['mitra', 'pesananItems.jenisPakaian'])->get();
+            $query->where('status', $status);
         }
 
+        // Eksekusi query dan ambil hasilnya
+        $pesanan = $query->get();
+
         return view('pesanan.index', compact('pesanan'));
+    }
+
+    // Menampilkan halaman pembayaran QRIS
+    public function showQRIS(Pesanan $pesanan)
+    {
+        return view('pesanan.qris', compact('pesanan'));
+    }
+
+    // Konfirmasi pembayaran dan ubah status ke "Diproses"
+    public function konfirmasiPembayaran(Pesanan $pesanan)
+    {
+        if ($pesanan->status === 'Pending') {
+            $pesanan->update(['status' => 'Diproses']);
+            return redirect()->route('pesanan.index')->with('success', 'Pembayaran berhasil dikonfirmasi.');
+        }
+
+        return redirect()->route('mitra.pembayaran')->with('error', 'Pesanan tidak dalam status yang bisa dikonfirmasi.');
     }
 }

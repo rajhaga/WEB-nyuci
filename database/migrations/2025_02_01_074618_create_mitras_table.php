@@ -17,7 +17,9 @@ return new class extends Migration {
             $table->string('jam_operasional');
             $table->text('layanan');
             $table->decimal('harga', 10, 2);
-            $table->string('metode_pembayaran');
+            // $table->string('metode_pembayaran'); 
+            $table->string('id_pembayaran')->nullable(); // ID pembayaran tambahan
+            $table->string('nomor_rekening')->nullable(); // Nomor rekening tambahan
             $table->text('deskripsi');
             $table->string('foto_tempat')->nullable();
             $table->string('foto_bukti')->nullable();
@@ -32,6 +34,6 @@ return new class extends Migration {
 
     public function down()
     {
-        Schema::dropIfExists('mitra');
+        Schema::dropIfExists('mitras');
     }
 };

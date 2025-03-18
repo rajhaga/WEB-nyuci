@@ -10,9 +10,13 @@ class Pesanan extends Model
 
     protected $table = 'pesanan';  // Explicitly set the table name
 
+    protected $fillable = ['pembeli_id', 'mitra_id', 'total_harga', 'status', 'kode_referral'];
 
-
-    protected $fillable = ['pembeli_id', 'mitra_id', 'total_harga', 'status'];
+    // Tambahkan relasi ke PesananItem
+    public function items()
+    {
+        return $this->hasMany(PesananItem::class, 'pesanan_id');
+    }
 
     // Define the relationship with Pembeli (User) and Mitra (Laundry)
     public function pembeli()

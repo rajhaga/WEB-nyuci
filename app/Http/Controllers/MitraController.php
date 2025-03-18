@@ -3,17 +3,85 @@ namespace App\Http\Controllers;
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Mitra;
 use App\Models\JenisPakaian;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Pesanan;
+use Illuminate\Support\Facades\Auth;
+
 
 class MitraController extends Controller
 {
-    public function dashboard()
-    {
-        return view('mitra.dashboard');
+//     public function dashboard()
+// {
+//     // Ambil data mitra berdasarkan ID pengguna yang login
+//     $mitra = Mitra::where('user_id', Auth::id())->first();
+
+//     // Periksa jika data mitra tidak ditemukan
+//     if (!$mitra) {
+//         return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
+//     }
+
+//     return view('mitra.dashboard', compact('mitra'));
+// }
+public function dashboard()
+{
+    // Ambil data mitra berdasarkan ID pengguna yang login
+    $mitra = Mitra::where('user_id', Auth::id())->first();
+
+    // Periksa jika data mitra tidak ditemukan
+    if (!$mitra) {
+        return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
     }
+
+    // Total Saldo: Sum of 'total_harga' for orders with 'status' = 'Dibayar'
+    $totalSaldo = Pesanan::where('mitra_id', $mitra->id)
+                         ->where('status', 'Dibayar')
+                         ->sum('total_harga');
+
+    // Pendapatan Bulanan: Sum of 'total_harga' grouped by month and year for 'Dibayar' orders
+    $pendapatanBulanan = Pesanan::where('mitra_id', $mitra->id)
+                                ->where('status', 'Dibayar')
+                                ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, SUM(total_harga) as total')
+                                ->groupBy('year', 'month')
+                                ->orderBy('year', 'desc')
+                                ->orderBy('month', 'desc')
+                                ->get();
+
+    // Status Pesanan: Count orders by each status
+    $statusPesanan = [
+        'pending' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Pending')->count(),
+        'dibayar' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Dibayar')->count(),
+        'diproses' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Diproses')->count(),
+        'selesai' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Selesai')->count(),
+    ];
+
+    // Grafik Pesanan per Tahun: Count of orders per year
+    $grafikPesanan = Pesanan::where('mitra_id', $mitra->id)
+                            ->selectRaw('YEAR(created_at) as year, COUNT(*) as total')
+                            ->groupBy('year')
+                            ->orderBy('year', 'asc')
+                            ->get();
+
+    return view('mitra.dashboard', compact('mitra', 'totalSaldo', 'pendapatanBulanan', 'statusPesanan', 'grafikPesanan'));
+}
+public function kelolaPesanan()
+{
+    // Fetch orders related to the logged-in partner (mitra)
+    $mitra = Mitra::where('user_id', Auth::id())->first();
+
+    // If mitra not found, redirect to the home page
+    if (!$mitra) {
+        return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
+    }
+
+    // Fetch orders with their status and paginate them
+    $orders = Pesanan::where('mitra_id', $mitra->id)
+                     ->orderBy('created_at', 'desc')
+                     ->paginate(12); // Adjust pagination as needed
+
+    return view('mitra.kelola-pesanan', compact('orders'));
+}
+
 
     public function registerMitra(Request $request)
     {
@@ -31,7 +99,8 @@ class MitraController extends Controller
             'jam_operasional' => 'required|string|max:255',
             'layanan' => 'required|string',
             'harga' => 'required|numeric|min:1000',
-            'metode_pembayaran' => 'required|string',
+            // 'metode_pembayaran' => 'required|string',
+            'nomor_rekening' => 'required|numeric',
             'deskripsi' => 'required|string',
             'foto_tempat' => 'required|image|max:2048',
             'foto_bukti' => 'required|image|max:2048',
@@ -60,7 +129,8 @@ class MitraController extends Controller
             'jam_operasional' => $request->jam_operasional,
             'layanan' => $request->layanan,
             'harga' => $request->harga,
-            'metode_pembayaran' => $request->metode_pembayaran,
+            // 'metode_pembayaran' => $request->metode_pembayaran,
+            'nomor_rekening' => $request->nomor_rekening,
             'deskripsi' => $request->deskripsi,
             'foto_tempat' => $fotoTempat,
             'foto_bukti' => $fotoBukti,
@@ -135,6 +205,43 @@ public function updatePrice(Request $request, $jenisPakaianId)
     // Redirect back to the profile page with a success message
     return redirect()->route('profile')->with('success', 'Price updated successfully!');
 }
+public function pembayaran()
+{
+    // Ambil data mitra berdasarkan ID pengguna yang login
+    $mitra = Mitra::where('user_id', Auth::id())->first();
 
+    // Periksa jika data mitra tidak ditemukan
+    if (!$mitra) {
+        return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
+    }
+
+    // Ambil pesanan dengan status "Belum" untuk mitra terkait
+    $pesananBelumDibayar = Pesanan::where('mitra_id', $mitra->id)
+                                  ->where('status', 'Pending')
+                                  ->orderBy('created_at', 'desc')
+                                  ->get();
+
+    return view('mitra.pembayaran', compact('pesananBelumDibayar'));
+}
+
+public function showKonfirmasiPembayaran($id)
+{
+    $pesanan = Pesanan::with('items')->findOrFail($id);
+
+    return view('mitra.konfirmasi-pembayaran', compact('pesanan'));
+}
+
+
+public function konfirmasiPembayaran(Request $request, $id)
+{
+    $pesanan = Pesanan::findOrFail($id);
+    
+    // Ubah status pesanan menjadi "Dibayar"
+    $pesanan->status = 'Dibayar';
+    $pesanan->save();
+
+    // Redirect ke halaman konfirmasi pembayaran
+    return redirect()->route('mitra.showKonfirmasiPembayaran', $pesanan->id);
+}
 }
 

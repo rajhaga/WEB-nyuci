@@ -75,8 +75,8 @@
                     <input type="number" name="harga" class="w-full p-2 border rounded-md" min="1000" required>
                 </div>
                 <div>
-                    <label for="metode_pembayaran" class="block font-medium">Metode Pembayaran</label>
-                    <input type="text" name="metode_pembayaran" class="w-full p-2 border rounded-md" required>
+                    <label for="metode_pembayaran" class="block font-medium">Nomor Rekening:</label>
+                    <input type="text" name="nomor_rekening" class="w-full p-2 border rounded-md" required>
                 </div>
             </div>
 
