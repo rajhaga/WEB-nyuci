@@ -15,7 +15,6 @@ return new class extends Migration {
             $table->string('nama_laundry');
             $table->text('alamat');
             $table->string('jam_operasional');
-            $table->text('layanan');
             $table->decimal('harga', 10, 2);
             // $table->string('metode_pembayaran'); 
             $table->string('id_pembayaran')->nullable(); // ID pembayaran tambahan

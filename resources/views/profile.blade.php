@@ -18,7 +18,8 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i> {{ Auth::user()->nama }}
+                            <i class="fas fa-user-circle"></i> {{ $user->nama }}
+
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/profile">Profile</a></li>
@@ -38,32 +39,44 @@
                     <div class="card-header">
                         <h3 class="text-center">Profile</h3>
                     </div>
-                    <div class="card-body">
-                        <div class="text-center mb-4">
-                            <img src="https://via.placeholder.com/150" class="rounded-circle" alt="Profile Picture">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <!-- Foto Profil -->
+                                <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="Profile">
+                                
+                                <!-- Informasi User -->
+                                <h5 class="mb-1">{{ Auth::user()->nama }}</h5>
+                                <p class="text-muted mb-1">{{ Auth::user()->email }}</p>
+                                <p class="text-muted mb-1"><strong>Role:</strong> {{ Auth::user()->role }}</p>
+                                <p class="text-muted mb-1"><strong>Phone:</strong> {{ Auth::user()->phone ?? 'N/A' }}</p>
+                                <p class="text-muted mb-3"><strong>Joined:</strong> {{ Auth::user()->created_at->format('d M Y') }}</p>
+                    
+                                <!-- Menu Navigasi -->
+                                <ul class="list-group text-start">
+                                    <li class="list-group-item border-0">
+                                        <a href="/profile" class="text-decoration-none">
+                                            <i class="fas fa-user-edit"></i> Edit Profile
+                                        </a>
+                                    </li>
+                                    <li class="list-group-item border-0">
+                                        <a href="/orders/history" class="text-decoration-none">
+                                            <i class="fas fa-history"></i> Riwayat Pesanan
+                                        </a>
+                                    </li>
+                                    <li class="list-group-item border-0">
+                                        <form action="{{ route('logout') }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger w-100">
+                                                <i class="fas fa-sign-out-alt"></i> Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <table class="table table-bordered">
-                            <tr>
-                                <th>nama</th>
-                                <td>{{ $user->nama }}</td>
-                            </tr>
-                            <tr>
-                                <th>Email</th>
-                                <td>{{ $user->email }}</td>
-                            </tr>
-                            <tr>
-                                <th>Role</th>
-                                <td>{{ $user->role }}</td>
-                            </tr>
-                            <tr>
-                                <th>Registered At</th>
-                                <td>{{ $user->created_at->format('d M Y') }}</td>
-                            </tr>
-                        </table>
-                        <div class="text-center">
-                            <a href="/profile/edit" class="btn btn-primary">Edit Profile</a>
-                        </div>
-                    </div>
+                    </div>                    
+                
                     @if(auth()->user()->role == 'mitra')
     <h3>Detail Akun Mitra</h3>
     <p>Nama Laundry: {{ auth()->user()->mitra->nama_laundry }}</p>

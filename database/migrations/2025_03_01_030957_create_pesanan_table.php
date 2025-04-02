@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('pembeli_id')->constrained('pengguna')->onDelete('cascade');
             $table->foreignId('mitra_id')->constrained('mitras')->onDelete('cascade');
             $table->decimal('total_harga', 10, 2);
-            $table->enum('status', ['Pending', 'Dibayar', 'Diproses', 'Selesai', 'Dibatalkan'])->default('Pending');
+            // $table->enum('status', ['Pending', 'Dibayar', 'Diproses', 'Selesai', 'Dibatalkan'])->default('Pending');
+            $table->enum('status', ['Menunggu', 'Diterima', 'Diproses', 'Selesai', 'Dibatalkan'])->default('Menunggu');
             $table->string('kode_referral')->nullable();
             $table->timestamps();
         });

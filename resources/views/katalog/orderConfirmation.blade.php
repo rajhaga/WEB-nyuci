@@ -7,10 +7,10 @@
         <p class="text-gray-700 text-lg">Thank you for your order! Here are the details of your order:</p>
         
         <div class="mt-6 p-6 bg-gray-50 rounded-lg shadow">
-            <h3 class="text-2xl font-semibold text-gray-800">Order #{{ $pesanan->id }}</h3>
+            <h3 class="text-2xl font-semibold text-gray-800">Order #{{ session('orderCount', 1) }}</h3>
             <p class="text-lg text-gray-700"><strong>Order Status:</strong> <span class="text-blue-500">{{ $pesanan->status }}</span></p>
             <p class="text-lg text-gray-700"><strong>Total Price:</strong> <span class="text-green-500">Rp{{ number_format($pesanan->total_harga, 0, ',', '.') }}</span></p>
-            <p class="text-lg text-gray-700"><strong>Payment Method:</strong> <span class="text-gray-800">{{ $pesanan->status === 'Pending' ? 'Pay at Store' : 'Paid' }}</span></p>
+            <p class="text-lg text-gray-700"><strong>Payment Method:</strong> <span class="text-gray-800">{{ $pesanan->status === 'Menunggu' ? 'Pay at Store' : 'Paid' }}</span></p>
             <p class="text-lg text-gray-700"><strong>Kode Referral:</strong> <span class="text-purple-500">{{ $pesanan->kode_referral }}</span></p>
         </div>
         

@@ -48,6 +48,32 @@
         </div>
     </section>
 
+    <section class="py-16">
+        @if(isset($rekomendasi) && count($rekomendasi) > 0)
+    @foreach ($rekomendasi as $laundry)
+        <div class="bg-white p-4 rounded-lg shadow-lg text-center">
+            <img src="{{ asset('storage/' . $laundry->foto_tempat) }}" 
+                alt="{{ $laundry->nama_laundry }}" 
+                class="w-full h-48 object-cover rounded-md">
+            
+            <h3 class="text-xl font-semibold mt-4">{{ $laundry->nama_laundry }}</h3>
+            <p class="text-gray-500">Pemilik: {{ $laundry->nama_pemilik }}</p>
+            <p class="text-gray-500">Kategori: {{ $kategoriFavorit->nama ?? 'Populer' }}</p>
+            <p class="text-yellow-500 text-lg">&#9733; {{ $laundry->rating }}</p>
+
+            <a href="/laundry/{{ $laundry->id }}" 
+                class="mt-4 inline-block bg-blue-500 text-white px-6 py-2 rounded-lg">
+                Pesan Sekarang
+            </a>
+        </div>
+    @endforeach
+@else
+    <p class="text-center text-gray-500">Belum ada rekomendasi.</p>
+@endif
+
+    </section>
+    
+    
     <!-- Why Choose Nyuci Section -->
     <section class="py-16">
         <div class="container mx-auto px-4 text-center">

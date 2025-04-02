@@ -1,59 +1,159 @@
-<nav class="bg-white shadow-md p-4">
+<nav class="bg-white shadow-lg p-4 sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center">
-        <!-- Logo Section on the Left -->
-        <a class="flex items-center text-lg font-semibold" href="/">
-            <img src="{{ asset('images/logo.png') }}" alt="Nyuci Logo" class="w-8 h-8 mr-2"> Nyuci
+        <!-- Logo untuk semua device -->
+        <a class="flex items-center text-xl font-bold" href="/">
+            <img src="{{ asset('images/logo.png') }}" alt="Nyuci Logo" class="w-10 h-10 mr-2"> 
+            <span class="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">Nyuci</span>
         </a>
-        
-        <!-- Toggle Button for Mobile -->
-        <button id="menu-toggle" class="md:hidden focus:outline-none">
+
+        <!-- Toggle Menu untuk Mobile -->
+        <button id="menu-toggle" class="md:hidden focus:outline-none p-2 rounded-lg hover:bg-gray-100 transition-all">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
             </svg>
         </button>
-        
-        <!-- Navbar Links Section -->
-        <div id="menu" class="hidden md:flex space-x-6">
-            <a class="text-gray-700 hover:text-blue-500" href="/">Beranda</a>
-            <a class="text-gray-700 hover:text-blue-500" href="/catalog">Katalog</a>
-            <a class="text-gray-700 hover:text-blue-500" href="{{ route('lacak.pesanan') }}">Lacak</a>
-            <a class="text-gray-700 hover:text-blue-500" href="/contact">Hubungi Kami</a>
+
+        <!-- Navbar Links di Desktop -->
+        <div id="menu" class="hidden md:flex space-x-1">
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium" href="/">
+                <span class="relative group">
+                    Beranda
+                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+            </a>
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium" href="/catalog">
+                <span class="relative group">
+                    Katalog
+                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+            </a>
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium" href="{{ route('lacak.pesanan') }}">
+                <span class="relative group">
+                    Lacak
+                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+            </a>
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium" href="/contact">
+                <span class="relative group">
+                    Hubungi Kami
+                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                </span>
+            </a>
         </div>
-        
-        <!-- User Authentication Links -->
-        <div class="hidden md:flex items-center space-x-4">
+
+        <!-- User Authentication -->
+        <div class="flex items-center space-x-3">
             @auth
-                <!-- Account Dropdown -->
+                <!-- Profile -->
                 <div class="relative">
-                    <button id="account-menu" class="flex items-center text-gray-700 hover:text-blue-500 focus:outline-none">
-                        <i class="fas fa-user-circle mr-2"></i> Akun
+                    <button id="account-menu" class="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100 transition-all duration-300 focus:outline-none">
+                        <img src="{{ Auth::user()->profile_image ?? asset('images/default-avatar.png') }}" alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-blue-100">
+                        <span class="font-medium text-gray-700">{{ Auth::user()->nama }}</span>
+                        <svg class="w-4 h-4 text-gray-500 transition-transform duration-200" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
                     </button>
-                    <div id="account-dropdown" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg hidden">
+                    <div id="account-dropdown" class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden hidden transition-all duration-300 transform origin-top">
                         @if(Auth::user()->role === 'admin')
-                            <a class="block px-4 py-2 text-gray-700 hover:bg-gray-100" href="/admin/dashboard">Dashboard Admin</a>
-                            <hr>
+                            <a class="block px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200 flex items-center" href="/admin/dashboard">
+                                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Dashboard Admin
+                            </a>
+                            <hr class="border-gray-100">
+                        @elseif(Auth::user()->role === 'mitra')
+                            <a class="block px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200 flex items-center" href="/mitra/dashboard">
+                                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                                Dashboard Mitra
+                            </a>
+                            <hr class="border-gray-100">
                         @endif
-                        <a class="block px-4 py-2 text-gray-700 hover:bg-gray-100" href="/profile">Profile</a>
-                        <form action="{{ route('logout') }}" method="POST" class="block px-4 py-2">
+                        <a class="block px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200 flex items-center" href="/profile">
+                            <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            Profile
+                        </a>
+                        <form action="{{ route('logout') }}" method="POST" class="block">
                             @csrf
-                            <button type="submit" class="w-full text-left text-gray-700 hover:bg-gray-100">Logout</button>
+                            <button type="submit" class="w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 transition-colors duration-200 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Logout
+                            </button>
                         </form>
                     </div>
                 </div>
             @else
-                <!-- For Unauthenticated Users -->
-                <a class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white" href="/register">Register</a>
-                <a class="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white" href="/login">Login</a>
+                <a class="px-4 py-2 rounded-lg border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition-all duration-300 font-medium" href="/register">Register</a>
+                <a class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 font-medium shadow-md hover:shadow-lg" href="/login">Login</a>
             @endauth
+        </div>
+    </div>
+
+    <!-- Dropdown Menu untuk Mobile -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 shadow-lg">
+        <div class="container mx-auto px-4 py-2 space-y-1">
+            <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="/">Beranda</a>
+            <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="/catalog">Katalog</a>
+            <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="{{ route('lacak.pesanan') }}">Lacak</a>
+            <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="/contact">Hubungi Kami</a>
+            
+            @guest
+                <div class="pt-2 border-t border-gray-100 space-y-2">
+                    <a class="block px-4 py-2 text-center rounded-lg border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition-all duration-300 font-medium" href="/register">Register</a>
+                    <a class="block px-4 py-2 text-center rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 font-medium" href="/login">Login</a>
+                </div>
+            @endguest
         </div>
     </div>
 </nav>
 
 <script>
+    // Toggle untuk menu mobile
     document.getElementById('menu-toggle').addEventListener('click', function() {
-        document.getElementById('menu').classList.toggle('hidden');
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden');
+        
+        // Animasi icon toggle
+        const icon = this.querySelector('svg');
+        if (menu.classList.contains('hidden')) {
+            icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>';
+        } else {
+            icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+        }
     });
-    document.getElementById('account-menu')?.addEventListener('click', function() {
-        document.getElementById('account-dropdown').classList.toggle('hidden');
-    });
+
+    // Toggle untuk dropdown akun
+    const accountMenu = document.getElementById('account-menu');
+    if (accountMenu) {
+        accountMenu.addEventListener('click', function() {
+            const dropdown = document.getElementById('account-dropdown');
+            const arrow = document.getElementById('dropdown-arrow');
+            
+            dropdown.classList.toggle('hidden');
+            dropdown.classList.toggle('scale-95');
+            dropdown.classList.toggle('opacity-0');
+            dropdown.classList.toggle('scale-100');
+            dropdown.classList.toggle('opacity-100');
+            
+            arrow.classList.toggle('rotate-180');
+        });
+        
+        // Tutup dropdown saat klik di luar
+        document.addEventListener('click', function(e) {
+            if (!accountMenu.contains(e.target) && !document.getElementById('account-dropdown').contains(e.target)) {
+                const dropdown = document.getElementById('account-dropdown');
+                const arrow = document.getElementById('dropdown-arrow');
+                
+                dropdown.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        });
+    }
 </script>

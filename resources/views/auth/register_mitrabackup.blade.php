@@ -1,4 +1,4 @@
-<section class="py-20 mt-16 bg-gray-100"> <!-- Ditambahkan mt-16 untuk memberi jarak dari navbar -->
+<section class="py-10 bg-gray-100">
     <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold text-center mb-6">Daftar Menjadi Mitra Laundry</h2>
 
@@ -35,30 +35,8 @@
                 </div>
                 
                 <div class="mt-4">
-                    <label class="block font-medium mb-2">Tentukan Lokasi Usaha</label>
-                    <div class="relative">
-                        <div id="map" class="w-full h-64 rounded-md border border-gray-300"></div>
-                        <div class="absolute top-2 right-2 bg-white p-1 rounded shadow-md z-10">
-                            <button type="button" id="locate-me" class="text-sm px-2 py-1 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                Lokasi Saya
-                            </button>
-                        </div>
-                    </div>
-                    {{-- <div class="grid grid-cols-2 gap-2 mt-2">
-                        <div>
-                            <label for="latitude" class="block text-sm font-medium">Latitude</label>
-                            <input type="text" name="latitude" id="latitude" class="w-full p-2 border rounded-md text-sm" readonly>
-                        </div>
-                        <div>
-                            <label for="longitude" class="block text-sm font-medium">Longitude</label>
-                            <input type="text" name="longitude" id="longitude" class="w-full p-2 border rounded-md text-sm" readonly>
-                        </div>
-                    </div> --}}
-                    <!-- Input hidden untuk latitude dan longitude -->
+                    <label class="block font-medium">Tentukan Lokasi Usaha</label>
+                    <div id="map" class="w-full h-64 bg-gray-200 rounded-md"></div>
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
                 </div>
@@ -135,27 +113,10 @@
     </div>
 </section>
 
+
 <!-- Tambahkan Script Leaflet.js -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<style>
-    /* Pastikan map tidak tertutup oleh navbar */
-    #map {
-        z-index: 0 !important;
-    }
-    
-    /* Tombol locate me */
-    #locate-me {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        cursor: pointer;
-    }
-    
-    #locate-me:hover {
-        background-color: #f8f9fa;
-    }
-</style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -168,46 +129,17 @@
         }).addTo(map);
 
         // Tambahkan marker yang bisa digeser (draggable)
-        var marker = L.marker(defaultLocation, { 
-            draggable: true,
-            autoPan: true
-        }).addTo(map);
+        var marker = L.marker(defaultLocation, { draggable: true }).addTo(map);
 
         // Update input saat marker dipindahkan
         marker.on('dragend', function (event) {
             var position = marker.getLatLng();
-            updatePositionInputs(position.lat, position.lng);
+            document.getElementById('latitude').value = position.lat;
+            document.getElementById('longitude').value = position.lng;
         });
 
         // Isi input dengan nilai default
-        updatePositionInputs(defaultLocation[0], defaultLocation[1]);
-
-        // Fungsi untuk update input fields
-        function updatePositionInputs(lat, lng) {
-            document.getElementById('latitude').value = lat.toFixed(6);
-            document.getElementById('longitude').value = lng.toFixed(6);
-        }
-
-        // Fitur "Lokasi Saya"
-        document.getElementById('locate-me').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var userLocation = [position.coords.latitude, position.coords.longitude];
-                    map.setView(userLocation, 15);
-                    marker.setLatLng(userLocation);
-                    updatePositionInputs(userLocation[0], userLocation[1]);
-                }, function(error) {
-                    alert('Tidak dapat mendapatkan lokasi Anda: ' + error.message);
-                });
-            } else {
-                alert('Geolocation tidak didukung oleh browser Anda.');
-            }
-        });
-
-        // Klik pada map untuk memindahkan marker
-        map.on('click', function(e) {
-            marker.setLatLng(e.latlng);
-            updatePositionInputs(e.latlng.lat, e.latlng.lng);
-        });
+        document.getElementById('latitude').value = defaultLocation[0];
+        document.getElementById('longitude').value = defaultLocation[1];
     });
 </script>

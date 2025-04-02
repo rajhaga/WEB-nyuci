@@ -40,11 +40,13 @@
             <div class="mb-4">
                 <label for="payment_method" class="block text-gray-700 font-semibold">Metode Pembayaran</label>
                 <select name="payment_method" id="payment_method" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    <option value="qris">QRIS</option>
-                    <option value="cod">Bayar di Tempat</option>
-                </select>
+                    <option value="qris" {{ old('payment_method') == 'qris' ? 'selected' : '' }}>QRIS</option>
+                    <option value="cod" {{ old('payment_method', 'cod') == 'cod' ? 'selected' : '' }}>Bayar di Tempat</option>
+                </select>                
             </div>
-            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">Pesan Sekarang</button>
+            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition relative z-10">
+                Pesan Sekarang
+            </button>
         </form>
     </div>
 </div>

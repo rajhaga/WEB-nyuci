@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\JenisPakaian;
 use App\Models\PaketPakaian;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+
 
 
 class AuthController extends Controller
@@ -20,10 +21,36 @@ class AuthController extends Controller
 
     public function home()
     {
+        $user = Auth::user();
         $jenis_pakaian = JenisPakaian::all();
         $paket_pakaian = PaketPakaian::all();
-        
-        return view('home', compact('jenis_pakaian', 'paket_pakaian'));
+        $rekomendasi = DB::table('mitras')->orderByDesc('rating')->limit(5)->get();
+        $kategoriFavorit = null;
+
+        if ($user) {
+            $kategoriFavorit = DB::table('pesanan_item as pi')
+                ->join('jenis_pakaian as jp', 'pi.item_id', '=', 'jp.id')
+                ->join('pesanan as p', 'pi.pesanan_id', '=', 'p.id')
+                ->select('pi.item_id', 'jp.nama', DB::raw('COUNT(*) as total_dipesan'))
+                ->where('p.pembeli_id', $user->id)
+                ->groupBy('pi.item_id', 'jp.nama')
+                ->orderByDesc('total_dipesan')
+                ->limit(1)
+                ->first();
+
+            if ($kategoriFavorit) {
+                $rekomendasi = DB::table('mitras as m')
+                    ->join('mitra_paket_pakaian as mp', 'm.id', '=', 'mp.mitra_id')
+                    ->join('paket_jenis_pakaian as pjp', 'mp.paket_pakaian_id', '=', 'pjp.paket_pakaian_id')
+                    ->where('pjp.jenis_pakaian_id', $kategoriFavorit->item_id)
+                    ->orderByDesc('m.rating')
+                    ->limit(5)
+                    ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating']);
+                    
+            }
+        }
+
+        return view('home', compact('jenis_pakaian', 'paket_pakaian', 'rekomendasi', 'kategoriFavorit'));
     }
 
     // Proses register pembeli

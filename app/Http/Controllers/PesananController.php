@@ -39,7 +39,7 @@ class PesananController extends Controller
     // Konfirmasi pembayaran dan ubah status ke "Diproses"
     public function konfirmasiPembayaran(Pesanan $pesanan)
     {
-        if ($pesanan->status === 'Pending') {
+        if ($pesanan->status === 'Diterima') {
             $pesanan->update(['status' => 'Diproses']);
             return redirect()->route('pesanan.index')->with('success', 'Pembayaran berhasil dikonfirmasi.');
         }

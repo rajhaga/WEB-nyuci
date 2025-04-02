@@ -20,8 +20,8 @@
             <!-- Status Pesanan -->
             <h3 class="mt-6 font-semibold">Status Pesanan</h3>
             <div class="grid grid-cols-4 gap-4 mt-2">
-                <div class="p-4 bg-yellow-100 rounded-lg">Menunggu: {{ $statusPesanan['pending'] }}</div>
-                <div class="p-4 bg-blue-100 rounded-lg">Dibayar: {{ $statusPesanan['dibayar'] }}</div>
+                <div class="p-4 bg-yellow-100 rounded-lg">Menunggu: {{ $statusPesanan['Menunggu'] }}</div>
+                <div class="p-4 bg-blue-100 rounded-lg">Diterima: {{ $statusPesanan['Diterima'] }}</div>
                 <div class="p-4 bg-orange-100 rounded-lg">Diproses: {{ $statusPesanan['diproses'] }}</div>
                 <div class="p-4 bg-green-100 rounded-lg">Selesai: {{ $statusPesanan['selesai'] }}</div>
             </div>

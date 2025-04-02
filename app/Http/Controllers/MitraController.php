@@ -33,14 +33,14 @@ public function dashboard()
         return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
     }
 
-    // Total Saldo: Sum of 'total_harga' for orders with 'status' = 'Dibayar'
+    // Total Saldo: Sum of 'total_harga' for orders with 'status' = 'Diterima'
     $totalSaldo = Pesanan::where('mitra_id', $mitra->id)
-                         ->where('status', 'Dibayar')
+                         ->where('status', 'Diterima')
                          ->sum('total_harga');
 
-    // Pendapatan Bulanan: Sum of 'total_harga' grouped by month and year for 'Dibayar' orders
+    // Pendapatan Bulanan: Sum of 'total_harga' grouped by month and year for 'Diterima' orders
     $pendapatanBulanan = Pesanan::where('mitra_id', $mitra->id)
-                                ->where('status', 'Dibayar')
+                                ->where('status', 'Diterima')
                                 ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, SUM(total_harga) as total')
                                 ->groupBy('year', 'month')
                                 ->orderBy('year', 'desc')
@@ -49,8 +49,8 @@ public function dashboard()
 
     // Status Pesanan: Count orders by each status
     $statusPesanan = [
-        'pending' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Pending')->count(),
-        'dibayar' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Dibayar')->count(),
+        'Menunggu' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Menunggu')->count(),
+        'Diterima' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Diterima')->count(),
         'diproses' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Diproses')->count(),
         'selesai' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Selesai')->count(),
     ];
@@ -64,89 +64,99 @@ public function dashboard()
 
     return view('mitra.dashboard', compact('mitra', 'totalSaldo', 'pendapatanBulanan', 'statusPesanan', 'grafikPesanan'));
 }
+
 public function kelolaPesanan()
 {
-    // Fetch orders related to the logged-in partner (mitra)
+    // Ambil data mitra berdasarkan ID pengguna yang login
     $mitra = Mitra::where('user_id', Auth::id())->first();
 
-    // If mitra not found, redirect to the home page
+    // Jika mitra tidak ditemukan, arahkan ke halaman utama
     if (!$mitra) {
         return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
     }
 
-    // Fetch orders with their status and paginate them
+    // Ambil pesanan dengan status selain "Menunggu" dan "Diproses"
     $orders = Pesanan::where('mitra_id', $mitra->id)
+                     ->whereNotIn('status', ['Menunggu', 'Diterima'])
                      ->orderBy('created_at', 'desc')
-                     ->paginate(12); // Adjust pagination as needed
+                     ->paginate(12); // Sesuaikan jumlah item per halaman
 
     return view('mitra.kelola-pesanan', compact('orders'));
 }
 
 
-    public function registerMitra(Request $request)
-    {
-        // Cek apakah user sudah login
-        if (!auth()->check()) {
-            return redirect('/login')->with('error', 'Anda harus login terlebih dahulu.');
-        }
 
-        // Validasi input
-        $request->validate([
-            'nama_pemilik' => 'required|string|max:255',
-            'nomor_hp' => 'required|string|regex:/^\d{10,15}$/',
-            'nama_laundry' => 'required|string|max:255',
-            'alamat' => 'required|string|max:255',
-            'jam_operasional' => 'required|string|max:255',
-            'layanan' => 'required|string',
-            'harga' => 'required|numeric|min:1000',
-            // 'metode_pembayaran' => 'required|string',
-            'nomor_rekening' => 'required|numeric',
-            'deskripsi' => 'required|string',
-            'foto_tempat' => 'required|image|max:2048',
-            'foto_bukti' => 'required|image|max:2048',
-            'kategori_layanan' => 'required|in:cuci,setrika,cuci dan setrika',
-            'paket_pakaian' => 'required|array',  // Menjamin bahwa paket yang dipilih adalah array
-            'paket_pakaian.*' => 'exists:paket_pakaians,id', // Memastikan ID paket yang dipilih valid
-        ]);
+public function registerMitra(Request $request)
+{
+    // Cek apakah user sudah login
+    if (!auth()->check()) {
+        return redirect('/login')->with('error', 'Anda harus login terlebih dahulu.');
+    }
 
+    // Validasi input
+    $validatedData = $request->validate([
+        'nama_pemilik' => 'required|string|max:255',
+        'nomor_hp' => 'required|string|regex:/^\d{10,15}$/',
+        'nama_laundry' => 'required|string|max:255',
+        'alamat' => 'required|string|max:255',
+        'jam_operasional' => 'required|string|max:255',
+        'harga' => 'required|numeric|min:1000',
+        'nomor_rekening' => 'required|numeric',
+        'deskripsi' => 'required|string',
+        'foto_tempat' => 'required|image|max:2048',
+        'foto_bukti' => 'required|image|max:2048',
+        'kategori_layanan' => 'required|in:cuci,setrika,cuci dan setrika',
+        'paket_pakaian' => 'required|array',
+        'paket_pakaian.*' => 'exists:paket_pakaians,id',
+        'latitude' => 'nullable|numeric|between:-90,90',
+        'longitude' => 'nullable|numeric|between:-180,180',
+    ]);
+
+    try {
         // Ambil user yang sedang login
         $user = auth()->user();
-
-        // Set status user menjadi 'pending'
         $user->update(['status' => 'pending']);
 
-        // Simpan file foto
-        $fotoTempat = $request->file('foto_tempat') ? $request->file('foto_tempat')->store('mitra', 'public') : null;
-        $fotoBukti = $request->file('foto_bukti') ? $request->file('foto_bukti')->store('mitra', 'public') : null;
+        // Simpan file foto (dengan pengecekan error)
+        try {
+            $fotoTempat = $request->file('foto_tempat')->store('mitra', 'public');
+            $fotoBukti = $request->file('foto_bukti')->store('mitra', 'public');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengunggah foto, coba lagi.');
+        }
 
-        // Simpan data mitra
+        // Simpan data mitra ke database
         $mitra = Mitra::create([
-            'user_id' => $user->id, 
-            'nama_pemilik' => $request->nama_pemilik,
-            'nomor_hp' => $request->nomor_hp,
-            'nama_laundry' => $request->nama_laundry,
-            'alamat' => $request->alamat,
-            'jam_operasional' => $request->jam_operasional,
-            'layanan' => $request->layanan,
-            'harga' => $request->harga,
-            // 'metode_pembayaran' => $request->metode_pembayaran,
-            'nomor_rekening' => $request->nomor_rekening,
-            'deskripsi' => $request->deskripsi,
+            'user_id' => $user->id,
+            'nama_pemilik' => $validatedData['nama_pemilik'],
+            'nomor_hp' => $validatedData['nomor_hp'],
+            'nama_laundry' => $validatedData['nama_laundry'],
+            'alamat' => $validatedData['alamat'],
+            'jam_operasional' => $validatedData['jam_operasional'],
+            'harga' => $validatedData['harga'],
+            'nomor_rekening' => $validatedData['nomor_rekening'],
+            'deskripsi' => $validatedData['deskripsi'],
             'foto_tempat' => $fotoTempat,
             'foto_bukti' => $fotoBukti,
-            'kategori_layanan' => $request->kategori_layanan,
-            'rating' => 0, // Default
-            'jumlah_ulasan' => 0, // Default
-            'latitude' => $request->latitude ?? null,
-            'longitude' => $request->longitude ?? null,
+            'kategori_layanan' => $validatedData['kategori_layanan'],
+            'rating' => 0,
+            'jumlah_ulasan' => 0,
+            'latitude' => $validatedData['latitude'] ?? null,
+            'longitude' => $validatedData['longitude'] ?? null,
         ]);
 
-        // Sinkronisasi jenis pakaian yang dipilih
-        // $mitra->jenisPakaian()->sync($request->jenis_pakaian);
-        $mitra->paketPakaian()->sync($request->paket_pakaian);
+        // Sinkronisasi paket pakaian
+        if (!empty($validatedData['paket_pakaian'])) {
+            $mitra->paketPakaian()->sync($validatedData['paket_pakaian']);
+        }
 
         return redirect()->route('profile')->with('success', 'Pendaftaran mitra berhasil, menunggu verifikasi.');
+
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Terjadi kesalahan, coba lagi. ' . $e->getMessage());
     }
+}
+
 
     // Fungsi untuk verifikasi mitra oleh admin
     public function verifikasi($id)
@@ -215,13 +225,13 @@ public function pembayaran()
         return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
     }
 
-    // Ambil pesanan dengan status "Belum" untuk mitra terkait
-    $pesananBelumDibayar = Pesanan::where('mitra_id', $mitra->id)
-                                  ->where('status', 'Pending')
+    // Ambil pesanan dengan status "Menunggu" dan "Diterima" untuk mitra terkait
+    $pesananBelumDiterima = Pesanan::where('mitra_id', $mitra->id)
+                                  ->whereIn('status', ['Menunggu', 'Diterima'])
                                   ->orderBy('created_at', 'desc')
                                   ->get();
 
-    return view('mitra.pembayaran', compact('pesananBelumDibayar'));
+    return view('mitra.pembayaran', compact('pesananBelumDiterima'));
 }
 
 public function showKonfirmasiPembayaran($id)
@@ -236,12 +246,33 @@ public function konfirmasiPembayaran(Request $request, $id)
 {
     $pesanan = Pesanan::findOrFail($id);
     
-    // Ubah status pesanan menjadi "Dibayar"
-    $pesanan->status = 'Dibayar';
+    // Ubah status pesanan menjadi "Diterima"
+    $pesanan->status = 'Diterima';
     $pesanan->save();
 
     // Redirect ke halaman konfirmasi pembayaran
     return redirect()->route('mitra.showKonfirmasiPembayaran', $pesanan->id);
 }
+
+public function editStatus($id)
+{
+    $order = Pesanan::with('pesananItems.jenisPakaian')->findOrFail($id);
+    return view('mitra.update-status', compact('order'));
+}
+
+public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|in:Menunggu,Diproses,Selesai',
+    ]);
+
+    $order = Pesanan::findOrFail($id);
+    $order->status = $request->status;
+    $order->save();
+
+    return redirect()->route('mitra.kelolaPesanan')->with('success', 'Status pesanan diperbarui!');
+}
+
+
 }
 

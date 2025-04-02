@@ -12,8 +12,8 @@
     <!-- Status Filter -->
     <form action="{{ route('lacak.pesanan') }}" method="GET" class="flex space-x-3 mb-6">
         <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 hover:shadow-lg transition">Semua</button>
-        <button type="submit" name="status" value="Pending" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 hover:shadow-lg transition">Pending</button>
-        <button type="submit" name="status" value="Dibayar" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 hover:shadow-lg transition">Dibayar</button>
+        <button type="submit" name="status" value="Menunggu" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 hover:shadow-lg transition">Menunggu</button>
+        <button type="submit" name="status" value="Diterima" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 hover:shadow-lg transition">Diterima</button>
         <button type="submit" name="status" value="Diproses" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 hover:shadow-lg transition">Diproses</button>
         <button type="submit" name="status" value="Selesai" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 hover:shadow-lg transition">Selesai</button>
         <button type="submit" name="status" value="Dibatalkan" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 hover:shadow-lg transition">Dibatalkan</button>
@@ -34,8 +34,9 @@
                 <p class="text-gray-700"><strong>Tanggal Pemesanan:</strong> {{ $order->created_at->format('Y-m-d') }}</p>
                 <p class="text-gray-700"><strong>Total Biaya:</strong> Rp{{ number_format($order->total_harga, 0, ',', '.') }}</p>
                 <p class="text-gray-700"><strong>Metode Pembayaran:</strong> {{ $order->metode_pembayaran ?? 'Bayar ditempat' }}</p>
-                @if($order->status == 'Dibayar')
-                    <button class="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg">Bayar</button>
+                @if($order->status == 'Diterima')
+                    {{-- <button class="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg">Bayar</button> --}}
+                    <button class="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg">Diterima</button>
                 @elseif($order->status == 'Selesai')
                     <button class="mt-4 w-full bg-green-500 text-white py-2 rounded-lg">Nilai</button>
                 @endif

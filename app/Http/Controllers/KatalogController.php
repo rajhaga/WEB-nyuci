@@ -67,55 +67,61 @@ class KatalogController extends Controller
     {
         // Validasi input metode pembayaran
         $validated = $request->validate([
-            'payment_method' => 'required|string',
+            'payment_method' => 'required|in:qris,cod',
         ]);
-    
+
         // Ambil data pesanan dari session
         $items = session('checkout_items', []);
         $totalCost = session('total_cost', 0);
-    
+
         if (empty($items)) {
             return back()->withErrors(['error' => 'Keranjang belanja kosong.']);
         }
-    
+
         // Simpan pesanan utama
         $pesanan = new Pesanan();
         $pesanan->pembeli_id = auth()->id();
         $pesanan->mitra_id = $mitra->id;
         $pesanan->total_harga = $totalCost;
-        $pesanan->status = 'Pending';
+        $pesanan->status = 'Menunggu';
         $pesanan->kode_referral = 'REF-' . strtoupper(Str::random(6));
+        $pesanan->metode_pembayaran = $validated['payment_method']; // Tambahkan metode pembayaran
         $pesanan->save();
-    
+
         // Simpan setiap item dalam pesanan
         foreach ($items as $item) {
-            // Cari ID dari `jenis_pakaian` berdasarkan nama
             $jenisPakaian = JenisPakaian::where('nama', $item['jenis'])->first();
-    
+
             if (!$jenisPakaian) {
                 return back()->withErrors(['error' => "Jenis pakaian '{$item['jenis']}' tidak ditemukan."]);
             }
-    
+
             // Simpan item pesanan
             PesananItem::create([
                 'pesanan_id' => $pesanan->id,
-                'item_id' => $jenisPakaian->id, // Pastikan menyimpan ID yang benar
+                'item_id' => $jenisPakaian->id,
                 'jumlah' => $item['quantity'],
-                'harga_total' => $item['cost'],
             ]);
         }
-    
+
         // Hapus session setelah pesanan berhasil disimpan
         session()->forget(['checkout_items', 'total_cost']);
-    
-        // Redirect ke halaman konfirmasi pesanan
-        return redirect()->route('katalog.orderConfirmation', $pesanan->id);
+        $orderCount = Pesanan::where('pembeli_id', auth()->id())->count();
+
+        // Redirect ke halaman konfirmasi pesanan dengan jumlah pesanan
+        return redirect()->route('katalog.orderConfirmation', $pesanan->id)
+            ->with('orderCount', $orderCount)
+            ->with('success', 'Pesanan berhasil dibuat!');
     }
     
 
     // Step 5: Order confirmation
     public function orderConfirmation(Pesanan $pesanan)
-    {
-        return view('katalog.orderConfirmation', compact('pesanan'));
-    }
+{
+    // Hitung jumlah pesanan yang telah dilakukan oleh pengguna
+    $orderCount = Pesanan::where('pembeli_id', $pesanan->pembeli_id)->count();
+
+    return view('katalog.orderConfirmation', compact('pesanan', 'orderCount'));
+}
+
 }

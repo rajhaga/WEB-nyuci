@@ -8,7 +8,7 @@
         <i class="fas fa-arrow-left mr-2"></i> Back
     </a>
 
-    <h3 class="text-xl font-semibold mt-6">Daftar Pengguna Pending</h3>
+    <h3 class="text-xl font-semibold mt-6">Daftar Pengguna Menunggu</h3>
 
     @if($users->isEmpty())
         <div class="bg-blue-100 text-blue-700 p-4 rounded-md mt-4">Tidak ada pengguna yang sedang menunggu verifikasi.</div>

@@ -6,8 +6,8 @@ use App\Http\Controllers\MitraController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\LaundryController;
 use App\Http\Controllers\PesananController;
+use App\Http\Controllers\RekomendasiController;
 
 
 
@@ -38,6 +38,7 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
+
 
 Route::get('/', [AuthController::class, 'home'])->name('home');
 
@@ -110,3 +111,10 @@ Route::post('/mitra/payment/confirm/{id}', [MitraController::class, 'konfirmasiP
 Route::get('/mitra/payment/confirm/{id}', [MitraController::class, 'showKonfirmasiPembayaran'])->name('mitra.showKonfirmasiPembayaran');
 Route::get('/pesanan/qris/{pesanan}', [PesananController::class, 'showQRIS'])->name('pesanan.qris');
 Route::post('/pesanan/konfirmasi/{pesanan}', [PesananController::class, 'konfirmasiPembayaran'])->name('pesanan.konfirmasi');
+
+Route::get('/mitra/pesanan/{id}/update-status', [MitraController::class, 'editStatus'])->name('mitra.editStatus');
+Route::post('/mitra/pesanan/{id}/update-status', [MitraController::class, 'updateStatus'])->name('mitra.updateStatus');
+
+use App\Http\Controllers\ContactController;
+Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
