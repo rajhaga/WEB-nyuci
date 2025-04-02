@@ -1,4 +1,4 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app')
 
 @section('title', 'Nyuci - Home')
 
@@ -124,4 +124,4 @@
         });
     });
 </script>
-@endpush
+@endpush --}}
