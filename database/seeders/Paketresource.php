@@ -4,7 +4,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class PaketItemSeeder extends Seeder
+class Paketresource extends Seeder
 {
     /**
      * Run the database seeds.
