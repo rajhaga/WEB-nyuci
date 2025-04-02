@@ -7,8 +7,8 @@
     <title>@yield('title', 'Nyuci - Home')</title>
 
     <!-- Tailwind CSS -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    {{-- @vite('resources/css/app.css') --}}
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+    @vite('resources/css/app.css')
 
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
