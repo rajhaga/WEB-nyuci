@@ -134,6 +134,8 @@
     <title>Document</title>
 </head>
 <body>
-    <h3>Terpercaya</h3>
+    <i class="fas fa-bicycle text-5xl mb-4"></i>
+    <h3 class="text-xl font-semibold">Antar-Jemput</h3>
+    <p class="text-gray-600">Kenyamanan layanan ojek siap antar-jemput cucian Anda.</p>
 </body>
 </html>
