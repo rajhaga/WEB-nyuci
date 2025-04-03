@@ -3,7 +3,7 @@
 @section('title', 'Nyuci - Home')
 
 @section('content')
-    <!-- Hero Section -->
+    {{-- <!-- Hero Section -->
     <section class="text-center py-16 bg-gray-100">
         <div class="container mx-auto px-4">
             <h1 class="text-4xl font-bold">Laundry Pakaian di Nyuci</h1>
@@ -67,9 +67,9 @@
                     </a>
                 </div>
             @endforeach
-        @else
+        @else --}}
             <p class="text-center text-gray-500">Belum ada rekomendasi.</p>
-        @endif
+        {{-- @endif
 
     </section>
     
@@ -99,7 +99,7 @@
     </section>
 
     <!-- Mitra Registration Section -->
-    @include('auth.register_mitra')
+    @include('auth.register_mitra') --}}
 
 @endsection
 
