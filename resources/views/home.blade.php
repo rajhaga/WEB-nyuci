@@ -1,4 +1,4 @@
-{{-- @extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Nyuci - Home')
 
@@ -123,25 +123,4 @@
         });
     });
 </script>
-@endpush --}}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    @vite('resources/css/app.css')
-</head>
-<body>
-    <section class="text-center py-16 bg-gray-100">
-        <div class="container mx-auto px-4">
-            <h1 class="text-4xl font-bold">Laundry Pakaian di Nyuci</h1>
-            <p class="text-lg text-gray-600">Pakaian Bersih dan Segar!</p>
-            <p class="mt-4 text-gray-500">Nikmati layanan laundry cepat, berkualitas, dan terpercaya. Kami siap mencuci, mengeringkan, dan merapikan pakaian Anda dengan hasil terbaik. Pesan sekarang dan rasakan kemudahan tanpa harus repot!</p>
-            <a href="/packages" class="mt-6 inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg">Mulai Layanan Kami</a>
-        </div>
-    </section>
-</body>
-</html>
+@endpush
