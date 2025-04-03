@@ -1,8 +1,8 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app')
 
 @section('title', 'Nyuci - Home')
 
-@section('content')
+@section('content') --}}
     {{-- <!-- Hero Section -->
     <section class="text-center py-16 bg-gray-100">
         <div class="container mx-auto px-4">
@@ -100,7 +100,7 @@
 
     <!-- Mitra Registration Section -->
     @include('auth.register_mitra') --}}
-
+{{-- 
 @endsection
 
 
@@ -124,4 +124,4 @@
         });
     });
 </script>
-@endpush
+@endpush --}}
