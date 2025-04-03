@@ -1,4 +1,4 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app')
 
 @section('title', 'Nyuci - Home')
 
@@ -12,7 +12,7 @@
             <a href="/packages" class="mt-6 inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg">Mulai Layanan Kami</a>
         </div>
     </section>
-{{-- 
+
     <!-- Features Section -->
     <section class="py-16">
         <div class="container mx-auto px-4 text-center">
@@ -98,11 +98,11 @@
     </section>
 
     <!-- Mitra Registration Section -->
-    @include('auth.register_mitra') --}}
+    @include('auth.register_mitra')
 
 @endsection
 
-{{-- 
+
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -124,3 +124,16 @@
     });
 </script>
 @endpush --}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h3>Terpercaya</h3>
+</body>
+</html>
