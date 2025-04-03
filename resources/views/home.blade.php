@@ -1,9 +1,9 @@
-{{-- @extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Nyuci - Home')
 
-@section('content') --}}
-    {{-- <!-- Hero Section -->
+@section('content')
+    <!-- Hero Section -->
     <section class="text-center py-16 bg-gray-100">
         <div class="container mx-auto px-4">
             <h1 class="text-4xl font-bold">Laundry Pakaian di Nyuci</h1>
@@ -12,7 +12,7 @@
             <a href="/packages" class="mt-6 inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg">Mulai Layanan Kami</a>
         </div>
     </section>
-
+{{-- 
     <!-- Features Section -->
     <section class="py-16">
         <div class="container mx-auto px-4 text-center">
@@ -67,12 +67,11 @@
                     </a>
                 </div>
             @endforeach
-        @else --}}
+        @else
             <p class="text-center text-gray-500">Belum ada rekomendasi.</p>
-        {{-- @endif
+        @endif
 
     </section>
-    
     
     <!-- Why Choose Nyuci Section -->
     <section class="py-16">
@@ -100,10 +99,10 @@
 
     <!-- Mitra Registration Section -->
     @include('auth.register_mitra') --}}
-{{-- 
+
 @endsection
 
-
+{{-- 
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
