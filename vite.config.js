@@ -70,6 +70,7 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash][extname]',
         entryFileNames: 'assets/[name]-[hash].js'
       }
+      
     }
   }
 });
@@ -92,3 +93,4 @@ export default defineConfig({
 //     emptyOutDir: true,
 //   }
 // });
+
