@@ -7,41 +7,44 @@ use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
+    // Menampilkan FORM ke user
     public function index()
     {
-        return view('emails.contact');
+        return view('emails.contact'); // resources/views/contact.blade.php
     }
     
-
+    // Mengirim EMAIL
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'Name' => 'required|string|max:255',
-        'Email' => 'required|email|max:255',
-        'Phone' => 'nullable|string|max:20',
-        'message' => 'required|string',
-    ]);
+    {
+        $validated = $request->validate([
+            'Name' => 'required|string|max:255',
+            'Email' => 'required|email|max:255',
+            'Phone' => 'nullable|string|max:20',
+            'message' => 'required|string',
+        ]);
 
-    try {
-        $data = [
-            'name' => $validated['Name'],
-            'email' => $validated['Email'],
-            'phone' => $validated['Phone'] ?? null,
-            'message' => $validated['message']
-        ];
+        try {
+            $data = [
+                'name' => $validated['Name'],
+                'email' => $validated['Email'],
+                'phone' => $validated['Phone'] ?? 'Tidak dicantumkan',
+                'messageContent' => $validated['message'] // Hindari nama 'message'
+            ];
 
-        Mail::send('emails.contact-form', $data, function($message) use ($data) {
-            $message->to('rajsee200478@gmail.com')
-                    ->subject('Pesan Baru dari Kontak')
-                    ->replyTo($data['email']);
-        });
+            // Menggunakan template EMAIL: resources/views/emails/contact-form.blade.php
+            Mail::send('emails.contact-form', $data, function($message) use ($data) {
+                $message->to('rajsee200478@gmail.com')
+                        ->subject('Pesan Baru dari Website')
+                        ->replyTo($data['email']);
+            });
 
-        return redirect()->view("contact-form.blade.php")
-               ->with('success', 'Pesan berhasil dikirim!');
+            return redirect()->route('contact.index')
+                   ->with('success', 'Pesan berhasil dikirim!');
 
-    } catch (\Exception $e) {
-        Log::error('Email error: '.$e->getMessage());
-        return back()->withInput()->with('error', 'Gagal mengirim pesan. Silakan coba lagi.');
+        } catch (\Exception $e) {
+            Log::error('Email error: '.$e->getMessage());
+            return back()->withInput()
+                         ->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+        }
     }
-}
 }
