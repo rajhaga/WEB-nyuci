@@ -11,6 +11,7 @@ class ContactController extends Controller
     {
         return view('emails.contact');
     }
+    
 
     public function store(Request $request)
 {
@@ -29,13 +30,13 @@ class ContactController extends Controller
             'message' => $validated['message']
         ];
 
-        Mail::send('emails.contact', $data, function($message) use ($data) {
+        Mail::send('emails.contact-form', $data, function($message) use ($data) {
             $message->to('rajsee200478@gmail.com')
                     ->subject('Pesan Baru dari Kontak')
                     ->replyTo($data['email']);
         });
 
-        return redirect()->route('contact.index')
+        return redirect()->view("contact-form.blade.php")
                ->with('success', 'Pesan berhasil dikirim!');
 
     } catch (\Exception $e) {

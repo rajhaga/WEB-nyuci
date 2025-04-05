@@ -8,12 +8,6 @@
 
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    {{-- @vite(['resources/css/app.css']) --}}
-
-    {{-- @vite('resources/css/app.css') --}}
-    {{-- <link href="{{ mix('/build/assets/app.css') }}" rel="stylesheet">
-    <script src="{{ mix('/build/assets/app.js') }}" defer></script> --}}
-    <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-100">
