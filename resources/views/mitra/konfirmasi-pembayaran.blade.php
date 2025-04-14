@@ -43,14 +43,21 @@
             <p class="text-xl font-bold">Total Pembayaran: Rp{{ number_format($pesanan->total_harga + 8000, 0, ',', '.') }}</p>
         </div>
 
-        <div class="mt-6 text-center">
+        {{-- <div class="mt-6 text-center">
             <a href="{{ route('pesanan.qris', ['pesanan' => $pesanan->id]) }}" 
                target="_blank" 
                class="bg-blue-600 text-white px-6 py-2 rounded">
                 KONFIRMASI PEMBAYARAN
             </a>
-        </div>
+        </div> --}}
         
+        <div class="mt-6 text-center">
+            <a href="{{ route('pesanan.qris', $pesanan) }}" 
+               target="_blank"
+               class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                LIHAT QRIS PEMBAYARAN
+            </a>
+        </div>
     </div>
 </div>
 @endsection

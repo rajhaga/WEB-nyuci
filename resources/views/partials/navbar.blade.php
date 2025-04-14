@@ -2,7 +2,7 @@
     <div class="container mx-auto flex justify-between items-center">
         <!-- Logo untuk semua device -->
         <a class="flex items-center text-xl font-bold" href="/">
-            <img src="{{ asset('images/logo.png') }}" alt="Nyuci Logo" class="w-10 h-10 mr-2"> 
+            <img src="{{ asset('assets/images/logo.png') }}" alt="Nyuci Logo" class="h-10 mr-2"> 
             <span class="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">Nyuci</span>
         </a>
 

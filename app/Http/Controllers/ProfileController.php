@@ -5,7 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-
+use App\Models\Pesanan;
+use Illuminate\Support\Facades\Storage;
 class ProfileController extends Controller
 {
     // Menampilkan halaman profil
@@ -31,23 +32,45 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        // Validasi input
         $request->validate([
-            'username' => 'required|string|min:3|max:20|unique:users,username,' . $user->id,
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:6|confirmed', // Opsional, hanya jika ingin update password
+            'nama' => 'required|string|max:255',  // Changed from 'name' to 'nama'
+            'email' => 'required|email|unique:pengguna,email,' . $user->id,  // Changed table name to 'pengguna'
+            'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|confirmed|min:6',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $data = [
-            'username' => $request->username,
-            'email' => $request->email,
-        ];
+        // Update data dasar
+        $user->nama = $request->nama;  // Changed from 'name' to 'nama'
+        $user->email = $request->email;
+        $user->phone = $request->phone;
 
+        // Ganti password jika diisi
         if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+            $user->password = Hash::make($request->password);
         }
 
-        $user->update($data);
+        // Upload foto jika ada
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama jika ada
+            if ($user->photo) {
+                Storage::disk('public')->delete($user->photo);
+            }
 
-        return redirect('/profile')->with('success', 'Profile updated successfully!');
+            $path = $request->file('photo')->store('profile_photos', 'public');
+            $user->photo = $path;
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
+    }
+    public function history()
+    {
+        $user = Auth::user();
+        $pesanans = Pesanan::where('pembeli_id', $user->id)->with('items')->get();
+
+        return view('order_history', compact('pesanans'));
     }
 }

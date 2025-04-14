@@ -7,9 +7,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PesananController;
-use App\Http\Controllers\RekomendasiController;
-
-
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\KatalogController;
+use Midtrans\Config;
+use Midtrans\Transaction; // Untuk cek status
+use Midtrans\CoreApi; // Untuk buat transaksi
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,7 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/register/mitra', [MitraController::class, 'showRegisterMitraForm'])->name('register.mitra');
     Route::post('/register/mitra', [MitraController::class, 'registerMitra']);
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 
@@ -94,7 +97,6 @@ Route::get('/mitra/dashboard', [MitraController::class, 'dashboard'])->name('mit
 // // Route::get('/checkout/{mitraId}/{pesananId}', [PesananController::class, 'showCheckout'])->name('laundry.ShowCheckout');
 // Route::post('/laundry/order/{mitraId}', [PesananController::class, 'storeAndCheckout'])->name('laundry.storeAndCheckout');
 
-use App\Http\Controllers\KatalogController;
 
 Route::get('katalog', [KatalogController::class, 'index'])->name('katalog.index'); // Display catalog (Step 1)
 Route::get('katalog/{mitra}/detail', [KatalogController::class, 'showKatalogDetail'])->name('katalog.detail'); // Show laundry details (Step 2)
@@ -109,12 +111,31 @@ Route::get('kelola-pesanan', [MitraController::class, 'kelolaPesanan'])->name('m
 Route::get('/mitra/payment', [MitraController::class, 'pembayaran'])->name('mitra.pembayaran');
 Route::post('/mitra/payment/confirm/{id}', [MitraController::class, 'konfirmasiPembayaran'])->name('mitra.konfirmasiPembayaran');
 Route::get('/mitra/payment/confirm/{id}', [MitraController::class, 'showKonfirmasiPembayaran'])->name('mitra.showKonfirmasiPembayaran');
-Route::get('/pesanan/qris/{pesanan}', [PesananController::class, 'showQRIS'])->name('pesanan.qris');
-Route::post('/pesanan/konfirmasi/{pesanan}', [PesananController::class, 'konfirmasiPembayaran'])->name('pesanan.konfirmasi');
+
+
 
 Route::get('/mitra/pesanan/{id}/update-status', [MitraController::class, 'editStatus'])->name('mitra.editStatus');
 Route::post('/mitra/pesanan/{id}/update-status', [MitraController::class, 'updateStatus'])->name('mitra.updateStatus');
-
-use App\Http\Controllers\ContactController;
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+// routes/web.php
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pesanan/{pesanan}/qris', [PesananController::class, 'showQRIS'])
+         ->name('pesanan.qris');
+    Route::post('/pesanan/{pesanan}/konfirmasi', [PesananController::class, 'konfirmasiPembayaran'])
+         ->name('pesanan.konfirmasi');
+});
+
+// routes/api.php
+Route::post('midtrans-callback', [PesananController::class, 'handleWebhook'])
+     ->middleware('verify.midtrans');
+    
+ Route::get('/order-history', [ProfileController::class, 'history'])->name('order.history');
+
+// // Route::get('/pesanan/qris/{pesanan}', [PesananController::class, 'showQRIS'])->name('pesanan.qris');
+// Route::get('/pesanan/{pesanan}/qris', [PesananController::class, 'showQRIS'])
+// ->name('pesanan.qris');
+// // Route::post('/pesanan/konfirmasi/{pesanan}', [PesananController::class, 'konfirmasiPembayaran'])->name('pesanan.konfirmasi');
+// Route::post('/pesanan/{pesanan}/konfirmasi', [PesananController::class, 'konfirmasiPembayaran'])
+// ->name('pesanan.konfirmasi');

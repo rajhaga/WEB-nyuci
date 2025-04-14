@@ -10,8 +10,19 @@ class Pesanan extends Model
 
     protected $table = 'pesanan';  // Explicitly set the table name
 
-    protected $fillable = ['pembeli_id', 'mitra_id', 'total_harga', 'status', 'kode_referral'];
-
+    protected $fillable = [
+        'pembeli_id',
+        'mitra_id',
+        'total_harga',
+        'status',
+        'kode_referral',
+        'midtrans_order_id',
+        'midtrans_transaction_id',
+        'qris_image',
+        'payment_notified',
+        'paid_at'
+    ];
+    
     // Tambahkan relasi ke PesananItem
     public function items()
     {

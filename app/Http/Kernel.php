@@ -67,6 +67,7 @@ class Kernel extends HttpKernel
     ];
     protected $routeMiddleware = [
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'verify.midtrans' => \App\Http\Middleware\VerifyMidtransSignature::class,
     ];
     
 }
