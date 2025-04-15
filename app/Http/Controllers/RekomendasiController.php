@@ -56,4 +56,59 @@ class RekomendasiController extends Controller
         // Pastikan data dikirim ke view
         return view('home', compact('rekomendasi', 'kategoriFavorit'));
     }
+
+    public function rekomendasiLaundry(Request $request)
+{
+    $request->validate([
+        'lat' => 'required|numeric',   // Latitude pengguna
+        'lng' => 'required|numeric',   // Longitude pengguna
+        'radius' => 'sometimes|numeric|min:1|max:50' // Radius pencarian (dalam km), default 50
+    ]);
+
+    $lat = $request->lat;
+    $lng = $request->lng;
+    $radius = $request->radius ?? 50; // Defaultkan radius 50 km jika tidak diberikan
+
+    // Query untuk mengambil laundries dalam radius tertentu
+    $laundries = Mitra::selectRaw(
+        "id, nama_laundry, alamat, foto_tempat, harga, rating, latitude, longitude, 
+        ( 6371 * acos( cos( radians(?) ) * 
+          cos( radians( latitude ) ) * 
+          cos( radians( longitude ) - radians(?) ) + 
+          sin( radians(?) ) * 
+          sin( radians( latitude ) ) ) ) AS distance",
+        [$lat, $lng, $lat]
+    )
+    ->having('distance', '<', $radius)  // Filter berdasarkan radius
+    ->orderBy('distance')  // Urutkan berdasarkan jarak terdekat
+    ->get();
+
+    // Format data to only show necessary attributes
+    $laundries = $laundries->map(function ($laundry) {
+        return [
+            'id' => $laundry->id,
+            'nama_laundry' => $laundry->nama_laundry,
+            'alamat' => $laundry->alamat,
+            'foto_tempat' => $laundry->foto_tempat,
+            'harga' => $laundry->harga,
+            'rating' => $laundry->rating,
+            'latitude' => $laundry->latitude,
+            'longitude' => $laundry->longitude,
+            'distance' => round($laundry->distance, 2) . ' km',
+        ];
+    });
+
+    // dd($laundries); // Uncomment if needed to debug
+
+    // Return the formatted data as JSON
+    return response()->json([
+        'success' => true,
+        'data' => $laundries,
+        'current_location' => [
+            'lat' => $lat,
+            'lng' => $lng
+        ]
+    ]);
+}
+
 }

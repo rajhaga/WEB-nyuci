@@ -10,6 +10,14 @@
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     @vite(['resources/css/app.css'])
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body class="bg-gray-100">
     @include('partials.navbar')
@@ -57,6 +65,8 @@
                 }
             }, 5000);
         });
+
+        
     </script>
 </body>
 
