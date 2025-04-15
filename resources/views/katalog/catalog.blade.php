@@ -1,57 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex">
-    {{-- Sidebar Filter --}}
-    <div class="w-1/5 p-6 border-r bg-gray-50">
-        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-            <i class="fas fa-filter text-blue-600"></i> Filter
-        </h2>
+{{-- <form method="GET" action="{{ route('catalog') }}">
+    <div class="container">
+        <h1 class="my-4">Katalog Laundry Mitra</h1>
 
-        {{-- Filter Kategori --}}
-        <form method="GET" action="{{ route('catalog') }}">
-            <h3 class="text-sm font-semibold text-gray-700 mb-2">Kategori Layanan</h3>
-            <select name="kategori_layanan" class="w-full mb-4 text-sm p-2 border rounded-md" onchange="this.form.submit()">
-                <option value="semua" {{ request('kategori_layanan') == 'semua' ? 'selected' : '' }}>Semua</option>
+        <!-- Filter Kategori -->
+        <div class="mb-4">
+            <label for="filterKategori">Filter Kategori:</label>
+            <select name="kategori_layanan" id="filterKategori" class="form-control" onchange="this.form.submit()">
+                <option value="semua" {{ request('kategori_layanan') == 'semua' ? 'selected' : '' }}>Semua Kategori</option>
                 <option value="cuci" {{ request('kategori_layanan') == 'cuci' ? 'selected' : '' }}>Cuci</option>
                 <option value="setrika" {{ request('kategori_layanan') == 'setrika' ? 'selected' : '' }}>Setrika</option>
                 <option value="cuci dan setrika" {{ request('kategori_layanan') == 'cuci dan setrika' ? 'selected' : '' }}>Cuci dan Setrika</option>
             </select>
-        </form>
-
-        {{-- Checkbox (Dummy/Optional Future Feature) --}}
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Tipe Toko</h3>
-        <div class="space-y-2 text-sm text-gray-600">
-            <label><input type="checkbox" disabled> Semua</label><br>
-            <label><input type="checkbox" disabled> Terdekat</label>
         </div>
-    </div>
 
-    {{-- Konten Utama --}}
-    <div class="w-4/5 p-6">
-        {{-- Filter Tab Paket --}}
-        <form method="GET" action="{{ route('catalog') }}" class="mb-6">
-            <input type="hidden" name="kategori_layanan" value="{{ request('kategori_layanan') }}">
-            <div class="flex flex-wrap items-center gap-2">
-                <button name="paket_layanan" value="semua" class="px-3 py-1 rounded-md text-sm border {{ request('paket_layanan') == 'semua' ? 'bg-blue-600 text-white' : 'text-gray-700 border-gray-300' }}">
-                    Semua
-                </button>
-                <button name="paket_layanan" value="1" class="px-3 py-1 rounded-md text-sm border {{ request('paket_layanan') == '1' ? 'bg-blue-600 text-white' : 'text-gray-700 border-gray-300' }}">
-                    Paket Pakaian
-                </button>
-                <button name="paket_layanan" value="2" class="px-3 py-1 rounded-md text-sm border {{ request('paket_layanan') == '2' ? 'bg-blue-600 text-white' : 'text-gray-700 border-gray-300' }}">
-                    Paket Rumah Tangga & Hotel
-                </button>
-                <button name="paket_layanan" value="3" class="px-3 py-1 rounded-md text-sm border {{ request('paket_layanan') == '3' ? 'bg-blue-600 text-white' : 'text-gray-700 border-gray-300' }}">
-                    Paket Sepatu & Aksesoris
-                </button>
-            </div>
-        </form>
+        <!-- Filter Paket Layanan -->
+        <div class="mb-4">
+            <label for="filterPaket">Filter Paket Layanan:</label>
+            <select name="paket_layanan" id="filterPaket" class="form-control" onchange="this.form.submit()">
+                <option value="semua" {{ request('paket_layanan') == 'semua' ? 'selected' : '' }}>Semua Paket</option>
+                <option value="1" {{ request('paket_layanan') == '1' ? 'selected' : '' }}>Paket Pakaian</option>
+                <option value="2" {{ request('paket_layanan') == '2' ? 'selected' : '' }}>Paket Rumah Tangga</option>
+                <option value="3" {{ request('paket_layanan') == '3' ? 'selected' : '' }}>Paket Sepatu & Aksesoris</option>
+            </select>
+        </div>
 
-        <h2 class="text-lg font-bold text-blue-700 mb-4">Rekomendasi Tempat Laundry</h2>
-
-        {{-- Daftar Mitra --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Daftar Laundry Mitra -->
+        <div class="row">
             @foreach($mitras as $mitra)
                 <div class="bg-white border rounded-lg shadow-sm overflow-hidden">
                     <img src="{{ asset('storage/' . $mitra->foto_tempat) }}" alt="{{ $mitra->nama_laundry }}" class="w-full h-48 object-cover">
@@ -78,11 +55,58 @@
                 </div>
             @endforeach
         </div>
+    </div>
+</form> --}}
 
-        {{-- Pagination --}}
-        {{-- <div class="mt-8 flex justify-center items-center gap-2">
-            {{ $mitras->withQueryString()->links() }}
-        </div> --}}
+<div class="container mx-auto px-4">
+    <h1 class="text-2xl font-bold text-center mb-6">Katalog Laundry Mitra</h1>
+    
+    <form method="GET" action="{{ route('catalog') }}" class="space-y-4 mb-6">
+        <div>
+            <label for="filterKategori" class="block text-sm font-medium text-gray-700">Filter Kategori:</label>
+            <select name="kategori_layanan" id="filterKategori" class="w-full p-2 border rounded-md" onchange="this.form.submit()">
+                <option value="semua" {{ request('kategori_layanan') == 'semua' ? 'selected' : '' }}>Semua Kategori</option>
+                <option value="cuci" {{ request('kategori_layanan') == 'cuci' ? 'selected' : '' }}>Cuci</option>
+                <option value="setrika" {{ request('kategori_layanan') == 'setrika' ? 'selected' : '' }}>Setrika</option>
+                <option value="cuci dan setrika" {{ request('kategori_layanan') == 'cuci dan setrika' ? 'selected' : '' }}>Cuci dan Setrika</option>
+            </select>
+        </div>
+        <div>
+            <label for="filterPaket" class="block text-sm font-medium text-gray-700">Filter Paket Layanan:</label>
+            <select name="paket_layanan" id="filterPaket" class="w-full p-2 border rounded-md" onchange="this.form.submit()">
+                <option value="semua" {{ request('paket_layanan') == 'semua' ? 'selected' : '' }}>Semua Paket</option>
+                <option value="1" {{ request('paket_layanan') == '1' ? 'selected' : '' }}>Paket Pakaian</option>
+                <option value="2" {{ request('paket_layanan') == '2' ? 'selected' : '' }}>Paket Rumah Tangga</option>
+                <option value="3" {{ request('paket_layanan') == '3' ? 'selected' : '' }}>Paket Sepatu & Aksesoris</option>
+            </select>
+        </div>
+    </form>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($mitras as $mitra)
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img src="{{ asset('storage/' . $mitra->foto_tempat) }}" class="w-full h-48 object-cover" alt="{{ $mitra->nama_laundry }}">
+                <div class="p-4">
+                    <h5 class="text-lg font-semibold">{{ $mitra->nama_laundry }}</h5>
+                    <p class="text-gray-600 text-sm">{{ $mitra->deskripsi }}</p>
+                    <p class="text-blue-600 font-bold mt-2">Harga mulai dari: Rp{{ number_format($mitra->harga, 0, ',', '.') }}</p>
+                    
+                    <h6 class="text-sm font-semibold mt-3">Paket Pakaian dan Jenis Pakaian:</h6>
+                    @foreach($mitra->paketPakaian as $paket)
+                        <div class="mt-2">
+                            <h6 class="text-sm font-medium">{{ $paket->nama }}</h6>
+                            <ul class="list-disc pl-5 text-sm text-gray-600">
+                                @foreach($paket->jenisPakaian as $jenis)
+                                    <li>{{ $jenis->nama }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endforeach
+                    
+                    <a href="{{ route('katalog.detail', $mitra->id) }}" class="block text-center mt-4 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">Lihat Detail</a>
+                </div>
+            </div>
+        @endforeach
     </div>
 </div>
 @endsection
