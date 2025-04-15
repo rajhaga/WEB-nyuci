@@ -118,7 +118,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<script>
+{{-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         var defaultLocation = [-6.200000, 106.816666]; // Jakarta sebagai lokasi default
         var map = L.map('map').setView(defaultLocation, 13);
@@ -142,4 +142,4 @@
         document.getElementById('latitude').value = defaultLocation[0];
         document.getElementById('longitude').value = defaultLocation[1];
     });
-</script>
+</script> --}}

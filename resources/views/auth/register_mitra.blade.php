@@ -210,4 +210,5 @@
             updatePositionInputs(e.latlng.lat, e.latlng.lng);
         });
     });
+    
 </script>

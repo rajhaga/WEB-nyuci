@@ -9,10 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\KatalogController;
-use Midtrans\Config;
-use Midtrans\Transaction; // Untuk cek status
-use Midtrans\CoreApi; // Untuk buat transaksi
-use Symfony\Component\HttpKernel\Profiler\Profile;
+use App\Http\Controllers\RekomendasiController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -132,6 +130,7 @@ Route::post('midtrans-callback', [PesananController::class, 'handleWebhook'])
      ->middleware('verify.midtrans');
     
  Route::get('/order-history', [ProfileController::class, 'history'])->name('order.history');
+ Route::get('/laundry/nearby', [RekomendasiController::class, 'rekomendasiLaundry']);
 
 // // Route::get('/pesanan/qris/{pesanan}', [PesananController::class, 'showQRIS'])->name('pesanan.qris');
 // Route::get('/pesanan/{pesanan}/qris', [PesananController::class, 'showQRIS'])

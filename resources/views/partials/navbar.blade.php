@@ -47,7 +47,7 @@
                 <!-- Profile -->
                 <div class="relative">
                     <button id="account-menu" class="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100 transition-all duration-300 focus:outline-none">
-                        <img src="{{ Auth::user()->profile_image ?? asset('images/default-avatar.png') }}" alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-blue-100">
+                        <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://via.placeholder.com/40' }}" alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-blue-100">
                         <span class="font-medium text-gray-700">{{ Auth::user()->nama }}</span>
                         <svg class="w-4 h-4 text-gray-500 transition-transform duration-200" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
