@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-100">
     <!-- Navbar -->
-    <nav class="bg-gray-800 text-white p-4">
+    <nav class="bg-gray-800 text-white p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <a class="text-xl font-bold" href="/">Nyuci</a>
             <div class="relative">
@@ -20,8 +20,8 @@
                     </svg>
                 </button>
                 <ul id="dropdown-menu" class="absolute right-0 mt-2 bg-white text-black rounded shadow-md hidden">
-                    <li><a class="block px-4 py-2 hover:bg-gray-200" href="/profile">Profile</a></li>
-                    <li><a class="block px-4 py-2 hover:bg-gray-200" href="/logout">Logout</a></li>
+                    <li><a class="block px-4 py-2 hover:bg-gray-200 transition duration-200" href="/profile">Profile</a></li>
+                    <li><a class="block px-4 py-2 hover:bg-gray-200 transition duration-200" href="/logout">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -30,19 +30,21 @@
     <!-- Dashboard -->
     <div class="container mx-auto mt-6 flex">
         <!-- Sidebar -->
-        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-md">
-            <nav class="space-y-2">
-                <a href="/mitra/dashboard" class="block p-2 bg-blue-500 text-white rounded">Dashboard</a>
-                <a href="{{ route('mitra.kelolaPesanan') }}" class="block p-2 hover:bg-gray-200 rounded">Kelola Pesanan</a>
-                <a href="/mitra/payment" class="block p-2 hover:bg-gray-200 rounded">Pembayaran</a>
-                <a href="/mitra/reports" class="block p-2 hover:bg-gray-200 rounded">Laporan</a>
-                <a href="/mitra/settings" class="block p-2 hover:bg-gray-200 rounded">Pengaturan</a>
+        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-md space-y-2">
+            <nav>
+                <a href="/mitra/dashboard" class="block p-3 rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition duration-300">Dashboard</a>
+                <a href="{{ route('mitra.kelolaPesanan') }}" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Kelola Pesanan</a>
+                <a href="/mitra/payment" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Pembayaran</a>
+                <a href="/mitra/reports" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Laporan</a>
+                <a href="/mitra/settings" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Pengaturan</a>
             </nav>
         </aside>
+
+        <!-- Main Content -->
         <main class="w-3/4 ml-6 bg-white p-6 rounded-lg shadow-md">
             <h2 class="text-xl font-semibold mb-4">Dashboard Mitra</h2>
-        @yield('mitracontent')
-
+            @yield('mitracontent')
+        </main>
     </div>
 
     <!-- Footer -->
@@ -50,7 +52,12 @@
         <p>&copy; 2023 Nyuci. All rights reserved.</p>
     </footer>
 
-    </main>
-</div>   
+    <script>
+        // Toggle Dropdown Menu
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdown-menu');
+            dropdown.classList.toggle('hidden');
+        }
+    </script>
 </body>
 </html>

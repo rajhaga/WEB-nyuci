@@ -10,6 +10,8 @@ use App\Http\Controllers\PesananController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\RekomendasiController;
+use App\Http\Controllers\UlasanController;
+
 
 
 /*
@@ -54,9 +56,6 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 
 
-// Route::get('/checkout/{mitraId}', [PesananController::class, 'showCheckout'])->name('checkout');
-// Route::post('/laundry/order/{mitraId}', [PesananController::class, 'placeOrder'])->name('laundry.placeOrder');
-
 Route::middleware(['auth'])->group(function () {
     // Register Mitra Route
     Route::post('/mitra/register', [MitraController::class, 'registerMitra'])->name('mitra.register');
@@ -74,12 +73,6 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/catalog', [MitraController::class, 'catalog'])->name('catalog');
 
 
-// Route::get('/laundry/{id}', [LaundryController::class, 'showDetail'])->name('laundry.detail');
-
-// Route::post('/laundry/order/{mitraId}', [PesananController::class, 'store'])->name('laundry.order');
-// Route::post('/laundry/order/{mitraId}', [PesananController::class, 'placeOrder'])->name('laundry.order');
-
-
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/approve/{id}', [AdminController::class, 'approveUser'])->name('admin.approve');
     Route::get('admin/reject/{id}', [AdminController::class, 'rejectUser'])->name('admin.reject');
@@ -90,10 +83,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
    
 Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 Route::get('/mitra/dashboard', [MitraController::class, 'dashboard'])->name('mitra.dashboard');
-// Route::put('/mitra/jenis-pakaian/{id}/update-price', [MitraController::class, 'updatePrice'])->name('mitra.updatePrice');
-// // Route::post('/laundry/order/{mitraId}', [PesananController::class, 'store'])->name('laundry.order');
-// // Route::get('/checkout/{mitraId}/{pesananId}', [PesananController::class, 'showCheckout'])->name('laundry.ShowCheckout');
-// Route::post('/laundry/order/{mitraId}', [PesananController::class, 'storeAndCheckout'])->name('laundry.storeAndCheckout');
 
 
 Route::get('katalog', [KatalogController::class, 'index'])->name('katalog.index'); // Display catalog (Step 1)
@@ -131,10 +120,14 @@ Route::post('midtrans-callback', [PesananController::class, 'handleWebhook'])
     
  Route::get('/order-history', [ProfileController::class, 'history'])->name('order.history');
  Route::get('/laundry/nearby', [RekomendasiController::class, 'rekomendasiLaundry']);
+ Route::get('/pesanan/{pesanan}/cod', [PesananController::class, 'showCOD'])
+     ->name('pesanan.cod');
 
-// // Route::get('/pesanan/qris/{pesanan}', [PesananController::class, 'showQRIS'])->name('pesanan.qris');
-// Route::get('/pesanan/{pesanan}/qris', [PesananController::class, 'showQRIS'])
-// ->name('pesanan.qris');
-// // Route::post('/pesanan/konfirmasi/{pesanan}', [PesananController::class, 'konfirmasiPembayaran'])->name('pesanan.konfirmasi');
-// Route::post('/pesanan/{pesanan}/konfirmasi', [PesananController::class, 'konfirmasiPembayaran'])
-// ->name('pesanan.konfirmasi');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pesanan/{pesanan}/ulas', [UlasanController::class, 'showReviewForm'])->name('pesanan.ulasan');
+    Route::post('/pesanan/{pesanan}/ulas', [UlasanController::class, 'storeReview']);
+    Route::get('/mitra/reports', [UlasanController::class, 'showReport'])->name('mitra.reports');
+
+});

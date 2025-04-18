@@ -74,7 +74,7 @@
             // Get position from marker
             const lat = currentLocation.lat;
             const lng = currentLocation.lng;
-            const radius = 1;  // For example, 50 km radius
+            const radius = 10;  // For example, 50 km radius
 
             // Call the backend API with radius 50 km
             const url = `/api/laundry/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;

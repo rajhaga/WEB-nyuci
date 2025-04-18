@@ -56,7 +56,8 @@
 
                         <div class="w-full sm:w-auto flex justify-start sm:justify-center">
                             @if($pesanan->status === 'Selesai')
-                                <a href="#" class="text-sm text-white bg-blue-500 hover:bg-blue-700 transition px-4 py-2 rounded-md">
+                                <!-- Redirect to review page when clicking "Ulas Pesanan" -->
+                                <a href="{{ route('pesanan.ulasan', $pesanan->id) }}" class="text-sm text-white bg-blue-500 hover:bg-blue-700 transition px-4 py-2 rounded-md">
                                     Ulas Pesanan
                                 </a>
                             @else

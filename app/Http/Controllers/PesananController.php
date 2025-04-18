@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\{Auth, Storage, Log, DB};
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Notifications\NewOrderNotification;
 use Midtrans\Config;
+use Midtrans\Transaction;
 use Midtrans\CoreApi;
 
 class PesananController extends Controller
@@ -151,24 +152,64 @@ class PesananController extends Controller
         // Notifikasi admin atau sistem monitoring
     }
 }
-    public function konfirmasiPembayaran(Pesanan $pesanan)
-    {
-        $this->authorize('update', $pesanan);
 
-        try {
+public function konfirmasiPembayaran(Pesanan $pesanan)
+{
+    $this->authorize('update', $pesanan);
+
+    try {
+        // Check if the payment is done via QRIS or COD
+        if ($pesanan->metode_pembayaran === 'qris') {
+            // Verifying the payment via Midtrans for QRIS
             Config::$serverKey = config('services.midtrans.server_key');
+            Config::$isProduction = config('services.midtrans.is_production');
+            
             $status = Transaction::status($pesanan->midtrans_transaction_id);
 
             if ($status->transaction_status === 'settlement') {
-                $pesanan->update(['status' => 'paid']);
-                return redirect()->back()->with('success', 'Pembayaran berhasil dikonfirmasi');
+                $pesanan->update([
+                    'status' => 'paid',
+                    'paid_at' => now()
+                ]);
+                
+                // Redirect to admin dashboard after payment confirmation
+                return redirect()->route('mitra.dashboard')->with('success', 'Pembayaran berhasil dikonfirmasi');
             }
+        } else if ($pesanan->metode_pembayaran === 'cash' || $pesanan->metode_pembayaran === 'cod') {
+            // If COD, directly update the status to "Diproses"
+            $pesanan->update([
+                'status' => 'Diproses'
+            ]);
 
-            return redirect()->back()->with('error', 'Pembayaran belum diterima');
-            
-        } catch (\Exception $e) {
-            Log::error('Konfirmasi Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal memverifikasi pembayaran');
+            // Redirect to admin dashboard after payment confirmation
+            return redirect()->route('mitra.dashboard')->with('success', 'Pembayaran telah dikonfirmasi dan pesanan sedang diproses');
         }
+        
+        // Default case if not QRIS or COD
+        $pesanan->update(['status' => 'Diproses']);
+        
+        // Redirect to admin dashboard after payment confirmation
+        return redirect()->route('mitra.dashboard')->with('success', 'Pesanan sedang diproses');
+        
+    } catch (\Exception $e) {
+        // Handle exception if any error occurs
+        $pesanan->update(['status' => 'Diproses']);
+        Log::error('Konfirmasi Error: ' . $e->getMessage());
+        
+        // Redirect to admin dashboard with error message
+        return redirect()->route('mitra.dashboard')->with('error', 'Pesanan sedang diproses, tetapi terjadi kesalahan verifikasi pembayaran');
     }
+}
+
+public function showCOD(Pesanan $pesanan)
+{
+    $this->authorize('view', $pesanan);
+    
+    // Jika COD, pastikan status masih pending
+    if ($pesanan->status === 'pending') {
+        $pesanan->update(['status' => 'waiting_payment']);
+    }
+
+    return view('pesanan.cod', compact('pesanan'));
+}
 }

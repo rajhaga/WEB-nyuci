@@ -63,8 +63,7 @@ public function dashboard()
 
     return view('mitra.dashboard', compact('mitra', 'totalSaldo', 'pendapatanBulanan', 'statusPesanan', 'grafikPesanan'));
 }
-
-public function kelolaPesanan()
+public function kelolaPesanan(Request $request)
 {
     // Ambil data mitra berdasarkan ID pengguna yang login
     $mitra = Mitra::where('user_id', Auth::id())->first();
@@ -74,16 +73,20 @@ public function kelolaPesanan()
         return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
     }
 
-    // Ambil pesanan dengan status selain "Menunggu" dan "Diproses"
+    // Filter berdasarkan status jika ada
+    $status = $request->status;
+
+    // Ambil pesanan berdasarkan mitra dan status
     $orders = Pesanan::where('mitra_id', $mitra->id)
-                     ->whereNotIn('status', ['Menunggu', 'Diterima'])
+                     ->whereNotIn('status', ['Menunggu', 'Diterima']) // Filter pesanan yang tidak "Menunggu" atau "Diterima"
+                     ->when($status, function($query) use ($status) {
+                         return $query->where('status', $status); // Filter pesanan berdasarkan status jika ada
+                     })
                      ->orderBy('created_at', 'desc')
                      ->paginate(12); // Sesuaikan jumlah item per halaman
 
     return view('mitra.kelola-pesanan', compact('orders'));
 }
-
-
 
 public function registerMitra(Request $request)
 {
