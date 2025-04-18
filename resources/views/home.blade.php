@@ -12,34 +12,45 @@
             <a href="/packages" class="mt-6 inline-block bg-blue-500 text-white px-6 py-3 rounded-lg text-lg">Mulai Layanan Kami</a>
         </div>
     </section>
-    <section class="py-16">
-        <div class="container mx-auto px-4 text-center">
+        <section class="py-16">
+        <div class="container mx-auto px-4 text-center text-white">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
-                    <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-washing-machine text-3xl text-blue-600"></i>
+                <!-- Cuci Card -->
+                <div class="bg-blue-700 p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-blue-100 w-20 h-20 mx-auto rounded-xl flex items-center justify-center mb-4">
+                        <div class="w-[52px] h-[52px] flex items-center justify-center overflow-hidden">
+                            @include("components.icon-cuci")
+                        </div>
                     </div>
                     <h3 class="text-xl font-semibold mb-2">Cuci</h3>
-                    <p class="text-gray-600">Pakaian Anda dicuci dengan detergen berkualitas dan proses hygienis.</p>
+                    <p class="">Pakaian Anda dicuci dengan detergen berkualitas dan proses hygienis.</p>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="200">
-                    <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-iron text-3xl text-blue-600"></i>
+                
+                <!-- Setrika Card -->
+                <div class="bg-blue-700  p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-blue-100 w-20 h-20 mx-auto rounded-xl flex items-center justify-center mb-4">
+                        <div class="w-[52px] h-[52px] flex items-center justify-center overflow-hidden">
+                            @include("components.icon-setrika")
+                        </div>
                     </div>
                     <h3 class="text-xl font-semibold mb-2">Setrika</h3>
-                    <p class="text-gray-600">Pakaian disetrika rapi dengan hasil sempurna tanpa merusak bahan.</p>
+                    <p class="">Pakaian disetrika rapi dengan hasil sempurna tanpa merusak bahan.</p>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="300">
-                    <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-cogs text-3xl text-blue-600"></i>
+                
+                <!-- Cuci & Setrika Card -->
+                <div class="bg-blue-700 p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-blue-100 w-20 h-20 mx-auto rounded-xl flex items-center justify-center mb-4">
+                        <div class="w-[52px] h-[52px] flex items-center justify-center overflow-hidden">
+                            @include("components.icon-cucisetrika")
+                        </div>
                     </div>
                     <h3 class="text-xl font-semibold mb-2">Cuci & Setrika</h3>
-                    <p class="text-gray-600">Paket lengkap mulai dari pencucian hingga penyetrikaan profesional.</p>
+                    <p class="">Paket lengkap mulai dari pencucian hingga penyetrikaan profesional.</p>
                 </div>
             </div>
         </div>
     </section>
-@include('partials.laundry-recommendations')
+    @include('partials.laundry-recommendations')
 
     <section class="py-16">
         <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -80,30 +91,45 @@
         </div>
 
     </section>
-    
-    <!-- Why Choose Nyuci Section -->
     <section class="py-16">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-6">Mengapa Nyuci?</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <i class="fas fa-wifi text-5xl mb-4"></i>
-                    <h3 class="text-xl font-semibold">Pesan Online</h3>
-                    <p class="text-gray-600">Mudah dan praktis, pesan kapan saja di aplikasi.</p>
+    <div class="container mx-auto px-4 text-center">
+        
+        <h2 class="text-2xl font-bold mb-8">Mengapa Nyuci?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+                <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
+                    <div class="w-[52px] h-[52px] flex items-center justify-center overflow-hidden">
+                        @include("components.icon-pesanonline")
+                    </div>
                 </div>
-                <div>
-                    <i class="fas fa-shield-alt text-5xl mb-4"></i>
-                    <h3 class="text-xl font-semibold">Terpercaya</h3>
-                    <p class="text-gray-600">Detail pesanan tercatat, barang aman tanpa khawatir hilang.</p>
+                <h3 class="text-xl font-semibold mb-2">Pesan Online</h3>
+                <p class="">Mudah dan praktis, pesan kapan saja di aplikasi.</p>
+            </div>
+            
+            <div class="bg-white  p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+                <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
+                    <div class="w-[52px] h-[52px] flex items-center justify-center overflow-hidden">
+                        @include("components.icon-terpercaya")
+                    </div>
                 </div>
-                <div>
-                    <i class="fas fa-bicycle text-5xl mb-4"></i>
-                    <h3 class="text-xl font-semibold">Antar-Jemput</h3>
-                    <p class="text-gray-600">Kenyamanan layanan ojek siap antar-jemput cucian Anda.</p>
+                <h3 class="text-xl font-semibold mb-2">Terpercaya</h3>
+                <p class="">Detail pesanan tercatat, barang aman tanpa khawatir hilang.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+                <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
+                    <div class="w-[52px] h-[52px] flex items-center justify-center overflow-hidden">
+                        @include("components.icon-diantar")
+                    </div>
                 </div>
+                <h3 class="text-xl font-semibold mb-2">Antar-Jemput</h3>
+                <p class="">Kenyamanan layanan ojek siap antar-jemput cucian Anda.</p>
             </div>
         </div>
+        </div>
     </section>
+  
 
     <!-- Mitra Registration Section -->
     @include('auth.register_mitra')
