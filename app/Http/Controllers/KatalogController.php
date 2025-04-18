@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Mitra;
 use App\Models\PaketPakaian;
 use App\Models\Pesanan;
+use App\Models\Ulasan;
 use App\Models\PesananItem;
 use App\Models\JenisPakaian;
 use Illuminate\Http\Request;
@@ -20,10 +21,14 @@ class KatalogController extends Controller
         return view('katalog.index', compact('mitras'));
     }
 
-    // Step 2: Show details for a specific laundry
+    // Show the details for a specific mitra including reviews
     public function showKatalogDetail(Mitra $mitra)
     {
-        return view('katalog.detail', compact('mitra'));
+        // Fetch reviews related to the specific mitra
+        $ulasan = Ulasan::where('mitra_id', $mitra->id)->with('user')->get();
+
+        // Pass mitra and ulasan to the view
+        return view('katalog.detail', compact('mitra', 'ulasan'));
     }
 
     // Step 3: Store order data and redirect to checkout page

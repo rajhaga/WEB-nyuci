@@ -46,7 +46,7 @@
                         </svg>
                         <span class="font-medium">{{ $mitra->rating }}</span>
                     </div>
-                    <span class="text-gray-600">• {{ rand(50, 200) }} ulasan</span>
+                    <span class="text-gray-600">• {{ $mitra->ulasan_count }} ulasan</span>
                 </div>
 
                 <div class="mb-6">
@@ -126,48 +126,58 @@
     </div>
 
     <!-- Reviews Section -->
-    <div class="bg-white rounded-xl shadow-md p-6 mb-12 transition-all duration-300 hover:shadow-lg">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-            Ulasan Pengguna
-        </h2>
-
-        <div class="space-y-6">
-            @foreach([
-                ['Andi Susanto', 'AS', 5, '2 minggu lalu', 'Pelayanan sangat memuaskan! Pakaian saya bersih dan wangi. Pengemasan rapi dan tepat waktu. Recommended banget!'],
-                ['Budi Darmawan', 'BD', 4, '1 bulan lalu', 'Hasil cucian bersih dan rapi. Harga cukup bersaing untuk kualitas yang diberikan. Hanya saja agak lama prosesnya, mungkin karena banyak orderan.']
-            ] as $review)
-            <div class="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
-                <div class="flex items-center mb-3">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4">
-                        {{ $review[1] }}
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900">{{ $review[0] }}</h4>
-                        <div class="flex items-center">
-                            <div class="flex text-yellow-400 mr-2">
-                                @for($i = 0; $i < 5; $i++)
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                @endfor
+    <div class="min-h-screen bg-[#f5f5f5] text-black flex justify-center px-4 sm:px-6 lg:px-8 py-8">
+        <main class="w-full max-w-5xl">
+            <h1 class="text-2xl sm:text-3xl font-semibold text-blue-500 mb-6 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                Ulasan Pengguna
+            </h1>
+    
+            <div class="bg-white rounded-xl shadow-md p-6 mb-12 transition-all duration-300 hover:shadow-lg">
+                <div class="space-y-6">
+                    @foreach($ulasan as $review)
+                    <div class="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
+                        <div class="flex items-center mb-3">
+                            <!-- Avatar for the reviewer -->
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4">
+                                {{ strtoupper($review->user->nama[0]) }}
                             </div>
-                            <span class="text-gray-500 text-sm">{{ $review[3] }}</span>
+                            <div>
+                                <h4 class="font-bold text-gray-900">{{ $review->user->name }}</h4>
+                                <div class="flex items-center">
+                                    <!-- Rating Stars -->
+                                    <div class="flex text-yellow-400 mr-2">
+                                        @for($i = 0; $i < 5; $i++)
+                                            @if($i < $review->rating) <!-- Filled star -->
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            @else <!-- Empty star -->
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <span class="text-gray-500 text-sm">{{ $review->created_at->diffForHumans() }}</span>
+                                </div>
+                                
+                            </div>
                         </div>
+                        <p class="text-gray-700">{{ $review->komentar }}</p>
                     </div>
+                    @endforeach
+    
+                    <!-- View All Reviews Button -->
+                    <button class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                        Lihat Semua Ulasan
+                    </button>
                 </div>
-                <p class="text-gray-700">{{ $review[4] }}</p>
             </div>
-            @endforeach
-
-            <button class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-3 px-6 rounded-lg transition-colors duration-200">
-                Lihat Semua Ulasan
-            </button>
-        </div>
+        </main>
     </div>
-</div>
 
 <!-- Order Modal -->
 <div id="orderModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">

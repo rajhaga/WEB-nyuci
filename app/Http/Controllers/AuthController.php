@@ -45,11 +45,7 @@ class AuthController extends Controller
                     ->where('pjp.jenis_pakaian_id', $kategoriFavorit->item_id)
                     ->orderByDesc('m.rating')
                     ->limit(5)
-<<<<<<< HEAD
                     ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating','m.alamat','m.harga']);
-=======
-                    ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating', 'm.harga', 'm.alamat']);
->>>>>>> 9bd3ad4eb7d5b57e992b7e18e670a64de89f9cd7
                     
             }
         }
