@@ -5,7 +5,7 @@
             <h2 class="text-2xl font-bold mb-6 text-black">
                 <span class="text-blue-500">Daftarkan</span> Dirimu Menjadi <span class="text-blue-500">Bagian Nyuci</span>
             </h2>
-            <p class="text-gray-600 mb-8">Daftarkan dirimu menjadi bagian Nyuci dan bergabunglah dalam jaringan kami untuk meraih peluang baru serta memberikan layanan laundry terbaik kepada pelanggan!</p>
+            <p class="text-gray-600 mb-8">Dapatkan lebih banyak pelanggan dan kelola bisnis laundry Anda dengan lebih mudah bersama kami.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-blue-50 p-4 rounded-lg">

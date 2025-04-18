@@ -43,7 +43,6 @@ Route::post('/logout', function () {
 
 Route::get('/', [AuthController::class, 'home'])->name('home');
 
-
 // Mitra Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/register/mitra', [MitraController::class, 'showRegisterMitraForm'])->name('register.mitra');
