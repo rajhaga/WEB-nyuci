@@ -59,6 +59,6 @@ class UlasanController extends Controller
         // Fetch all reviews for this mitra
         $ulasan = Ulasan::where('mitra_id', $mitra->id)->with('user')->get();
 
-        return view('mitra.reports', compact('ulasan'));
+        return view('mitra.reports', compact('ulasan','mitra'));
     }
 }

@@ -13,7 +13,13 @@ class JenisPakaian extends Model
 
     protected $fillable = ['nama'];
 
+    public function jenisPakaian()
+    {
+        return $this->belongsToMany(JenisPakaian::class, 'paket_jenis_pakaian', 'paket_pakaian_id', 'jenis_pakaian_id')
+                    ->withPivot('price');
+    }
 
+    
     public function mitra()
 {
     return $this->belongsToMany(Mitra::class, 'paket_jenis_pakaian', 'jenis_pakaian_id', 'paket_pakaian_id')

@@ -39,6 +39,12 @@
                     @else
                         <h3 class="text-2xl font-bold mt-2">Rp0</h3>
                     @endif
+                    {{-- @if(isset($mitra) && $mitra->id)
+                        <p>ID Mitra: {{ $mitra->id }}</p>
+                    @else
+                        <p>Mitra tidak ditemukan</p>
+                    @endif --}}
+
                 </div>
                 <div class="bg-green-400 p-3 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">

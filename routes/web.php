@@ -37,10 +37,8 @@ Route::get('register', [AuthController::class, 'showRegisterForm']);
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect('/');
-})->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 
 Route::get('/', [AuthController::class, 'home'])->name('home');
@@ -130,3 +128,24 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mitra/reports', [UlasanController::class, 'showReport'])->name('mitra.reports');
 
 });
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/mitra', [AdminController::class, 'manageMitra'])->name('admin.mitra');
+    Route::get('/pelanggan', [AdminController::class, 'manageCustomers'])->name('admin.customers');
+    Route::get('/pesanan', [AdminController::class, 'manageOrders'])->name('admin.orders');
+    Route::get('/laporan', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::post('/mitra/verify/{id}', [AdminController::class, 'verifyMitra'])->name('admin.verify.mitra');
+});
+
+Route::get('/mitra/settings/{id}', [MitraController::class, 'edit'])->name('mitra.pengaturan');
+Route::put('/mitra/settings/{id}', [MitraController::class, 'update'])->name('mitra.update');
+Route::put('/mitra/{mitraId}/update-price', [MitraController::class, 'updatePrice'])->name('mitra.updatePrice');
+
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+Route::get('/admin/hubungi-kami', [AdminController::class, 'hubungiKami'])->name('admin.hubungiKami');
+Route::get('/admin/kelola-pelanggan', [AdminController::class, 'kelolaPelanggan'])->name('admin.kelolaPelanggan');
+Route::delete('/admin/kelola-pelanggan/{id}', [AdminController::class, 'deletePelanggan'])->name('admin.deletePelanggan');
+Route::get('/admin/verifikasi-mitra', [AdminController::class, 'verifikasiMitra'])->name('admin.verifikasiMitra');
+Route::get('/admin/verifikasi-mitra/{id}', [AdminController::class, 'verifikasiMitraDetail'])->name('admin.verifikasiMitraDetail');
+Route::put('/admin/verifikasi-mitra/{id}', [AdminController::class, 'updateVerifikasiMitra'])->name('admin.verifikasiMitra.update');
