@@ -92,12 +92,54 @@
         </div>
         </div>
     </section>
-  
+  <!-- Mitra Registration Section -->
+<!-- Mitra Registration Section -->
+           
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <!-- Main Card Container -->
+        <div class="bg-white p-8 md:p-12 rounded-xl shadow-lg text-center">
+            <!-- Main Heading -->
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">
+                Daftarkan Dirimu Menjadi <span class="text-blue-600">Bagian Nyuci</span>
+            </h1>
+            
+            <!-- Description -->
+            <div class="mb-8 md:mb-10">
+                <p class="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                    Daftarkan dirimu menjadi bagian Nyuci dan bergabunglah dalam jaringan kami untuk meraih peluang baru serta memberikan layanan laundry terbaik kepada pelanggan!
+                </p>
+            </div>
+            
+            <!-- Decorative Divider -->
+            <div class="border-t border-gray-200 w-16 mx-auto my-6 md:my-8"></div>
+            
+            <!-- Icon Section -->
+            <div class="mb-8 md:mb-10 flex justify-center">
+                <div class="bg-blue-100 p-6 rounded-full">
+                    <img src="{{ asset('images/icons/partner-icon.png') }}" alt="Mitra Icon" class="w-24 md:w-32 max-w-full h-auto">
+                </div>
+            </div>
+            
+            <!-- DAFTAR Heading -->
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 tracking-wide">DAFTAR</h2>
+            
+            <!-- CTA Button -->
+            <div class="mt-6 md:mt-8">
+                <a href="{{ route('register.mitra') }}" 
+                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 md:py-4 px-8 md:px-12 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                        Mulai Pendaftaran
+                    </a>
+            </div>
+        </div>
+    </div>
+</section>
+
 
     <!-- Mitra Registration Section -->
-    @auth
+    {{-- @auth
         @include('auth.register_mitra')
-    @endauth
+    @endauth --}}
 
 
 @endsection

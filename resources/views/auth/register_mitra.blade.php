@@ -1,3 +1,8 @@
+@extends('layouts.app')
+
+@section('title', 'Nyuci - Home')
+
+@section('content')
 <section class="py-20 mt-16 bg-gray-100">
     <div class="max-w-6xl mx-auto">
         <!-- Initial Card -->
@@ -199,11 +204,14 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label for="nama_pemilik" class="block font-medium">Nama Pemilik</label>
-                                        <input type="text" name="nama_pemilik" class="w-full p-2 border rounded-md" value="{{ Auth::check() ? Auth::user()->nama : '' }}" required>
+                                        <input type="text" name="nama_pemilik" class="w-full p-2 border rounded-md" 
+                                               value="{{ Auth::check() ? Auth::user()->nama : '' }}" required>
                                     </div>
                                     <div>
                                         <label for="nomor_hp" class="block font-medium">Nomor HP/WhatsApp</label>
-                                        <input type="tel" name="nomor_hp" class="w-full p-2 border rounded-md" value="{{ Auth::check() ? Auth::user()->phone : '' }}" pattern="[0-9]{10,15}" required>
+                                        <input type="tel" name="nomor_hp" class="w-full p-2 border rounded-md" 
+                                               value="{{ Auth::check() ? Auth::user()->phone : '' }}" 
+                                               pattern="[0-9]{10,15}" required>
                                     </div>
                                 </div>
                                 
@@ -226,6 +234,38 @@
                                     </div>
                                 </div>
                                 
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label for="jam_operasional" class="block font-medium">Jam Operasional</label>
+                                        <input type="text" name="jam_operasional" class="w-full p-2 border rounded-md" placeholder="08:00 - 21:00" required>
+                                    </div>
+                                    <div>
+                                        <label for="harga" class="block font-medium">Harga per Kg (Rp)</label>
+                                        <input type="number" name="harga" class="w-full p-2 border rounded-md" min="1000" required>
+                                    </div>
+                                </div>
+                        
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label for="nomor_rekening" class="block font-medium">Nomor Rekening</label>
+                                        <input type="text" name="nomor_rekening" class="w-full p-2 border rounded-md" required>
+                                    </div>
+                                    <div>
+                                        <label for="kategori_layanan" class="block font-medium">Kategori Layanan</label>
+                                        <select name="kategori_layanan" class="w-full p-2 border rounded-md" required>
+                                            <option value="">Pilih Kategori</option>
+                                            <option value="cuci">Cuci Saja</option>
+                                            <option value="setrika">Setrika Saja</option>
+                                            <option value="cuci dan setrika">Cuci dan Setrika</option>
+                                        </select>
+                                    </div>
+                                </div>
+                        
+                                <div class="mt-4">
+                                    <label for="deskripsi" class="block font-medium">Deskripsi Singkat</label>
+                                    <textarea name="deskripsi" class="w-full p-2 border rounded-md" rows="3" required></textarea>
+                                </div>
+                        
                                 <div class="mt-4">
                                     <label class="block font-medium mb-2">Tentukan Lokasi Usaha</label>
                                     <div class="relative">
@@ -243,17 +283,6 @@
                                     <input type="hidden" name="latitude" id="latitude">
                                     <input type="hidden" name="longitude" id="longitude">
                                 </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                    <div>
-                                        <label for="jam_operasional" class="block font-medium">Jam Operasional</label>
-                                        <input type="text" name="jam_operasional" class="w-full p-2 border rounded-md" placeholder="08:00 - 21:00" required>
-                                    </div>
-                                    <div>
-                                        <label for="deskripsi" class="block font-medium">Deskripsi Singkat</label>
-                                        <input type="text" name="deskripsi" class="w-full p-2 border rounded-md" required>
-                                    </div>
-                                </div>
                                 
                                 <div class="mt-6 flex justify-between">
                                     <button type="button" class="prev-section bg-gray-300 text-gray-700 py-2 px-6 rounded-md hover:bg-gray-400 transition" data-prev="1">Kembali</button>
@@ -261,24 +290,20 @@
                                 </div>
                             </div>
                             
-                           <!-- Section 3: Dokumen -->
+                            <!-- Section 3: Dokumen -->
                             <div id="section-3" class="form-section hidden">
-                                <div class="grid grid-cols-1 gap-8">
+                                <h3 class="text-lg font-semibold mb-4">Dokumen Pendukung</h3>
+                                <div class="space-y-6">
                                     <div>
-                                        <h3 class="text-lg font-semibold mb-4">Dokumen Pendukung</h3>
-                                        <div class="space-y-6">
-                                            <div>
-                                                <label for="foto_tempat" class="block font-medium mb-2">Foto Tempat Usaha</label>
-                                                <input type="file" name="foto_tempat" class="w-full p-2 border rounded-md" accept="image/*" required>
-                                                <p class="text-sm text-gray-500 mt-1">Upload minimal 3 foto tempat usaha</p>
-                                            </div>
-                                            
-                                            <div>
-                                                <label for="dokumen_legalitas" class="block font-medium mb-2">Dokumen Legalitas</label>
-                                                <input type="file" name="dokumen_legalitas" class="w-full p-2 border rounded-md" accept=".pdf,.doc,.docx" required>
-                                                <p class="text-sm text-gray-500 mt-1">Upload SIUP/TDP atau surat keterangan usaha</p>
-                                            </div>
-                                        </div>
+                                        <label for="foto_tempat" class="block font-medium mb-2">Foto Tempat Usaha</label>
+                                        <input type="file" name="foto_tempat" class="w-full p-2 border rounded-md" accept="image/*" required>
+                                        <p class="text-sm text-gray-500 mt-1">Format: JPG/PNG (Max 2MB)</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="foto_bukti" class="block font-medium mb-2">Foto Bukti Kepemilikan Usaha</label>
+                                        <input type="file" name="foto_bukti" class="w-full p-2 border rounded-md" accept="image/*" required>
+                                        <p class="text-sm text-gray-500 mt-1">Format: JPG/PNG (Max 2MB)</p>
                                     </div>
                                 </div>
                                 
@@ -290,41 +315,25 @@
                             
                             <!-- Section 4: Layanan -->
                             <div id="section-4" class="form-section hidden">
-                                <div class="grid grid-cols-1 gap-8">
-                                    <div>
-                                        <h3 class="text-lg font-semibold mb-4">Jenis Layanan</h3>
-                                        
-                                        <!-- Dynamic Fields Container -->
-                                        <div id="jenis-container" class="space-y-4">
-                                            <div class="jenis-item border rounded-md p-4">
-                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label class="block font-medium mb-2">Jenis Pakaian</label>
-                                                        <input type="text" name="jenis_pakaian[0][nama]" class="w-full p-2 border rounded-md" required>
-                                                    </div>
-                                                    <div>
-                                                        <label class="block font-medium mb-2">Harga per Satuan (Rp)</label>
-                                                        <input type="number" name="jenis_pakaian[0][harga]" class="w-full p-2 border rounded-md" min="1000" required>
-                                                    </div>
-                                                </div>
-                                                <button type="button" class="mt-2 text-red-500 text-sm hover:text-red-700 remove-jenis hidden">
-                                                    Hapus Jenis
-                                                </button>
-                                            </div>
+                                <h3 class="text-lg font-semibold mb-4">Pilih Paket Layanan</h3>
+                                <div class="space-y-4">
+                                    @foreach ($paket_pakaian as $paket)
+                                        <div class="flex items-center">
+                                            <input class="mr-2 paket-checkbox" type="checkbox" 
+                                                   name="paket_pakaian[]" value="{{ $paket->id }}" 
+                                                   id="paket_{{ $paket->id }}">
+                                            <label for="paket_{{ $paket->id }}">
+                                                {{ $paket->nama }} ({{ $paket->jenisPakaian->pluck('nama')->join(', ') }})
+                                            </label>
                                         </div>
-                                        
-                                        <button type="button" id="tambah-jenis" class="mt-4 text-blue-600 hover:text-blue-800 flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                            </svg>
-                                            Tambah Jenis Layanan
-                                        </button>
-                                    </div>
+                                    @endforeach
                                 </div>
-                                
+                                <button type="button" id="tambah-jenis" class="mt-4 text-blue-600 hover:text-blue-800 flex items-center">
                                 <div class="mt-6 flex justify-between">
                                     <button type="button" class="prev-section bg-gray-300 text-gray-700 py-2 px-6 rounded-md hover:bg-gray-400 transition" data-prev="3">Kembali</button>
-                                    <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 transition">Daftar sebagai Mitra</button>
+                                    <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 transition">
+                                        Daftar sebagai Mitra
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -334,7 +343,7 @@
         </div>
     </div>
 </section>
-
+@endsection()
 <!-- Leaflet.js for Maps -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -359,6 +368,8 @@
     
     #map {
         z-index: 0;
+        height: 400px; /* or any value to ensure proper display */
+
     }
     
     #locate-me {
@@ -383,6 +394,7 @@
 </style>
 
 <script>
+    
     document.addEventListener("DOMContentLoaded", function () {
         // Show/hide registration form
         const initialCard = document.getElementById('initial-card');
@@ -564,7 +576,7 @@
         
         // Initialize map
         var defaultLocation = [-6.200000, 106.816666]; // Jakarta default
-        var map = L.map('map').setView(defaultLocation, 13);
+        var map = L.map('map').setView([defaultLocation[0], defaultLocation[1]], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'

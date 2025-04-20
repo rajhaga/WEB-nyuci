@@ -88,7 +88,7 @@ Route::post('katalog/{mitra}/checkout', [KatalogController::class, 'storeAndChec
 Route::post('katalog/{mitra}/placeOrder', [KatalogController::class, 'placeOrder'])->name('katalog.placeOrder'); // Place the order (Step 4)
 Route::get('/laundry/{pesanan}/orderConfirmation', [KatalogController::class, 'orderConfirmation'])->name('katalog.orderConfirmation'); // Order confirmation (Step 5)
 
-Route::get('/lacak-pesanan', [PesananController::class, 'index'])->name('lacak.pesanan');
+// Route::get('/lacak-pesanan', [PesananController::class, 'index'])->name('lacak.pesanan');
 Route::get('kelola-pesanan', [MitraController::class, 'kelolaPesanan'])->name('mitra.kelolaPesanan');
 
 // Group route khusus mitra dengan autentikasi
