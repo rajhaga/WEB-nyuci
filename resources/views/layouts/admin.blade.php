@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Mitra - Nyuci</title>
+    <title>Dashboard admin - Nyuci</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -32,22 +32,17 @@
         <!-- Sidebar -->
         <aside class="w-1/4 bg-white p-4 rounded-lg shadow-md space-y-2">
             <nav>
-                <a href="/mitra/dashboard" class="block p-3 rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition duration-300">Dashboard</a>
-                <a href="{{ route('mitra.kelolaPesanan') }}" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Kelola Pesanan</a>
-                <a href="/mitra/payment" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Pembayaran</a>
-                <a href="/mitra/reports" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Laporan</a>
-                @if(isset($mitra) && $mitra->id)
-                <a href="{{ route('mitra.pengaturan', $mitra->id) }}" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Pengaturan</a>
-            @else
-                <p>Mitra tidak ditemukan</p>
-            @endif
+                <a href="/admin/dashboard" class="block p-3 rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition duration-300">Dashboard</a>
+                <a href="/admin/hubungi-kami" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Hubungi Kami</a>
+                <a href="/admin/kelola-pelanggan" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Kelola Pelanggan</a>
+                <a href="/admin/verifikasi-mitra" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Verifikasi Mitra</a>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="w-3/4 ml-6 bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-4">Dashboard Mitra</h2>
-            @yield('mitracontent')
+            <h2 class="text-xl font-semibold mb-4">Dashboard admin</h2>
+            @yield('admincontent')
         </main>
     </div>
 

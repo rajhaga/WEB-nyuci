@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Mitra;
 use App\Models\JenisPakaian;
 use App\Models\Pesanan;
+use App\Models\PaketPakaian;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -85,7 +86,7 @@ public function kelolaPesanan(Request $request)
                      ->orderBy('created_at', 'desc')
                      ->paginate(12); // Sesuaikan jumlah item per halaman
 
-    return view('mitra.kelola-pesanan', compact('orders'));
+    return view('mitra.kelola-pesanan', compact('orders','mitra'));
 }
 
 public function registerMitra(Request $request)
@@ -196,27 +197,26 @@ public function registerMitra(Request $request)
     // Send the data to the view
     return view('katalog.catalog', compact('mitras'));
 }
-public function updatePrice(Request $request, $jenisPakaianId)
+public function updatePrice(Request $request, $mitraId)
 {
-    // Validate the price input
     $request->validate([
-        'price' => 'required|numeric|min:0',
+        'jenis_pakaian' => 'required|array',
+        'jenis_pakaian.*.id' => 'required|exists:jenis_pakaian,id',  // Pastikan ID jenis pakaian valid
+        'jenis_pakaian.*.price' => 'required|numeric|min:0',  // Validasi harga
     ]);
 
-    // Find the clothing item (jenis pakaian) and the associated mitra
-    $jenisPakaian = JenisPakaian::findOrFail($jenisPakaianId);
+    $mitra = Mitra::findOrFail($mitraId);
 
-    // Get the authenticated user's mitra
-    $mitra = auth()->user()->mitra;
+    // Update harga untuk setiap jenis pakaian yang terkait dengan mitra
+    foreach ($request->jenis_pakaian as $item) {
+        $mitra->jenisPakaian()->updateExistingPivot($item['id'], [
+            'price' => $item['price']
+        ]);
+    }
 
-    // Update the price in the pivot table
-    $mitra->jenisPakaian()->updateExistingPivot($jenisPakaianId, [
-        'price' => $request->price
-    ]);
-
-    // Redirect back to the profile page with a success message
-    return redirect()->route('profile')->with('success', 'Price updated successfully!');
+    return redirect()->route('mitra.pengaturan', $mitra->id)->with('success', 'Harga jenis pakaian berhasil diperbarui');
 }
+
 public function pembayaran()
 {
     // Ambil data mitra berdasarkan ID pengguna yang login
@@ -233,7 +233,7 @@ public function pembayaran()
                                   ->orderBy('created_at', 'desc')
                                   ->get();
 
-    return view('mitra.pembayaran', compact('pesananBelumDiterima'));
+    return view('mitra.pembayaran', compact('pesananBelumDiterima','mitra'));
 }
 
 public function showKonfirmasiPembayaran($id)
@@ -275,6 +275,65 @@ public function updateStatus(Request $request, $id)
     return redirect()->route('mitra.kelolaPesanan')->with('success', 'Status pesanan diperbarui!');
 }
 
+public function edit($id)
+{
+    $mitra = Mitra::findOrFail($id);
+    return view('mitra.pengaturan', compact('mitra'));
+}
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'nama_pemilik' => 'required|string|max:255',
+        'nomor_hp' => 'required|string|max:15',
+        'nama_laundry' => 'required|string|max:255',
+        'alamat' => 'required|string',
+        'foto_tempat' => 'nullable|image|mimes:jpg,jpeg,png,gif',
+        'metode_pembayaran' => 'required|string',
+        'paket' => 'required|array',
+        'paket.*.nama' => 'required|string|max:255',
+        'paket.*.harga' => 'required|numeric|min:0',
+    ]);
+
+    $mitra = Mitra::findOrFail($id);
+
+    // Update mitra data
+    $mitra->nama_pemilik = $request->nama_pemilik;
+    $mitra->nomor_hp = $request->nomor_hp;
+    $mitra->nama_laundry = $request->nama_laundry;
+    $mitra->alamat = $request->alamat;
+    $mitra->metode_pembayaran = $request->metode_pembayaran;
+
+    // Handle foto tempat upload
+    if ($request->hasFile('foto_tempat')) {
+        // Delete old photo
+        if ($mitra->foto_tempat) {
+            Storage::delete($mitra->foto_tempat);
+        }
+        $mitra->foto_tempat = $request->file('foto_tempat')->store('foto_mitra');
+    }
+
+    $mitra->save();
+
+    // Update harga dan nama paket pakaian (Sync paket_pakaian)
+    foreach ($request->paket as $paketId => $paketData) {
+        $paket = PaketPakaian::find($paketId);
+        if ($paket) {
+            // Update paket data
+            $paket->update([
+                'nama' => $paketData['nama'],
+                'harga' => $paketData['harga']
+            ]);
+        }
+    }
+
+    // Sync paket pakaian jika ada perubahan
+    if ($request->has('paket_pakaian')) {
+        $mitra->paketPakaian()->sync($request->paket_pakaian);
+    }
+
+    return redirect()->route('mitra.pengaturan', $mitra->id)->with('success', 'Pengaturan Mitra berhasil diperbarui');
+}
 
 }
 

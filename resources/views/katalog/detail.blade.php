@@ -206,32 +206,33 @@
                         <p class="text-blue-600 font-bold mb-3">Rp{{ number_format($paket->harga, 0, ',', '.') }}</p>
                         
                         <div class="space-y-3">
-                            @foreach($paket->jenisPakaian as $jenis)
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="font-medium">{{ $jenis->nama }}</p>
-                                    <p class="text-sm text-blue-600">Rp{{ number_format($jenis->pivot->price, 0, ',', '.') }}/item</p>
+                            @foreach($jenisPakaianList as $jenisPakaian)
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">{{ $jenisPakaian->nama }}</p>
+                                        <p class="text-sm text-blue-600">Rp{{ number_format($jenisPakaian->pivot->price, 0, ',', '.') }}/item</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button type="button" 
+                                                class="quantity-btn decrease bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-200 transition-all duration-200"
+                                                data-id="{{ $jenisPakaian->id }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <span class="quantity-{{ $jenisPakaian->id }} w-8 text-center">0</span>
+                                        <button type="button" 
+                                                class="quantity-btn increase bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-700 transition-all duration-200"
+                                                data-id="{{ $jenisPakaian->id }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <input type="hidden" name="quantities[{{ $mitra->id }}][{{ $jenisPakaian->id }}]" value="0" class="quantity-input-{{ $jenisPakaian->id }}">
+                                    </div>
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    <button type="button" 
-                                            class="quantity-btn decrease bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-200 transition-all duration-200"
-                                            data-id="{{ $jenis->id }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                    <span class="quantity-{{ $jenis->id }} w-8 text-center">0</span>
-                                    <button type="button" 
-                                            class="quantity-btn increase bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-700 transition-all duration-200"
-                                            data-id="{{ $jenis->id }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                    <input type="hidden" name="quantities[{{ $paket->id }}][{{ $jenis->id }}]" value="0" class="quantity-input-{{ $jenis->id }}">
-                                </div>
-                            </div>
                             @endforeach
+
                         </div>
                     </div>
                     @endforeach

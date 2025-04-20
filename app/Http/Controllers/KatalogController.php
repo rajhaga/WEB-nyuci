@@ -23,13 +23,17 @@ class KatalogController extends Controller
 
     // Show the details for a specific mitra including reviews
     public function showKatalogDetail(Mitra $mitra)
-    {
-        // Fetch reviews related to the specific mitra
-        $ulasan = Ulasan::where('mitra_id', $mitra->id)->with('user')->get();
+{
+    // Fetch reviews related to the specific mitra
+    $ulasan = Ulasan::where('mitra_id', $mitra->id)->with('user')->get();
 
-        // Pass mitra and ulasan to the view
-        return view('katalog.detail', compact('mitra', 'ulasan'));
-    }
+    // Fetch the list of 'jenis_pakaian' associated with the mitra
+    $jenisPakaianList = $mitra->jenisPakaian; // Make sure this is the correct relationship for fetching jenis pakaian
+
+    // Pass mitra, ulasan, and jenisPakaianList to the view
+    return view('katalog.detail', compact('mitra', 'ulasan', 'jenisPakaianList'));
+}
+
 
     // Step 3: Store order data and redirect to checkout page
     public function storeAndCheckout(Request $request, Mitra $mitra)
