@@ -64,8 +64,12 @@
                             </div>
                             
                             <div class="p-4 bg-gray-50 rounded-lg">
-                                <h4 class="font-medium text-gray-700">3. Layanan & Dokumen</h4>
-                                <p class="text-sm text-gray-600 mt-1">Pilih layanan dan upload dokumen pendukung</p>
+                                    <h4 class="font-medium text-gray-700">3. Dokumen</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Upload dokumen pendukung</p>
+                                </div>
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <h4 class="font-medium text-gray-700">4. Layanan</h4>
+                                <p class="text-sm text-gray-600 mt-1">Tentukan jenis layanan dan harga</p>
                             </div>
                         </div>
                         
@@ -125,8 +129,12 @@
                                 </div>
                                 
                                 <div class="p-4 bg-gray-50 rounded-lg">
-                                    <h4 class="font-medium text-gray-700">3. Layanan & Dokumen</h4>
-                                    <p class="text-sm text-gray-600 mt-1">Pilih layanan dan upload dokumen pendukung</p>
+                                    <h4 class="font-medium text-gray-700">3. Dokumen</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Upload dokumen pendukung</p>
+                                </div>
+                                <div class="p-4 bg-gray-50 rounded-lg">
+                                    <h4 class="font-medium text-gray-700">4. Layanan</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Tentukan jenis layanan dan harga</p>
                                 </div>
                             </div>
                             
@@ -174,7 +182,11 @@
                             </div>
                             <div class="step flex-1 text-center" data-step="3">
                                 <div class="step-number mx-auto w-10 h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center mb-2">3</div>
-                                <div class="step-title font-medium text-gray-500">Layanan & Dokumen</div>
+                                <div class="step-title font-medium text-gray-500">Dokumen</div>
+                            </div>
+                            <div class="step flex-1 text-center" data-step="4">
+                                <div class="step-number mx-auto w-10 h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center mb-2">4</div>
+                                <div class="step-title font-medium text-gray-500">Layanan</div>
                             </div>
                         </div>
 
@@ -249,65 +261,22 @@
                                 </div>
                             </div>
                             
-                            <!-- Section 3: Layanan & Dokumen -->
+                           <!-- Section 3: Dokumen -->
                             <div id="section-3" class="form-section hidden">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div>
-                                        <h3 class="text-lg font-semibold mb-4">Paket Layanan</h3>
-                                        <div class="space-y-4">
-                                            <div>
-                                                <label for="kategori_layanan" class="block font-medium mb-2">Kategori Layanan</label>
-                                                <select name="kategori_layanan" class="w-full p-2 border rounded-md" required>
-                                                    <option value="cuci">Cuci</option>
-                                                    <option value="setrika">Setrika</option>
-                                                    <option value="cuci dan setrika">Cuci dan Setrika</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div>
-                                                <label class="block font-medium mb-2">Pilih Paket</label>
-                                                <div class="space-y-2">
-                                                    @foreach ($paket_pakaian as $paket)
-                                                        <div class="flex items-center">
-                                                            <input class="mr-2 paket-checkbox" type="checkbox" name="paket_pakaian[]" value="{{ $paket->id }}" id="paket_{{ $paket->id }}">
-                                                            <label for="paket_{{ $paket->id }}">{{ $paket->nama }} ({{ $paket->jenisPakaian->pluck('nama')->join(', ') }})</label>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                            
-                                            <div>
-                                                <label for="harga" class="block font-medium">Harga per Kg atau per Item</label>
-                                                <input type="number" name="harga" class="w-full p-2 border rounded-md" min="1000" required>
-                                            </div>
-                                            
-                                            <div>
-                                                <label for="metode_pembayaran" class="block font-medium">Nomor Rekening:</label>
-                                                <input type="text" name="nomor_rekening" class="w-full p-2 border rounded-md" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
+                                <div class="grid grid-cols-1 gap-8">
                                     <div>
                                         <h3 class="text-lg font-semibold mb-4">Dokumen Pendukung</h3>
-                                        <div class="space-y-4">
+                                        <div class="space-y-6">
                                             <div>
                                                 <label for="foto_tempat" class="block font-medium mb-2">Foto Tempat Usaha</label>
                                                 <input type="file" name="foto_tempat" class="w-full p-2 border rounded-md" accept="image/*" required>
-                                                <p class="text-sm text-gray-500 mt-1">Upload foto tempat usaha Anda</p>
+                                                <p class="text-sm text-gray-500 mt-1">Upload minimal 3 foto tempat usaha</p>
                                             </div>
                                             
                                             <div>
-                                                <label for="foto_bukti" class="block font-medium mb-2">Foto Bukti Kepemilikan</label>
-                                                <input type="file" name="foto_bukti" class="w-full p-2 border rounded-md" accept="image/*" required>
-                                                <p class="text-sm text-gray-500 mt-1">Upload foto bukti kepemilikan usaha</p>
-                                            </div>
-                                            
-                                            <div class="border-t pt-4 mt-4">
-                                                <div class="flex items-center">
-                                                    <input type="checkbox" id="agree_terms" name="agree_terms" class="mr-2" required>
-                                                    <label for="agree_terms">Saya menyetujui syarat dan ketentuan yang berlaku</label>
-                                                </div>
+                                                <label for="dokumen_legalitas" class="block font-medium mb-2">Dokumen Legalitas</label>
+                                                <input type="file" name="dokumen_legalitas" class="w-full p-2 border rounded-md" accept=".pdf,.doc,.docx" required>
+                                                <p class="text-sm text-gray-500 mt-1">Upload SIUP/TDP atau surat keterangan usaha</p>
                                             </div>
                                         </div>
                                     </div>
@@ -315,6 +284,46 @@
                                 
                                 <div class="mt-6 flex justify-between">
                                     <button type="button" class="prev-section bg-gray-300 text-gray-700 py-2 px-6 rounded-md hover:bg-gray-400 transition" data-prev="2">Kembali</button>
+                                    <button type="button" class="next-section bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 transition" data-next="4">Selanjutnya</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Section 4: Layanan -->
+                            <div id="section-4" class="form-section hidden">
+                                <div class="grid grid-cols-1 gap-8">
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-4">Jenis Layanan</h3>
+                                        
+                                        <!-- Dynamic Fields Container -->
+                                        <div id="jenis-container" class="space-y-4">
+                                            <div class="jenis-item border rounded-md p-4">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label class="block font-medium mb-2">Jenis Pakaian</label>
+                                                        <input type="text" name="jenis_pakaian[0][nama]" class="w-full p-2 border rounded-md" required>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block font-medium mb-2">Harga per Satuan (Rp)</label>
+                                                        <input type="number" name="jenis_pakaian[0][harga]" class="w-full p-2 border rounded-md" min="1000" required>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="mt-2 text-red-500 text-sm hover:text-red-700 remove-jenis hidden">
+                                                    Hapus Jenis
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <button type="button" id="tambah-jenis" class="mt-4 text-blue-600 hover:text-blue-800 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Tambah Jenis Layanan
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6 flex justify-between">
+                                    <button type="button" class="prev-section bg-gray-300 text-gray-700 py-2 px-6 rounded-md hover:bg-gray-400 transition" data-prev="3">Kembali</button>
                                     <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 transition">Daftar sebagai Mitra</button>
                                 </div>
                             </div>
@@ -384,7 +393,39 @@
             initialCard.classList.add('hidden');
             registrationForm.classList.remove('hidden');
         });
-        
+          // Dynamic Jenis Layanan
+          let jenisIndex = 1;
+        const jenisContainer = document.getElementById('jenis-container');
+        const initialJenisItem = document.querySelector('.jenis-item');
+
+        document.getElementById('tambah-jenis').addEventListener('click', function() {
+            const newItem = initialJenisItem.cloneNode(true);
+            const inputs = newItem.querySelectorAll('input');
+            
+            // Update input names
+            inputs[0].name = `jenis_pakaian[${jenisIndex}][nama]`;
+            inputs[1].name = `jenis_pakaian[${jenisIndex}][harga]`;
+            
+            // Reset values
+            inputs[0].value = '';
+            inputs[1].value = '';
+            
+            // Show remove button
+            newItem.querySelector('.remove-jenis').classList.remove('hidden');
+            
+            jenisContainer.appendChild(newItem);
+            jenisIndex++;
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-jenis')) {
+                if (document.querySelectorAll('.jenis-item').length > 1) {
+                    e.target.closest('.jenis-item').remove();
+                } else {
+                    alert('Minimal harus ada satu jenis layanan');
+                }
+            }
+        });
         // Mobile guide toggle
         const guideToggle = document.getElementById('guide-toggle');
         const mobileGuide = document.getElementById('mobile-guide');
