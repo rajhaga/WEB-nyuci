@@ -1,11 +1,29 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-6 flex gap-8">
-
-    <!-- Sidebar Filter -->
-    <aside class="w-64 bg-white p-4 rounded-lg shadow border border-gray-200">
+<div class="container mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-8">
+    <!-- Mobile Filter Toggle Button -->
+    <div class="md:hidden flex items-center gap-2">
+        <button id="filter-toggle" class="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+            </svg>
+            Filter
+        </button>
         
+        <!-- Quick Filters for Mobile -->
+        <div class="flex-1 overflow-x-auto">
+            <div class="flex space-x-2">
+                <a href="?kategori_layanan=semua" class="whitespace-nowrap px-3 py-1 rounded-full border text-sm {{ request('kategori_layanan') == 'semua' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Semua</a>
+                <a href="?kategori_layanan=cuci" class="whitespace-nowrap px-3 py-1 rounded-full border text-sm {{ request('kategori_layanan') == 'cuci' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Pakaian</a>
+                <a href="?kategori_layanan=setrika" class="whitespace-nowrap px-3 py-1 rounded-full border text-sm {{ request('kategori_layanan') == 'setrika' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Rumah Tangga</a>
+                <a href="?kategori_layanan=cuci dan setrika" class="whitespace-nowrap px-3 py-1 rounded-full border text-sm {{ request('kategori_layanan') == 'cuci dan setrika' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Sepatu</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Filter - Hidden on mobile by default -->
+    <aside id="sidebar-filter" class="hidden md:block w-full md:w-64 bg-white p-4 rounded-lg shadow border border-gray-200">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Filter Kategori:</label>
             @php
@@ -34,17 +52,16 @@
                 @endforeach
             </div>
         </div>
-
     </aside>
 
     <!-- Main Content -->
     <div class="flex-1">
-        <!-- Filter Buttons -->
-        <div class="flex flex-wrap gap-2 mb-4">
-            <a href="?kategori_layanan=semua" class="px-3 py-1 rounded-full border text-sm {{ request('kategori_layanan') == 'semua' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Semua</a>
-            <a href="?kategori_layanan=cuci" class="px-3 py-1 rounded-full border text-sm {{ request('kategori_layanan') == 'cuci' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Pakaian</a>
-            <a href="?kategori_layanan=setrika" class="px-3 py-1 rounded-full border text-sm {{ request('kategori_layanan') == 'setrika' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Rumah Tangga & Hotel</a>
-            <a href="?kategori_layanan=cuci dan setrika" class="px-3 py-1 rounded-full border text-sm {{ request('kategori_layanan') == 'cuci dan setrika' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Sepatu & Aksesoris</a>
+        <!-- Filter Buttons - Desktop -->
+        <div class="hidden md:flex flex-wrap gap-2 mb-4">
+            <a href="?kategori_layanan=semua" class="px-6 py-2 rounded-xl border text-md {{ request('kategori_layanan') == 'semua' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Semua</a>
+            <a href="?kategori_layanan=cuci" class="px-6 py-2 rounded-xl border text-md {{ request('kategori_layanan') == 'cuci' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Pakaian</a>
+            <a href="?kategori_layanan=setrika" class="px-6 py-2 rounded-xl border text-md {{ request('kategori_layanan') == 'setrika' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Rumah Tangga & Hotel</a>
+            <a href="?kategori_layanan=cuci dan setrika" class="px-6 py-2 rounded-xl border text-md {{ request('kategori_layanan') == 'cuci dan setrika' ? 'bg-blue-600 text-white' : 'text-blue-600 border-blue-600' }}">Paket Sepatu & Aksesoris</a>
         </div>
 
         <!-- Title -->
@@ -53,7 +70,7 @@
         <!-- Catalog Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             @forelse($mitras as $mitra)
-            <a href="{{ route('katalog.detail', $mitra->id) }}" class="block bg-white rounded-xl border shadow-sm overflow-hidden hover:shadow-md ">
+            <a href="{{ route('katalog.detail', $mitra->id) }}" class="block bg-white rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
                 <img src="{{ asset('storage/' . $mitra->foto_tempat) }}" class="w-full h-48 object-cover rounded-t-xl" alt="{{ $mitra->nama_laundry }}">
                 <div class="p-4 space-y-2">
                     <div class="flex justify-between items-center">
@@ -83,4 +100,24 @@
         </div>--}}
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterToggle = document.getElementById('filter-toggle');
+        const sidebarFilter = document.getElementById('sidebar-filter');
+        
+        if (filterToggle && sidebarFilter) {
+            filterToggle.addEventListener('click', function() {
+                sidebarFilter.classList.toggle('hidden');
+            });
+            
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!filterToggle.contains(e.target) && !sidebarFilter.contains(e.target)) {
+                    sidebarFilter.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
 @endsection

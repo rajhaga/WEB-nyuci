@@ -15,28 +15,28 @@
 
         <!-- Navbar Links di Desktop -->
         <div id="menu" class="hidden md:flex space-x-1">
-            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium" href="/">
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium {{ request()->is('/') ? 'text-blue-600 bg-blue-50' : '' }}" href="/">
                 <span class="relative group">
                     Beranda
-                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                    <span class="absolute left-0 bottom-0 w-full h-0.5 bg-blue-600 transition-all duration-300 {{ request()->is('/') ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"></span>
                 </span>
             </a>
-            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium" href="/catalog">
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium {{ request()->is('catalog*') ? 'text-blue-600 bg-blue-50' : '' }}" href="/catalog">
                 <span class="relative group">
                     Katalog
-                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                    <span class="absolute left-0 bottom-0 w-full h-0.5 bg-blue-600 transition-all duration-300 {{ request()->is('catalog*') ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"></span>
                 </span>
             </a>
-            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium" href="{{ route('lacak.pesanan') }}">
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium {{ request()->routeIs('lacak.pesanan') ? 'text-blue-600 bg-blue-50' : '' }}" href="{{ route('lacak.pesanan') }}">
                 <span class="relative group">
                     Lacak
-                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                    <span class="absolute left-0 bottom-0 w-full h-0.5 bg-blue-600 transition-all duration-300 {{ request()->routeIs('lacak.pesanan') ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"></span>
                 </span>
             </a>
-            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium" href="/contact">
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium {{ request()->is('contact*') ? 'text-blue-600 bg-blue-50' : '' }}" href="/contact">
                 <span class="relative group">
                     Hubungi Kami
-                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                    <span class="absolute left-0 bottom-0 w-full h-0.5 bg-blue-600 transition-all duration-300 {{ request()->is('contact*') ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"></span>
                 </span>
             </a>
         </div>
@@ -161,6 +161,7 @@
 </nav>
 
 <script>
+    
     // Toggle untuk menu mobile
     document.getElementById('menu-toggle').addEventListener('click', function() {
         const menu = document.getElementById('mobile-menu');
