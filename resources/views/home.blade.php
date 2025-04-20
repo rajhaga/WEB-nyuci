@@ -52,45 +52,8 @@
     </section>
     @include('partials.laundry-recommendations')
 
-    <section class="py-16">
-        <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @if(isset($rekomendasi) && count($rekomendasi) > 0)
-                @foreach($rekomendasi as $laundry)
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:shadow-lg">
-                        <img src="{{ asset('storage/' . $laundry->foto_tempat) }}" 
-                             alt="{{ $laundry->nama_laundry }}" 
-                             class="w-full h-48 object-cover">
-                        <div class="p-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-lg font-semibold text-gray-800">{{ $laundry->nama_laundry }}</h4>
-                                <span class="flex items-center bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
-                                    <i class="fas fa-star mr-1"></i> {{ $laundry->rating ?? 'Baru' }}
-                                </span>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-3">
-                                <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i> 
-                                {{ Str::limit($laundry->alamat, 50) }}
-                            </p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-blue-600 font-medium">Rp {{ number_format($laundry->harga, 0) }}/kg</span>
-                                <a href="/laundry/{{ $laundry->id }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm transition">
-                                    <i class="fas fa-shopping-cart mr-1"></i> Pesan
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            @else
-                <!-- Initial empty state -->
-                <div id="emptyStateInitial" class="text-center py-12 col-span-3">
-                    <i class="fas fa-tshirt text-5xl text-gray-300 mb-4"></i>
-                    <h4 class="text-xl font-medium text-gray-500">Belum ada pencarian</h4>
-                    <p class="text-gray-400 mb-4">Silakan cari laundry di sekitar lokasi Anda</p>
-                </div>
-            @endif
-        </div>
+  
 
-    </section>
     <section class="py-16">
     <div class="container mx-auto px-4 text-center">
         
@@ -132,7 +95,10 @@
   
 
     <!-- Mitra Registration Section -->
-    @include('auth.register_mitra')
+    @auth
+        @include('auth.register_mitra')
+    @endauth
+
 
 @endsection
 @include('partials.laundry-recommendations-js')
