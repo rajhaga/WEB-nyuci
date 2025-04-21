@@ -1,82 +1,78 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-[#f5f5f5] text-black flex justify-center px-4 sm:px-6 lg:px-8 py-8">
-    <main class="w-full max-w-5xl">
-        <h1 class="text-2xl sm:text-3xl font-semibold text-blue-500 mb-6">Riwayat Pesanan</h1>
+<section class="py-10 px-4 bg-blue-50 min-h-screen">
+  <div class="max-w-7xl mx-auto">
+    <h2 class="text-3xl font-bold mb-2">Lacak Pesanan</h2>
+    <p class="text-gray-600 mb-6">Lacak pesananmu untuk mengetahui status pesanan laundry-mu secara real-time.</p>
 
-        <!-- Filter Status -->
-        <div class="flex flex-wrap gap-2 mb-6">
-            @php
-                $statuses = ['' => 'Semua', 'Menunggu' => 'Menunggu', 'Dibayar' => 'Dibayar', 'Diproses' => 'Diproses', 'Selesai' => 'Selesai'];
-                $currentStatus = request('status');
-            @endphp
+    <!-- Filter Tabs -->
+    <div class="flex flex-wrap gap-2 mb-8">
+      @php
+        $statuses = ['' => 'Semua', 'Menunggu' => 'Menunggu', 'Diterima' => 'Diterima', 'Diproses' => 'Diproses', 'Selesai' => 'Selesai', 'Dibatalkan' => 'Dibatalkan'];
+        $currentStatus = request('status');
+      @endphp
 
-            @foreach($statuses as $key => $label)
-                <a href="{{ url()->current() }}{{ $key !== '' ? '?status=' . $key : '' }}"
-                   class="px-4 py-2 rounded-xl text-sm font-medium border
-                   {{ $currentStatus === $key || ($key === '' && $currentStatus === null) ? 'bg-blue-500 text-white border-transparent' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100' }}">
-                    {{ $label }}
-                </a>
-            @endforeach
+      @foreach($statuses as $key => $label)
+      <a href="{{ url()->current() }}{{ $key !== '' ? '?status=' . $key : '' }}" 
+        class="px-4 py-2 rounded-xl text-sm font-medium
+        {{ $currentStatus === $key || ($key === '' && $currentStatus === null) ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border text-gray-700 hover:bg-gray-100' }}">
+         {{ $label }}
+     </a>
+     
+      @endforeach
+    </div>
+
+    <!-- Card Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @forelse($pesanans as $pesanan)
+        <div class="border rounded-xl p-4 shadow-sm bg-white">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-bold text-lg text-gray-800">{{ $pesanan->laundry_name }}</h3>
+            <span class="text-xs px-2 py-1 rounded-full font-medium
+              @if($pesanan->status == 'Dibatalkan') bg-red-100 text-red-700
+              @elseif($pesanan->status == 'Selesai') bg-green-100 text-green-700
+              @elseif($pesanan->status == 'Diproses') bg-yellow-100 text-yellow-700
+              @elseif($pesanan->status == 'Menunggu') bg-blue-100 text-blue-700
+              @else bg-gray-100 text-gray-700
+              @endif">
+              {{ $pesanan->status }}
+            </span>
+          </div>
+          <p class="text-sm mb-1"><span class="font-medium">Paket:</span> {{ $pesanan->paket }}</p>
+          <p class="text-sm mb-1"><span class="font-medium">Kode Referal:</span> {{ $pesanan->kode_referral }}</p>
+          <p class="text-sm mb-1"><span class="font-medium">Tanggal Pemesanan:</span> {{ $pesanan->created_at->format('Y-m-d') }}</p>
+          <p class="text-sm mb-1"><span class="font-medium">Total Biaya:</span> Rp{{ number_format($pesanan->total_harga, 0, ',', '.') }}</p>
+          <p class="text-sm mb-4"><span class="font-medium">Metode Pembayaran:</span> {{ $pesanan->metode_pembayaran }}</p>
+
+          @if($pesanan->status === 'Selesai')
+            
+          <div class="flex justify-center mt-4">
+            <a href="{{ route('pesanan.ulasan', $pesanan->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg font-semibold inline-block text-center">
+                Nilai
+            </a>
         </div>
-
-        <!-- List Pesanan -->
-        <div class="space-y-4">
-            @forelse($pesanans as $pesanan)
-                <div class="bg-white rounded-md shadow-sm border border-gray-200 p-4 sm:p-6">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                        <div class="flex-1">
-                            <p class="text-sm text-gray-400">Kode Referral</p>
-                            <p class="text-base font-medium text-gray-800">{{ $pesanan->kode_referral }}</p>
-                        </div>
-
-                        <div class="flex-1">
-                            <p class="text-sm text-gray-400">Harga</p>
-                            <p class="text-base font-medium text-gray-800">Rp{{ number_format($pesanan->total_harga, 0, ',', '.') }}</p>
-                        </div>
-
-                        <div class="flex-1">
-                            <p class="text-sm text-gray-400">Tanggal Pemesanan</p>
-                            <p class="text-base font-medium text-gray-800">{{ $pesanan->created_at->format('Y-m-d') }}</p>
-                        </div>
-
-                        <div class="flex-1">
-                            <p class="text-sm text-gray-400">Status</p>
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full inline-block
-                                @if($pesanan->status == 'Menunggu') bg-red-100 text-red-600
-                                @elseif($pesanan->status == 'Dibayar') bg-green-100 text-green-600
-                                @elseif($pesanan->status == 'Diproses') bg-yellow-100 text-yellow-600
-                                @elseif($pesanan->status == 'Selesai') bg-blue-100 text-blue-600
-                                @else bg-gray-100 text-gray-600
-                                @endif">
-                                {{ $pesanan->status }}
-                            </span>
-                        </div>
-
-                        <div class="w-full sm:w-auto flex justify-start sm:justify-center">
-                            @if($pesanan->status === 'Selesai')
-                                <!-- Redirect to review page when clicking "Ulas Pesanan" -->
-                                <a href="{{ route('pesanan.ulasan', $pesanan->id) }}" class="text-sm text-white bg-blue-500 hover:bg-blue-700 transition px-4 py-2 rounded-md">
-                                    Ulas Pesanan
-                                </a>
-                            @else
-                                <span class="invisible text-sm px-4 py-2">Ulas Pesanan</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            @empty
-                <p class="text-center text-gray-500">Tidak ada pesanan ditemukan.</p>
-            @endforelse
+        
+            
+          @elseif($pesanan->status === 'Menunggu' || $pesanan->status === 'Dibatalkan')
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold">Bayar</button>
+          @endif
         </div>
+      @empty
+        <p class="text-center text-gray-500">Tidak ada pesanan ditemukan.</p>
+      @endforelse
+    </div>
 
-        <!-- Pagination -->
-        <div class="mt-6 flex justify-center gap-4 items-center">
-            <button class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 px-3 py-1 rounded">←</button>
-            <span class="font-semibold text-gray-800">1</span>
-            <button class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 px-3 py-1 rounded">→</button>
-        </div>
-    </main>
-</div>
+    <!-- Pagination -->
+    <div class="mt-10 flex justify-center items-center space-x-2">
+      <button class="px-3 py-2 bg-white border rounded hover:bg-gray-100">&lt;</button>
+      <button class="px-3 py-2 rounded bg-blue-600 text-white">1</button>
+      <button class="px-3 py-2 rounded border bg-white text-gray-700 hover:bg-gray-100">2</button>
+      <button class="px-3 py-2 rounded border bg-white text-gray-700 hover:bg-gray-100">3</button>
+      <button class="px-3 py-2 rounded border bg-white text-gray-700 hover:bg-gray-100">4</button>
+      <button class="px-3 py-2 rounded border bg-white text-gray-700 hover:bg-gray-100">5</button>
+      <button class="px-3 py-2 bg-white border rounded hover:bg-gray-100">&gt;</button>
+    </div>
+  </div>
+</section>
 @endsection

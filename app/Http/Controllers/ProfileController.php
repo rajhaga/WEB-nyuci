@@ -66,11 +66,38 @@ class ProfileController extends Controller
 
         return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
     }
+    
     public function history()
-    {
-        $user = Auth::user();
-        $pesanans = Pesanan::where('pembeli_id', $user->id)->with('items')->get();
-
-        return view('order_history', compact('pesanans'));
+{
+    $user = Auth::user();
+    $currentStatus = request('status'); // Get the status from the query parameter
+    if (!$user) {
+        return redirect()->route('login');  // 'login' is the named route for the login page
     }
+    $pesanans = Pesanan::where('pembeli_id', $user->id)
+                       ->when($currentStatus, function ($query, $currentStatus) {
+                           return $query->where('status', $currentStatus); // Filter based on status
+                       })
+                       ->with('items')
+                       ->paginate(10); // Use pagination
+
+
+    // Pass the status to the view
+    return view('order_history', compact('pesanans', 'currentStatus'));
+}
+public function donehistroryprofile()
+{
+    $user = Auth::user();
+    
+    // Flag to check if the current page is "Riwayat Pesanan"
+    $isProfilePage = false;  // For example, false because this is Riwayat Pesanan page
+
+    $pesanans = Pesanan::where('pembeli_id', $user->id)
+                       ->where('status', 'Selesai')  // Only 'Selesai' status
+                       ->with('items')
+                       ->get();
+
+    return view('profile_history', compact('pesanans', 'isProfilePage'));
+
+}
 }

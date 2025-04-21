@@ -49,6 +49,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/register/mitra', [MitraController::class, 'registerMitra']);
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/historyprofile', [ProfileController::class, 'donehistroryprofile'])->name('profile.historyprofile');
+
 });
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 

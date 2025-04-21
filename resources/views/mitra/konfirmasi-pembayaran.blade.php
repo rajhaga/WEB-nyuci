@@ -52,7 +52,7 @@
                 <div class="flex flex-col items-center space-y-4">
                     @if($pesanan->metode_pembayaran === 'qris')
                     <div class="text-center">
-                        <img src="{{ asset('images/qris-logo.png') }}" alt="QRIS" class="w-24 mx-auto mb-3">
+                        <img src="{{ asset('images/qris.png') }}" alt="QRIS" class="w-24 mx-auto mb-3">
                         <p class="text-gray-700">Pembayaran via QRIS</p>
                     </div>
                     <a href="{{ route('pesanan.qris', $pesanan) }}" 
@@ -65,7 +65,7 @@
                     </a>
                     @else
                     <div class="text-center">
-                        <img src="{{ asset('images/cash-logo.png') }}" alt="Cash" class="w-24 mx-auto mb-3">
+                        <img src="{{ asset('images/cash.png') }}" alt="Cash" class="w-24 mx-auto mb-3">
                         <p class="text-gray-700">Pembayaran Cash (COD)</p>
                     </div>
                     <a href="{{ route('pesanan.cod', $pesanan) }}" 

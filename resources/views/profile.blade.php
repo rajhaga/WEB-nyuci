@@ -14,27 +14,13 @@
                     <span x-text="isEditing ? 'Batal Edit' : 'Edit Profile'"></span>
                 </button>
 
-                <a href="{{ route('order.history') }}" class="text-blue-600 font-semibold flex items-center gap-2 focus:outline-none">
+                <a href="{{ route('profile.historyprofile') }}" class="text-blue-600 font-semibold flex items-center gap-2 focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>Riwayat Pesanan</span>
                 </a>
 
-                <div class="text-gray-400 font-semibold flex items-center gap-2 cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3.28a2 2 0 01-1.42-.59l-1.42-1.42A2 2 0 0010.28 3H6a2 2 0 00-2 2v8" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8m-4 0v6" />
-                    </svg>
-                    <span>Belum Tersedia</span>
-                </div>
-
-                <div class="text-gray-400 font-semibold flex items-center gap-2 cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h13M4 6h16M4 12h4M4 18h4" />
-                    </svg>
-                    <span>Belum Tersedia</span>
-                </div>
             </nav>
         </div>
 
