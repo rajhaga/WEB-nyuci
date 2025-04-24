@@ -159,8 +159,14 @@ public function registerMitra(Request $request)
         return redirect()->back()->with('error', 'Terjadi kesalahan, coba lagi. ' . $e->getMessage());
     }
 }
+public function showRegisterMitraForm()
+    {
+       // Ambil semua paket pakaian dari database
+    $paket_pakaian = PaketPakaian::with('jenisPakaian')->get(); // Mengambil semua paket pakaian beserta jenis pakaian yang terhubung
 
-
+    // Kirim data ke view
+    return view('auth.register_mitra', compact('paket_pakaian'));
+    }
     // Fungsi untuk verifikasi mitra oleh admin
     public function verifikasi($id)
     {

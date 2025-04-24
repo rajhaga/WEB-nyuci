@@ -1,6 +1,6 @@
 <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-        <h2 class="text-2xl font-bold text-center mb-8">Tempat Laundry Terbaik yang Sering Anda Gunakantg</h2>
+        <h2 class="text-2xl font-bold text-center mb-8">Tempat Laundry Terbaik yang Sering Anda Gunakan</h2>
         <div id="resultsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @auth
                 @if(isset($rekomendasi) && count($rekomendasi) > 0)

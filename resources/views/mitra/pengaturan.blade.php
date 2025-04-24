@@ -5,7 +5,7 @@
         <h2 class="text-2xl font-semibold mb-6">Pengaturan Mitra</h2>
 
         <!-- Form Edit Pengaturan Mitra -->
-        <form action="{{ route('mitra.update', $mitra->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('mitra.update', $mitra->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 
@@ -46,9 +46,9 @@
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Paket Pakaian</label>
                 @foreach($mitra->paketPakaian as $paket)
-                    <div class="flex items-center mb-2">
+                    <div class="flex items-center mb-2 space-x-2">
                         <input type="text" name="paket[{{ $paket->id }}][nama]" value="{{ $paket->nama }}" class="p-2 border rounded w-full" required>
-                        <input type="number" name="paket[{{ $paket->id }}][harga]" value="{{ $paket->harga }}" class="ml-2 p-2 border rounded w-24" required>
+                        <input type="number" name="paket[{{ $paket->id }}][harga]" value="{{ $paket->harga }}" class="p-2 border rounded w-24" required>
                     </div>
                 @endforeach
             </div>
@@ -66,21 +66,25 @@
             <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Update Pengaturan</button>
         </form>
 
-        <form action="{{ route('mitra.updatePrice', $mitra->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-        
-            @foreach($mitra->jenisPakaian as $jenisPakaian)
-                <div class="mb-4">
-                    <label for="price_{{ $jenisPakaian->id }}" class="block">{{ $jenisPakaian->nama }}</label>
-                    <input type="number" id="price_{{ $jenisPakaian->id }}" name="jenis_pakaian[{{ $jenisPakaian->id }}][price]" value="{{ old('jenis_pakaian.' . $jenisPakaian->id . '.price', $jenisPakaian->pivot->price) }}" class="p-2 border rounded" required>
-                    <input type="hidden" name="jenis_pakaian[{{ $jenisPakaian->id }}][id]" value="{{ $jenisPakaian->id }}">
-                </div>
-            @endforeach
+        <!-- Form Update Harga -->
+        <div class="mt-8">
+            <h3 class="text-xl font-semibold mb-4">Update Harga Paket Pakaian</h3>
+            <form action="{{ route('mitra.updatePrice', $mitra->id) }}" method="POST" class="space-y-6">
+                @csrf
+                @method('PUT')
 
-        
-            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Update Harga</button>
-        </form>
+                <!-- Update Harga Paket Pakaian -->
+                @foreach($mitra->jenisPakaian as $jenisPakaian)
+                    <div class="mb-4">
+                        <label for="price_{{ $jenisPakaian->id }}" class="block">{{ $jenisPakaian->nama }}</label>
+                        <input type="number" id="price_{{ $jenisPakaian->id }}" name="jenis_pakaian[{{ $jenisPakaian->id }}][price]" value="{{ old('jenis_pakaian.' . $jenisPakaian->id . '.price', $jenisPakaian->pivot->price) }}" class="p-2 border rounded w-full" required>
+                        <input type="hidden" name="jenis_pakaian[{{ $jenisPakaian->id }}][id]" value="{{ $jenisPakaian->id }}">
+                    </div>
+                @endforeach
+
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Update Harga</button>
+            </form>
+        </div>
         
     </div>
 @endsection

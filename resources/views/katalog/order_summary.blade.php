@@ -71,13 +71,24 @@
                 </div>
             </div>
             @endforeach
+            
+            <!-- Added Layanan Aplikasi -->
+            <div class="flex justify-between items-center border-b border-gray-100 pb-4 last:border-0">
+                <div>
+                    <p class="font-medium text-gray-800">Layanan Aplikasi</p>
+                    <p class="text-sm text-gray-500">1 item</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-medium text-blue-600">Rp8.000</p>
+                </div>
+            </div>
         </div>
-
+    
         <!-- Total Section -->
         <div class="pt-6 mt-6 border-t border-gray-100">
             <div class="flex justify-between items-center">
                 <span class="font-semibold text-gray-800">Total Pembayaran</span>
-                <span class="text-xl font-bold text-blue-600">Rp{{ number_format(array_sum(array_column($items, 'cost')), 0, ',', '.') }}</span>
+                <span class="text-xl font-bold text-blue-600">Rp{{ number_format(array_sum(array_column($items, 'cost')) + 8000, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>
@@ -95,7 +106,7 @@
                         <span class="font-medium text-gray-800">QRIS</span>
                         <p class="text-sm text-gray-500">Bayar menggunakan QR Code (DANA, OVO, ShopeePay)</p>
                     </div>
-                    <img src="/images/qris-icon.png" class="ml-auto h-8" alt="QRIS">
+                    <img src="/images/qris.png" class="ml-auto h-8" alt="QRIS">
                 </label>
 
                 <label class="flex items-center p-4 border rounded-lg hover:border-blue-400 cursor-pointer">
@@ -104,7 +115,7 @@
                         <span class="font-medium text-gray-800">Bayar di Tempat (COD)</span>
                         <p class="text-sm text-gray-500">Bayar ketika laundry diantar kembali</p>
                     </div>
-                    <img src="/images/cod-icon.png" class="ml-auto h-8" alt="COD">
+                    <img src="/images/cash.png" class="ml-auto h-8" alt="COD">
                 </label>
             </div>
 

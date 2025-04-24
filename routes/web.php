@@ -49,6 +49,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/register/mitra', [MitraController::class, 'registerMitra']);
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/historyprofile', [ProfileController::class, 'donehistroryprofile'])->name('profile.historyprofile');
+
 });
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 
@@ -88,7 +90,7 @@ Route::post('katalog/{mitra}/checkout', [KatalogController::class, 'storeAndChec
 Route::post('katalog/{mitra}/placeOrder', [KatalogController::class, 'placeOrder'])->name('katalog.placeOrder'); // Place the order (Step 4)
 Route::get('/laundry/{pesanan}/orderConfirmation', [KatalogController::class, 'orderConfirmation'])->name('katalog.orderConfirmation'); // Order confirmation (Step 5)
 
-Route::get('/lacak-pesanan', [PesananController::class, 'index'])->name('lacak.pesanan');
+// Route::get('/lacak-pesanan', [PesananController::class, 'index'])->name('lacak.pesanan');
 Route::get('kelola-pesanan', [MitraController::class, 'kelolaPesanan'])->name('mitra.kelolaPesanan');
 
 // Group route khusus mitra dengan autentikasi

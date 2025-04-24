@@ -27,10 +27,10 @@
                     <span class="absolute left-0 bottom-0 w-full h-0.5 bg-blue-600 transition-all duration-300 {{ request()->is('catalog*') ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"></span>
                 </span>
             </a>
-            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium {{ request()->routeIs('lacak.pesanan') ? 'text-blue-600 bg-blue-50' : '' }}" href="{{ route('lacak.pesanan') }}">
+            <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium {{ request()->routeIs('order.history') ? 'text-blue-600 bg-blue-50' : '' }}" href="{{ route('order.history') }}">
                 <span class="relative group">
                     Lacak
-                    <span class="absolute left-0 bottom-0 w-full h-0.5 bg-blue-600 transition-all duration-300 {{ request()->routeIs('lacak.pesanan') ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"></span>
+                    <span class="absolute left-0 bottom-0 w-full h-0.5 bg-blue-600 transition-all duration-300 {{ request()->routeIs('order.history') ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"></span>
                 </span>
             </a>
             <a class="px-4 py-2 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 font-medium {{ request()->is('contact*') ? 'text-blue-600 bg-blue-50' : '' }}" href="/contact">
@@ -107,7 +107,7 @@
         <div class="container mx-auto px-4 py-2 space-y-1">
             <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="/">Beranda</a>
             <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="/catalog">Katalog</a>
-            <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="{{ route('lacak.pesanan') }}">Lacak</a>
+            <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="{{ route('order.history') }}">Lacak</a>
             <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium" href="/contact">Hubungi Kami</a>
             
             @auth
@@ -134,12 +134,12 @@
                             Dashboard Mitra
                         </a>
                     @endif
-                    <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium flex items-center" href="{{ route('order.history') }}">
+                    {{-- <a class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium flex items-center" href="{{ route('order.history') }}">
                         <svg xmlns="http://www.w3.org/2000/svg"class="w-5 h-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                         </svg>
                         Riwayat Pesanan
-                    </a>
+                    </a> --}}
                     <form action="{{ route('logout') }}" method="POST" class="block">
                         @csrf
                         <button type="submit" class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 font-medium flex items-center">
