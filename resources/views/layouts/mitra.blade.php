@@ -55,7 +55,7 @@
     <footer class="mt-10 text-center text-gray-600 py-4">
         <p>&copy; 2023 Nyuci. All rights reserved.</p>
     </footer>
-
+    @stack('scripts')
     <script>
         // Toggle Dropdown Menu
         function toggleDropdown() {
