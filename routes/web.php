@@ -145,6 +145,7 @@ Route::put('/mitra/settings/{id}', [MitraController::class, 'update'])->name('mi
 Route::put('/mitra/{mitraId}/update-price', [MitraController::class, 'updatePrice'])->name('mitra.updatePrice');
 
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 Route::get('/admin/hubungi-kami', [AdminController::class, 'hubungiKami'])->name('admin.hubungiKami');
 Route::get('/admin/kelola-pelanggan', [AdminController::class, 'kelolaPelanggan'])->name('admin.kelolaPelanggan');
 Route::delete('/admin/kelola-pelanggan/{id}', [AdminController::class, 'deletePelanggan'])->name('admin.deletePelanggan');
