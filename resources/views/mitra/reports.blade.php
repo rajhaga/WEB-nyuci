@@ -3,39 +3,69 @@
 @extends('layouts.mitra')
 
 @section('mitracontent')
-<div class="min-h-screen bg-[#f5f5f5] text-black flex justify-center px-4 sm:px-6 lg:px-8 py-8">
-    <main class="w-full max-w-5xl">
-        <h1 class="text-2xl sm:text-3xl font-semibold text-blue-500 mb-6">Laporan Ulasan</h1>
+<section class="p-6 space-y-6 bg-gray-50 min-h-screen">
+    <!-- Judul -->
+    <h2 class="text-2xl font-semibold text-gray-800">Rating & Ulasan Pelanggan</h2>
 
-        <!-- Table to display reviews -->
-        <div class="overflow-x-auto bg-white p-6 rounded-lg shadow-md">
-            <table class="min-w-full table-auto">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">No</th>
-                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Nama Pengguna</th>
-                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Rating</th>
-                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Komentar</th>
-                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Tanggal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($ulasan as $index => $review)
-                    <tr>
-                        <td class="px-4 py-2 text-sm text-gray-700">{{ $index + 1 }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">{{ $review->user->nama }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">{{ $review->rating }} ★</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">{{ $review->komentar }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">{{ $review->created_at->format('d M Y') }}</td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="px-4 py-2 text-center text-sm text-gray-500">Tidak ada ulasan ditemukan.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    <!-- Ringkasan Rating -->
+    @php
+        $jumlahUlasan = $ulasan->count();
+        $totalRating = $ulasan->sum('rating');
+        $rataRataRating = $jumlahUlasan > 0 ? number_format($totalRating / $jumlahUlasan, 1) : null;
+    @endphp
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
+            <div class="text-yellow-400 text-4xl">★</div>
+            <div>
+                @if ($rataRataRating)
+                    <p class="text-3xl font-bold text-gray-800 leading-none">{{ $rataRataRating }} <span class="text-gray-400 text-xl">/5.0</span></p>
+                    <p class="text-sm text-gray-500 mt-1">Rating</p>
+                @else
+                    <p class="text-sm text-gray-500">Belum ada ulasan</p>
+                @endif
+            </div>
         </div>
-    </main>
-</div>
+        <div class="bg-white shadow rounded-xl p-6 flex items-center gap-4">
+            <div>
+                @if ($jumlahUlasan > 0)
+                    <p class="text-3xl font-bold text-gray-800">{{ $jumlahUlasan }}</p>
+                    <p class="text-sm text-gray-500">Total Jumlah Ulasan</p>
+                @else
+                    <p class="text-sm text-gray-500">Belum ada ulasan</p>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Komentar -->
+    <div class="space-y-6">
+        <h3 class="text-lg font-semibold text-gray-700">Komentar Pelanggan</h3>
+
+        <div class="space-y-4">
+            @forelse ($ulasan as $review)
+            <div class="bg-white rounded-xl shadow p-4 space-y-2">
+                <div class="flex items-center gap-2">
+                    <div class="bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center text-blue-600 font-bold text-sm">
+                        {{ strtoupper(substr($review->user->nama, 0, 1)) }}
+                    </div>
+                    <p class="font-semibold text-gray-700">{{ $review->user->nama }}</p>
+                </div>
+                <div class="text-yellow-400 text-lg">
+                    {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
+                </div>
+                <p class="text-sm text-gray-700 leading-relaxed">
+                    {{ $review->komentar }}
+                </p>
+                <p class="text-xs text-gray-400">{{ $review->created_at->format('d M Y') }}</p>
+            </div>
+            @empty
+            <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">
+                Belum ada ulasan.
+            </div>
+            @endforelse
+        </div>
+    </div>
+
+</section>
 @endsection
