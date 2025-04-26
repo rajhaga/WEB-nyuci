@@ -30,17 +30,49 @@
     <!-- Dashboard -->
     <div class="container mx-auto mt-6 flex">
         <!-- Sidebar -->
-        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-md space-y-2">
-            <nav>
-                <a href="/mitra/dashboard" class="block p-3 rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition duration-300">Dashboard</a>
-                <a href="{{ route('mitra.kelolaPesanan') }}" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Kelola Pesanan</a>
-                <a href="/mitra/payment" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Pembayaran</a>
-                <a href="/mitra/reports" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Laporan</a>
+        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-md">
+            <nav class="space-y-1">
+                <a href="/mitra/dashboard" class="block p-3 rounded-lg transition duration-300 border-l-4 {{
+                    request()->is('mitra/dashboard') 
+                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                    : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                }}">
+                    Dashboard
+                </a>
+
+                <a href="{{ route('mitra.kelolaPesanan') }}" class="block p-3 rounded-lg transition duration-300 border-l-4 {{
+                    Route::currentRouteNamed('mitra.kelolaPesanan') 
+                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                    : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                }}">
+                    Kelola Pesanan
+                </a>
+
+                <a href="/mitra/payment" class="block p-3 rounded-lg transition duration-300 border-l-4 {{
+                    request()->is('mitra/payment') 
+                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                    : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                }}">
+                    Pembayaran
+                </a>
+
+                <a href="/mitra/reports" class="block p-3 rounded-lg transition duration-300 border-l-4 {{
+                    request()->is('mitra/reports') 
+                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                    : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                }}">
+                    Laporan
+                </a>
+
                 @if(isset($mitra) && $mitra->id)
-                <a href="{{ route('mitra.pengaturan', $mitra->id) }}" class="block p-3 rounded-lg hover:bg-gray-100 text-gray-700 transition duration-300 hover:text-blue-500">Pengaturan</a>
-            @else
-                <p>Mitra tidak ditemukan</p>
-            @endif
+                <a href="{{ route('mitra.pengaturan', $mitra->id) }}" class="block p-3 rounded-lg transition duration-300 border-l-4 {{
+                    Route::currentRouteNamed('mitra.pengaturan') 
+                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                    : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                }}">
+                    Pengaturan
+                </a>
+                @endif
             </nav>
         </aside>
 
@@ -65,3 +97,4 @@
     </script>
 </body>
 </html>
+
