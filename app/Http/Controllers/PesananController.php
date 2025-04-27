@@ -9,6 +9,8 @@ use App\Notifications\NewOrderNotification;
 use Midtrans\Config;
 use Midtrans\Transaction;
 use Midtrans\CoreApi;
+use App\Models\Admin;
+
 
 class PesananController extends Controller
 {
@@ -38,43 +40,62 @@ class PesananController extends Controller
 
     protected function generateQRIS(Pesanan $pesanan)
     {
-        Config::$serverKey = config('services.midtrans.server_key');
-        Config::$isProduction = config('services.midtrans.is_production');
-        Config::$isSanitized = true;
-        $totalPembayaran = $pesanan->total_harga + 8000;
+        // konfigurasi Midtrans
+        Config::$serverKey     = config('services.midtrans.server_key');
+        Config::$isProduction  = config('services.midtrans.is_production');
+        Config::$isSanitized   = true;
+
+        // fee admin per order
+        $adminFeePerOrder = 8000;
+        $totalPembayaran  = $pesanan->total_harga + $adminFeePerOrder;
 
         $params = [
-            'payment_type' => 'qris',
+            'payment_type'        => 'qris',
             'transaction_details' => [
-                'order_id' => 'LAUNDRY-' . $pesanan->id . '-' . time(),
-                'gross_amount' => $totalPembayaran// Konversi ke float
-                // 'gross_amount' => '10.000' // Konversi ke float
+                'order_id'     => 'LAUNDRY-' . $pesanan->id . '-' . time(),
+                'gross_amount' => $totalPembayaran,
             ],
-            'customer_details' => [
-                'first_name' => $pesanan->pembeli->name,
-                'email' => $pesanan->pembeli->email,
-                'phone' => $pesanan->pembeli->phone,
+            'customer_details'    => [
+                'first_name' => $pesanan->pembeli->nama,
+                'email'      => $pesanan->pembeli->email,
+                'phone'      => $pesanan->pembeli->phone,
             ],
             'qris' => [
-                'acquirer' => 'gopay' // bisa diganti linkaja/shopeepay
-            ]
+                'acquirer' => 'gopay',
+            ],
         ];
 
         try {
-            $response = CoreApi::charge($params);
-            
-            $qrPath = 'qris/' . $pesanan->id . '.png';
-            Storage::put('public/' . $qrPath, QrCode::format('png')
-                ->size(300)
-                ->generate($response->actions[0]->url));
+            DB::transaction(function() use ($pesanan, $params, $totalPembayaran, $adminFeePerOrder) {
+                // charge via Midtrans
+                $response = CoreApi::charge($params);
 
-            $pesanan->update([
-                'total_harga' => $totalPembayaran,
-                'midtrans_order_id' => $response->order_id,
-                'midtrans_transaction_id' => $response->transaction_id,
-                'qris_image' => $qrPath,
-                'status' => 'Diproses'
-            ]);
+                // generate & simpan QR code
+                $qrPath = 'qris/' . $pesanan->id . '.png';
+                Storage::put(
+                    'public/' . $qrPath,
+                    QrCode::format('png')
+                        ->size(300)
+                        ->generate($response->actions[0]->url)
+                );
+
+                // update pesanan
+                $pesanan->update([
+                    'total_harga'            => $totalPembayaran,
+                    'midtrans_order_id'      => $response->order_id,
+                    'midtrans_transaction_id'=> $response->transaction_id,
+                    'qris_image'             => $qrPath,
+                    'status'                 => 'Diproses',
+                ]);
+
+                // catat fee ke tabel admins
+                // ganti '1' dengan user_id admin yang sesuai
+                $adminUserId = 1;
+                Admin::firstOrCreate(
+                    ['user_id' => $adminUserId],
+                    ['pendapatan' => 0]
+                )->increment('pendapatan', $adminFeePerOrder);
+            });
 
         } catch (\Exception $e) {
             Log::error('QRIS Generation Error: ' . $e->getMessage());

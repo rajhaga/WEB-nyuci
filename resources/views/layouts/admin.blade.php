@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard admin - Nyuci</title>
+    <title>Dashboard Admin - Nyuci</title>
+    {{-- Tailwind CSS --}}
     <script src="https://cdn.tailwindcss.com"></script>
+    {{-- Chart.js library (global) --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100">
     <!-- Navbar -->
     <nav class="bg-gray-800 text-white p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
-            <a class="text-xl font-bold" href="/">Nyuci</a>
+            <a href="/" class="text-xl font-bold">Nyuci</a>
             <div class="relative">
                 <button onclick="toggleDropdown()" class="flex items-center space-x-2">
                     <span class="hidden md:inline">{{ Auth::user()->nama }}</span>
@@ -20,14 +22,14 @@
                     </svg>
                 </button>
                 <ul id="dropdown-menu" class="absolute right-0 mt-2 bg-white text-black rounded shadow-md hidden">
-                    <li><a class="block px-4 py-2 hover:bg-gray-200 transition duration-200" href="/profile">Profile</a></li>
-                    <li><a class="block px-4 py-2 hover:bg-gray-200 transition duration-200" href="/logout">Logout</a></li>
+                    <li><a href="/profile" class="block px-4 py-2 hover:bg-gray-200 transition duration-200">Profile</a></li>
+                    <li><a href="/logout" class="block px-4 py-2 hover:bg-gray-200 transition duration-200">Logout</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Dashboard -->
+    <!-- Container -->
     <div class="container mx-auto mt-6 flex">
         <!-- Sidebar -->
         <aside class="w-1/4 bg-white p-4 rounded-lg shadow-md space-y-2">
@@ -40,17 +42,19 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="w-3/4 ml-6 bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-4">Dashboard admin</h2>
-            @yield('admincontent')
+        <main class="w-3/4 ml-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                @yield('admincontent')
+            </div>
         </main>
     </div>
 
     <!-- Footer -->
     <footer class="mt-10 text-center text-gray-600 py-4">
-        <p>&copy; 2023 Nyuci. All rights reserved.</p>
+        <p>&copy; 2025 Nyuci. All rights reserved.</p>
     </footer>
 
+    <!-- Scripts -->
     <script>
         // Toggle Dropdown Menu
         function toggleDropdown() {
@@ -58,5 +62,8 @@
             dropdown.classList.toggle('hidden');
         }
     </script>
+
+    {{-- stack for page-specific scripts --}}
+    @stack('scripts')
 </body>
 </html>

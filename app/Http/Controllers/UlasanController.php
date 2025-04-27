@@ -17,7 +17,7 @@ class UlasanController extends Controller
         }
 
         // Pass the pesanan to the view
-        return view('mitra.ulasan', compact('pesanan'));
+        return view('mitra.ulasan');
     }
 
     public function storeReview(Request $request, Pesanan $pesanan)

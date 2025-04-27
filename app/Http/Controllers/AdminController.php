@@ -6,6 +6,10 @@ use App\Models\Mitra; // Model untuk mitra
 use App\Models\User;  // Model untuk user
 use App\Models\Pesanan;  // Model untuk user
 use App\Models\Contact;  // Model untuk user
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Models\Admin;
+
 
 
 class AdminController extends Controller
@@ -56,27 +60,58 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        // Get statistics for the dashboard
-        $totalSaldo = Pesanan::where('status', 'completed')->sum('total_harga');
-        $totalMitra = user::count();
-        $pendingMitra = user::where('status', 'pending')->count();
-        $totalPelanggan = User::where('role', 'pembeli')->count();
-        
-        // Get customer growth data (last 8 months)
-        $customerGrowth = $this->getCustomerGrowthData();
-        
-        // Get digital metrics data
-        $digitalMetrics = $this->getDigitalMetricsData();
-        
+        // 1. Total Saldo Admin (semua pendapatan di tabel admins)
+        $totalSaldo = Admin::sum('pendapatan');
+
+        // 2. Total Mitra Terdaftar
+        $totalMitra = Mitra::count();
+
+        // 3. Mitra Pending Verifikasi
+        $pendingMitra = Mitra::whereHas('user', fn($q) =>
+            $q->where('role','mitra')->where('status','pending')
+        )->count();
+
+        // 4. Total Pelanggan
+        $totalPelanggan = User::where('role','pembeli')->count();
+
+        // 5. Pertumbuhan Pelanggan Baru 12 bulan
+        $customerGrowth = User::where('role','pembeli')
+            ->select([
+                DB::raw("DATE_FORMAT(created_at,'%Y-%m') as month"),
+                DB::raw("COUNT(*) as total")
+            ])
+            ->where('created_at','>=', Carbon::now()->subYear())
+            ->groupBy('month')->orderBy('month')
+            ->get()->pluck('total','month');
+
+        $customerGrowthLabels = $customerGrowth->keys();
+        $customerGrowthData   = $customerGrowth->values();
+
+        // 6. Metrik Digital: pesanan harian 7 hari terakhir
+        $digitalMetrics = Pesanan::select([
+                DB::raw("DATE_FORMAT(created_at,'%Y-%m-%d') as date"),
+                DB::raw("COUNT(*) as total")
+            ])
+            ->where('created_at','>=', Carbon::now()->subDays(7))
+            ->groupBy('date')->orderBy('date')
+            ->get()->pluck('total','date');
+
+        $digitalMetricsLabels = $digitalMetrics->keys();
+        $digitalMetricsData   = $digitalMetrics->values();
+
+       
         return view('admin.dashboard', compact(
             'totalSaldo',
             'totalMitra',
             'pendingMitra',
             'totalPelanggan',
-            'customerGrowth',
-            'digitalMetrics'
+            'customerGrowthLabels',
+            'customerGrowthData',
+            'digitalMetricsLabels',
+            'digitalMetricsData'
         ));
     }
+    
     
     public function verifyMitra($id)
     {
@@ -93,31 +128,6 @@ class AdminController extends Controller
         return view('admin.customers', compact('customers'));
     }
     
-    private function getCustomerGrowthData()
-    {
-        // This would typically come from your database
-        // For now, we'll use the sample data from your image
-        return [
-            'current' => 0.1900,
-            'previous' => [
-                0.1700, 0.1500, 0.1300, 0.1100, 0.0900, 0.0700, 0.0500
-            ]
-        ];
-    }
-    
-    private function getDigitalMetricsData()
-    {
-        // This would typically come from your database
-        // For now, we'll use the sample data from your image
-        return [
-            'current' => 0.1679,
-            'trend' => [
-                0.1532, 0.1405, 0.1244, 0.1121, 0.1143, 0.1166, 0.1178,
-                0.1187, 0.1196, 0.1209, 0.1227, 0.1230, 0.1244, 0.1257,
-                // ... and so on with the rest of your data
-            ]
-        ];
-    }
 
     public function hubungiKami()
     {
@@ -152,28 +162,61 @@ class AdminController extends Controller
     }
     
     public function verifikasiMitra()
+{
+    $mitraList = Mitra::with([
+            'user:id,nama,email,phone,photo,status'  // pilih kolom user yang kamu butuhkan
+        ])
+        ->whereHas('user', function($q) {
+            $q->where('status', 'pending');
+        })
+        ->get();
+    return view('admin.verifikasi-mitra', compact('mitraList'));
+}
+
+
+    public function show($id)
     {
-        // Get all mitra that need to be verified
-        $mitraList = user::where('status', 'pending')->get();
+        $mitra = Mitra::with(['user','paketPakaian','paketPakaian.jenisPakaian'])
+                      ->findOrFail($id);
 
-        return view('admin.verifikasi-mitra', compact('mitraList'));
-    }
-
-    public function verifikasiMitraDetail($id)
-    {
-        // Fetch a specific mitra and its details
-        $mitra = Mitra::findOrFail($id);
-
-        // Pass mitra to the detail view
         return view('admin.verifikasi-mitra-detail', compact('mitra'));
     }
-    public function updateVerifikasiMitra($id)
+    
+    
+    public function verify($id)
     {
         $mitra = Mitra::findOrFail($id);
-        $mitra->status_registration_mitra = 'verified'; // Update the status to 'verified'
-        $mitra->save();
 
-        return redirect()->route('admin.verifikasiMitra')->with('success', 'Mitra berhasil diverifikasi');
+        // Example verification logic: change the status to 'verified'
+        if ($mitra->status != 'verified') {
+            $mitra->status = 'verified'; // Update status
+            $mitra->save();
+
+            return redirect()->route('admin.verifikasiMitraDetail', $mitra->id)
+                ->with('success', 'Mitra successfully verified');
+        }
+
+        return redirect()->route('admin.verifikasiMitraDetail', $mitra->id)
+            ->with('error', 'Mitra is already verified');
     }
 
+    public function deleteMitra($id)
+{
+    // Find the mitra by id
+    $mitra = Mitra::findOrFail($id);
+    
+    // Find the associated user of this mitra
+    $user = $mitra->user;
+
+    // Update the user's status to 'Ditolak' (Rejected)
+    $user->status = 'Ditolak';
+    $user->save();
+
+    // Delete the mitra record
+    $mitra->delete();
+
+    // Redirect with a success message
+    return redirect()->route('admin.verifikasiMitra')
+        ->with('success', 'Mitra has been rejected, and the user status has been updated to Ditolak. The Mitra record has been deleted.');
+}
 }

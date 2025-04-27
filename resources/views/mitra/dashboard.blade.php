@@ -12,29 +12,45 @@
         <div class="lg:col-span-2 space-y-4">
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-md text-blue-600 font-semibold">Total Saldo</h2>
-                <p class="text-2xl font-bold text-gray-800 mt-2">Rp200.000</p>
+                <p class="text-2xl font-bold text-gray-800 mt-2">Rp{{ number_format($totalSaldoBulanIni, 0, ',', '.') }}</p>
                 <div class="mt-4">
-                    <h3 class="text-lg font-bold">Rp300.000</h3>
-                    <p class="text-sm text-gray-500">+50% dari bulan sebelumnya</p>
+                    <h3 class="text-lg font-bold" 
+                        @if($persenPerubahan > 0)
+                            style="color: green;"  
+                        @elseif($persenPerubahan < 0)
+                            style="color: red;"  
+                        @else
+                            style="color: gray;"  
+                        @endif
+                    >
+                        @if($persenPerubahan > 0)
+                            +{{ number_format($persenPerubahan, 2) }}% dari bulan sebelumnya
+                        @elseif($persenPerubahan < 0)
+                            {{ number_format($persenPerubahan, 2) }}% dari bulan sebelumnya
+                        @else
+                            Tidak ada perubahan
+                        @endif
+                    </h3>
                 </div>
             </div>
+            
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white rounded-xl shadow p-4 text-center">
                     <p class="font-medium text-md text-gray-700">Pesanan Menunggu</p>
-                    <p class="text-blue-600 font-bold text-lg">50</p>
+                    <p class="text-blue-600 font-bold text-lg">{{ $totalPesananMenunggu }}</p>
                 </div>
                 <div class="bg-white rounded-xl shadow p-4 text-center">
                     <p class="font-medium text-gray-700">Pesanan Diterima</p>
-                    <p class="text-green-600 font-bold text-lg">50</p>
+                    <p class="text-green-600 font-bold text-lg">{{ $totalPesananDiterima }}</p>
                 </div>
                 <div class="bg-white rounded-xl shadow p-4 text-center">
                     <p class="font-medium text-gray-700">Pesanan Diproses</p>
-                    <p class="text-yellow-500 font-bold text-lg">50</p>
+                    <p class="text-yellow-500 font-bold text-lg">{{ $totalPesananDiproses }}</p>
                 </div>
                 <div class="bg-white rounded-xl shadow p-4 text-center">
                     <p class="font-medium text-gray-700">Pesanan Selesai</p>
-                    <p class="text-blue-600 font-bold text-lg">50</p>
+                    <p class="text-blue-600 font-bold text-lg">{{ $totalPesananSelesai }}</p>
                 </div>
             </div>
         </div>
@@ -58,15 +74,15 @@
         <div class="lg:col-span-2 space-y-4">
             <div class="bg-white rounded-xl shadow p-4 text-center">
                 <p class="text-gray-600 font-medium">Pendapatan Terbanyak</p>
-                <p class="text-xl font-bold">Rp300.000,00</p>
+                <p class="text-xl font-bold">{{ 'Rp' . number_format($pendapatanTerbesar, 0, ',', '.') }}</p>
             </div>
             <div class="bg-white rounded-xl shadow p-4 text-center">
                 <p class="text-gray-600 font-medium">Pendapatan Terkecil</p>
-                <p class="text-xl font-bold">Rp300.000,00</p>
+                <p class="text-xl font-bold">{{ 'Rp' . number_format($pendapatanTerkecil, 0, ',', '.') }}</p>
             </div>
             <div class="bg-white rounded-xl shadow p-4 text-center">
                 <p class="text-gray-600 font-medium">Bulan Terbaik</p>
-                <p class="text-xl font-bold">Januari</p>
+                <p class="text-xl font-bold">{{ $bulanTerbaik }}</p>
             </div>
         </div>
     </div>
@@ -79,24 +95,12 @@
     new Chart(pakaianCtx, {
         type: 'bar',
         data: {
-            labels: ['Kaos', 'Kemeja', 'Celana', 'Jaket', 'Lainnya'],
+            labels: @json($jenisPakaianLabels), // Menampilkan jenis pakaian
             datasets: [{
                 label: 'Jumlah Pakaian',
-                data: [12, 19, 8, 5, 3],
-                backgroundColor: [
-                    'rgba(37, 99, 235, 0.7)',
-                    'rgba(37, 99, 235, 0.7)',
-                    'rgba(37, 99, 235, 0.7)',
-                    'rgba(37, 99, 235, 0.7)',
-                    'rgba(37, 99, 235, 0.7)'
-                ],
-                borderColor: [
-                    'rgba(37, 99, 235, 1)',
-                    'rgba(37, 99, 235, 1)',
-                    'rgba(37, 99, 235, 1)',
-                    'rgba(37, 99, 235, 1)',
-                    'rgba(37, 99, 235, 1)'
-                ],
+                data: @json($jenisPakaianData), // Menampilkan jumlah pakaian
+                backgroundColor: 'rgba(37, 99, 235, 0.7)',
+                borderColor: 'rgba(37, 99, 235, 1)',
                 borderWidth: 1
             }]
         },
@@ -115,10 +119,10 @@
     new Chart(pendapatanCtx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+            labels: @json(array_values($pesananBulan->keys()->toArray())), // Mengambil bulan (nama bulan) yang diurutkan dengan benar
             datasets: [{
                 label: 'Pendapatan (Rp)',
-                data: [300000, 450000, 200000, 600000, 500000, 750000],
+                data: @json($pesananBulan->values()), // Menampilkan total pendapatan per bulan
                 borderColor: 'rgba(37, 99, 235, 1)',
                 borderWidth: 2,
                 fill: false,
@@ -140,6 +144,7 @@
             }
         }
     });
+
 </script>
 @endpush
 

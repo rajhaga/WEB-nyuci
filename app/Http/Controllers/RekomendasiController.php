@@ -15,7 +15,9 @@ class RekomendasiController extends Controller
 
         // Default rekomendasi jika user belum login
         $rekomendasi = DB::table('mitras')
-            ->orderByDesc('rating')
+            ->join('pengguna as u', 'mitras.user_id', '=', 'u.id')  // Join with the User table
+            ->where('u.status', 'verified')  // Ensure only verified users are included
+            ->orderByDesc('mitras.rating')
             ->limit(5)
             ->get();
         
@@ -47,6 +49,7 @@ class RekomendasiController extends Controller
                     ->join('mitra_paket_pakaian as mp', 'm.id', '=', 'mp.mitra_id')
                     ->join('paket_jenis_pakaian as pjp', 'mp.paket_pakaian_id', '=', 'pjp.paket_pakaian_id')
                     ->where('pjp.jenis_pakaian_id', $kategoriFavorit->item_id)
+                    ->where('u.status', 'verified')  // Ensure only verified users are included
                     ->orderByDesc('m.rating')
                     ->limit(5)
                     ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating']);
@@ -83,7 +86,6 @@ class RekomendasiController extends Controller
     ->orderBy('distance')  // Urutkan berdasarkan jarak terdekat
     ->get();
 
-    // Format data to only show necessary attributes
     $laundries = $laundries->map(function ($laundry) {
         return [
             'id' => $laundry->id,

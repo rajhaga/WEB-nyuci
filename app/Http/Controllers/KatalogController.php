@@ -17,13 +17,17 @@ class KatalogController extends Controller
     // Step 1: Display the catalog of laundries
     public function index()
     {
-        $mitras = Mitra::all(); // Fetch all laundry services (partners)
+        $mitras = Mitra::where('status', 'verified')->get(); // Fetch only verified mitras
         return view('katalog.index', compact('mitras'));
     }
 
     // Show the details for a specific mitra including reviews
     public function showKatalogDetail(Mitra $mitra)
 {
+    // Check if the mitra is verified
+    if ($mitra->status !== 'verified') {
+        return redirect()->route('katalog.index')->with('error', 'Mitra not verified.');
+    }
     // Fetch reviews related to the specific mitra
     $ulasan = Ulasan::where('mitra_id', $mitra->id)->with('user')->get();
 

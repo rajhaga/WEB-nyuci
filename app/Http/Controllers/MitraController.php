@@ -7,63 +7,105 @@ use App\Models\JenisPakaian;
 use App\Models\Pesanan;
 use App\Models\PaketPakaian;
 use Illuminate\Support\Facades\Auth;
+use App\Models\PesananItem;
+use App\Models\Ulasan;
+use Carbon\Carbon;
 
 
 class MitraController extends Controller
 {
-//     public function dashboard()
-// {
-//     // Ambil data mitra berdasarkan ID pengguna yang login
-//     $mitra = Mitra::where('user_id', Auth::id())->first();
 
-//     // Periksa jika data mitra tidak ditemukan
-//     if (!$mitra) {
-//         return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
-//     }
+    public function dashboard()
+    {
+        // Ambil data mitra yang login (misalnya berdasarkan user yang sedang login)
+        $mitra = Mitra::where('user_id', auth()->id())->first();
 
-//     return view('mitra.dashboard', compact('mitra'));
-// }
-public function dashboard()
-{
-    // Ambil data mitra berdasarkan ID pengguna yang login
-    $mitra = Mitra::where('user_id', Auth::id())->first();
+        // Total saldo bulan ini
+        $totalSaldoBulanIni = Pesanan::where('mitra_id', 3)
+            ->whereIn('status', ['Diproses', 'Selesai'])  // Memastikan status adalah Diproses atau Selesai
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)  // Memastikan tahun sama dengan tahun sekarang
+            ->sum('total_harga');
 
-    // Periksa jika data mitra tidak ditemukan
-    if (!$mitra) {
-        return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
+        // Total saldo bulan lalu
+        $totalSaldoBulanLalu = Pesanan::where('mitra_id', $mitra->id)
+            ->whereIn('status', ['Diproses', 'Selesai'])  // Status untuk pesanan yang sudah dibayar atau diterima
+            ->whereMonth('created_at', Carbon::now()->subMonth()->month)
+            ->sum('total_harga');
+
+        // Menghitung persentase perubahan
+        $persenPerubahan = 0;
+        if ($totalSaldoBulanLalu > 0) {
+            $persenPerubahan = (($totalSaldoBulanIni - $totalSaldoBulanLalu) / $totalSaldoBulanLalu) * 100;
+        }
+
+        // Grafik Pesanan Berdasarkan Bulan
+        $pesananBulan = Pesanan::where('mitra_id', $mitra->id)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->whereIn('status', ['Diproses', 'Selesai'])  // Mengambil hanya status 'Diproses' dan 'Selesai'
+            ->selectRaw('MONTH(created_at) as bulan, SUM(total_harga) as total_pendapatan')
+            ->groupBy('bulan')
+            ->pluck('total_pendapatan', 'bulan')
+            ->sortKeys()  // Menambahkan pengurutan berdasarkan bulan
+            ->mapWithKeys(function ($item, $key) {
+                return [Carbon::createFromFormat('m', $key)->format('F') => $item];
+            });
+
+        // Cari pendapatan terbesar
+        $pendapatanTerbesar = $pesananBulan->max();
+        $bulanPendapatanTerbesar = $pesananBulan->search($pendapatanTerbesar);
+
+        // Cari pendapatan terkecil
+        $pendapatanTerkecil = $pesananBulan->min();
+        $bulanPendapatanTerkecil = $pesananBulan->search($pendapatanTerkecil);
+
+        // Cari bulan terbaik
+        $bulanTerbaik = $bulanPendapatanTerbesar;  // Bulan dengan pendapatan terbesar dianggap bulan terbaik
+
+        // Ambil data jumlah pakaian yang dipesan per jenis pakaian
+        $jenisPakaian = PesananItem::whereHas('pesanan', function ($query) use ($mitra) {
+            $query->where('mitra_id', $mitra->id)
+                ->whereIn('status', ['Diproses', 'Selesai']); // Mengambil pesanan yang sudah diproses atau selesai
+        })
+        ->selectRaw('item_id, SUM(jumlah) as total')
+        ->groupBy('item_id')
+        ->orderByDesc('total')
+        ->take(5) // Mengambil 5 jenis pakaian teratas yang paling banyak dipesan
+        ->get();
+
+        // Ambil nama jenis pakaian berdasarkan item_id
+        $jenisPakaianLabels = $jenisPakaian->map(function ($item) {
+            return $item->jenisPakaian->nama; // Mengambil nama jenis pakaian dari relasi
+        });
+
+        $jenisPakaianData = $jenisPakaian->map(function ($item) {
+            return $item->total; // Mengambil total jumlah yang dipesan
+        });
+
+        // Total Pesanan per Status
+        $totalPesananMenunggu = Pesanan::where('mitra_id', $mitra->id)->where('status', 'Menunggu')->count();
+        $totalPesananDiterima = Pesanan::where('mitra_id', $mitra->id)->where('status', 'Diterima')->count();
+        $totalPesananDiproses = Pesanan::where('mitra_id', $mitra->id)->where('status', 'Diproses')->count();
+        $totalPesananSelesai = Pesanan::where('mitra_id', $mitra->id)->where('status', 'Selesai')->count();
+        $totalPesananDibatalkan = Pesanan::where('mitra_id', $mitra->id)->where('status', 'Dibatalkan')->count();
+
+        // Review Mitra
+        $ulasan = Ulasan::where('mitra_id', $mitra->id)
+            ->avg('rating');
+
+        // Render View Dashboard
+        return view('mitra.dashboard', compact(
+            'mitra', 'totalSaldoBulanIni', 'totalSaldoBulanLalu', 'persenPerubahan', 'pesananBulan', 'jenisPakaian', 
+            'totalPesananMenunggu', 'totalPesananDiterima', 'totalPesananDiproses', 
+            'totalPesananSelesai', 'totalPesananDibatalkan', 'ulasan', 
+            'bulanTerbaik', 'pendapatanTerbesar', 'bulanPendapatanTerbesar', 'pendapatanTerkecil', 'bulanPendapatanTerkecil',
+            'jenisPakaianLabels', 'jenisPakaianData'
+
+        ));
     }
 
-    // Total Saldo: Sum of 'total_harga' for orders with 'status' = 'Diterima'
-    $totalSaldo = Pesanan::where('mitra_id', $mitra->id)
-                         ->where('status', 'Diterima')
-                         ->sum('total_harga');
+    
 
-    // Pendapatan Bulanan: Sum of 'total_harga' grouped by month and year for 'Diterima' orders
-    $pendapatanBulanan = Pesanan::where('mitra_id', $mitra->id)
-                                ->where('status', 'Diterima')
-                                ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, SUM(total_harga) as total')
-                                ->groupBy('year', 'month')
-                                ->orderBy('year', 'desc')
-                                ->orderBy('month', 'desc')
-                                ->get();
-
-    // Status Pesanan: Count orders by each status
-    $statusPesanan = [
-        'Menunggu' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Menunggu')->count(),
-        'Diterima' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Diterima')->count(),
-        'diproses' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Diproses')->count(),
-        'selesai' => Pesanan::where('mitra_id', $mitra->id)->where('status', 'Selesai')->count(),
-    ];
-
-    // Grafik Pesanan per Tahun: Count of orders per year
-    $grafikPesanan = Pesanan::where('mitra_id', $mitra->id)
-                            ->selectRaw('YEAR(created_at) as year, COUNT(*) as total')
-                            ->groupBy('year')
-                            ->orderBy('year', 'asc')
-                            ->get();
-
-    return view('mitra.dashboard', compact('mitra', 'totalSaldo', 'pendapatanBulanan', 'statusPesanan', 'grafikPesanan'));
-}
 public function kelolaPesanan(Request $request)
 {
     // Ambil data mitra berdasarkan ID pengguna yang login
@@ -179,30 +221,35 @@ public function showRegisterMitraForm()
         
         return redirect()->route('admin.dashboard')->with('error', 'Mitra tidak ditemukan.');
     }
+    
     public function catalog(Request $request)
 {
-    // Start the query for Mitra
-    $query = Mitra::query();
+    $query = Mitra::query()->with(['paketPakaian', 'jenisPakaian']);
 
-    // Filter by 'kategori_layanan' if provided
-    if ($request->has('kategori_layanan') && $request->kategori_layanan != 'semua') {
+    if ($request->filled('kategori_layanan') && $request->kategori_layanan !== 'semua') {
         $query->where('kategori_layanan', $request->kategori_layanan);
     }
 
-    // Filter by 'paket_layanan' if provided
-    if ($request->has('paket_layanan') && $request->paket_layanan != 'semua') {
+    if ($request->filled('paket_layanan') && $request->paket_layanan !== 'semua') {
         $query->whereHas('paketPakaian', function ($q) use ($request) {
-            // Filter by paket_pakaian id from request
-            $q->where('paket_pakaians.id', $request->paket_layanan);
+            $q->where('nama', $request->paket_layanan);
         });
     }
-    $mitras = $query->with('jenisPakaian')->get();
 
-    // Get the filtered and sorted Mitra results
+    $mitras = $query->orderBy('kategori_layanan', 'asc')
+                    ->paginate(10)
+                    ->withQueryString();
 
-    // Send the data to the view
-    return view('katalog.catalog', compact('mitras'));
+    return view('katalog.catalog', [
+        'mitras' => $mitras,
+        'kategori_layanan_selected' => $request->kategori_layanan ?? 'semua',
+        'paket_layanan_selected' => $request->paket_layanan ?? 'semua',
+    ]);
 }
+
+
+
+
 public function updatePrice(Request $request, $mitraId)
 {
     $request->validate([

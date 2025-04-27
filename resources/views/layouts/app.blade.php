@@ -5,7 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Nyuci - Home')</title>
+    <style>
+        /* Example of custom styles */
+        .navbar {
+            z-index: 10; /* Ensure navbar is on top of map */
+        }
 
+        #map {
+            z-index: 1; /* Place map behind navbar */
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* You can add more custom styles here */
+    </style>
     <!-- Tailwind CSS -->
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     @vite(['resources/css/app.css'])
@@ -13,7 +33,6 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
     <!-- Font Awesome untuk ikon -->
