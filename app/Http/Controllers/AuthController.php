@@ -37,19 +37,23 @@ class AuthController extends Controller
                 ->orderByDesc('total_dipesan')
                 ->limit(1)
                 ->first();
-
+        
             if ($kategoriFavorit) {
-                $rekomendasi = DB::table('mitras as m')
+                $rekomendasiFavorit = DB::table('mitras as m')
                     ->join('mitra_paket_pakaian as mp', 'm.id', '=', 'mp.mitra_id')
                     ->join('paket_jenis_pakaian as pjp', 'mp.paket_pakaian_id', '=', 'pjp.paket_pakaian_id')
                     ->where('pjp.jenis_pakaian_id', $kategoriFavorit->item_id)
                     ->orderByDesc('m.rating')
                     ->limit(5)
                     ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating','m.alamat','m.harga']);
-                    
+        
+                if ($rekomendasiFavorit->isNotEmpty()) {
+                    $rekomendasi = $rekomendasiFavorit;
+                }
+                // kalau kosong, tetap pakai rekomendasi default (rating tertinggi)
             }
         }
-
+        
         return view('home', compact('jenis_pakaian', 'paket_pakaian', 'rekomendasi', 'kategoriFavorit'));
     }
 

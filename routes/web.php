@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\RekomendasiController;
 use App\Http\Controllers\UlasanController;
+use App\Http\Controllers\InvoiceController;
 use App\Models\Ulasan;
 
 /*
@@ -69,6 +70,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/catalog', [MitraController::class, 'catalog'])->name('catalog');
+// Di routes/web.php
+Route::get('/download-invoice/{id}', [InvoiceController::class, 'downloadInvoice'])->name('download.invoice');
 
 
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -83,7 +86,6 @@ Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.d
 Route::get('/mitra/dashboard', [MitraController::class, 'dashboard'])->name('mitra.dashboard');
 
 
-Route::get('katalog', [KatalogController::class, 'index'])->name('katalog.index'); // Display catalog (Step 1)
 Route::get('katalog/{mitra}/detail', [KatalogController::class, 'showKatalogDetail'])->name('katalog.detail'); // Show laundry details (Step 2)
 Route::post('katalog/{mitra}/checkout', [KatalogController::class, 'storeAndCheckout'])->name('katalog.storeAndCheckout'); // Handle the checkout (Step 3)
 Route::post('katalog/{mitra}/placeOrder', [KatalogController::class, 'placeOrder'])->name('katalog.placeOrder'); // Place the order (Step 4)

@@ -224,28 +224,38 @@ public function showRegisterMitraForm()
     
     public function catalog(Request $request)
 {
+     // Pastikan pengguna sudah login
+     if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+    }
+    // Query untuk mengambil data mitra dengan relasi
     $query = Mitra::query()->with(['paketPakaian', 'jenisPakaian']);
 
+    // Filter berdasarkan kategori layanan jika ada
     if ($request->filled('kategori_layanan') && $request->kategori_layanan !== 'semua') {
         $query->where('kategori_layanan', $request->kategori_layanan);
     }
 
+    // Filter berdasarkan paket layanan jika ada
     if ($request->filled('paket_layanan') && $request->paket_layanan !== 'semua') {
         $query->whereHas('paketPakaian', function ($q) use ($request) {
             $q->where('nama', $request->paket_layanan);
         });
     }
 
+    // Ambil mitra yang sudah difilter dan dipaginasi
     $mitras = $query->orderBy('kategori_layanan', 'asc')
                     ->paginate(10)
-                    ->withQueryString();
+                    ->withQueryString();  // Menyertakan query string pada link pagination
 
+    // Mengembalikan view dengan data mitra dan filter yang dipilih
     return view('katalog.catalog', [
         'mitras' => $mitras,
-        'kategori_layanan_selected' => $request->kategori_layanan ?? 'semua',
-        'paket_layanan_selected' => $request->paket_layanan ?? 'semua',
+        'kategori_layanan_selected' => $request->kategori_layanan ?? 'semua',  // Menyimpan nilai kategori_layanan yang dipilih
+        'paket_layanan_selected' => $request->paket_layanan ?? 'semua',        // Menyimpan nilai paket_layanan yang dipilih
     ]);
 }
+
 
 
 

@@ -67,23 +67,37 @@
         </div>
 
         <!-- Next Steps -->
-        <div class="mb-8">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Apa Selanjutnya?</h3>
-            <div class="flex justify-center space-x-4">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mr-2">1</div>
-                    <span class="text-gray-600">Pencucian pakaian</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-8 h-8 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mr-2">2</div>
-                    <span class="text-gray-600">Pengepakan</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-8 h-8 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mr-2">3</div>
-                    <span class="text-gray-600">Pengantaran</span>
-                </div>
+<div class="mb-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Apa Selanjutnya?</h3>
+    <div class="flex justify-center space-x-4">
+        @if($pesanan->status == 'Menunggu')
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center mr-2">1</div>
+                <span class="text-gray-600">Menunggu Mitra untuk Menerima Pesanan</span>
             </div>
-        </div>
+        @elseif($pesanan->status == 'Diterima')
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mr-2">2</div>
+                <span class="text-gray-600">Mitra Menerima Pesanan - Silakan Melakukan Pembelian</span>
+            </div>
+        @elseif($pesanan->status == 'Diproses')
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mr-2">3</div>
+                <span class="text-gray-600">Sedang Dicuci</span>
+            </div>
+        @elseif($pesanan->status == 'Selesai')
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center mr-2">4</div>
+                <span class="text-gray-600">Selesai Dicuci</span>
+            </div>
+        @elseif($pesanan->status == 'Dibatalkan')
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center mr-2">5</div>
+                <span class="text-gray-600">Pesanan Dibatalkan oleh Mitra</span>
+            </div>
+        @endif
+    </div>
+</div>
 
         <!-- Action Buttons -->
         <div class="flex justify-center space-x-4">
@@ -93,12 +107,13 @@
                 </svg>
                 Kembali ke Beranda
             </a>
-            <button class="px-6 py-3 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 transition-colors flex items-center">
+            <button onclick="window.location.href='{{ route('download.invoice', $pesanan->id) }}'" class="px-6 py-3 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 transition-colors flex items-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
                 Unduh Invoice
             </button>
+        
         </div>
 
         <!-- Social Sharing -->

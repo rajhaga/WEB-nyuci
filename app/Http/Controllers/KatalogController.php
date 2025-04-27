@@ -14,27 +14,19 @@ use Auth;
 
 class KatalogController extends Controller
 {
-    // Step 1: Display the catalog of laundries
-    public function index()
-    {
-        $mitras = Mitra::where('status', 'verified')->get(); // Fetch only verified mitras
-        return view('katalog.index', compact('mitras'));
-    }
 
     // Show the details for a specific mitra including reviews
     public function showKatalogDetail(Mitra $mitra)
 {
-    // Check if the mitra is verified
-    if ($mitra->status !== 'verified') {
-        return redirect()->route('katalog.index')->with('error', 'Mitra not verified.');
+    // Cek status mitra
+    if ($mitra->user->status !== 'verified') {
+        return redirect()->route('catalog')->with('error', 'Mitra not verified.');
     }
-    // Fetch reviews related to the specific mitra
+
+    // Fetch reviews and jenis pakaian
     $ulasan = Ulasan::where('mitra_id', $mitra->id)->with('user')->get();
+    $jenisPakaianList = $mitra->jenisPakaian;
 
-    // Fetch the list of 'jenis_pakaian' associated with the mitra
-    $jenisPakaianList = $mitra->jenisPakaian; // Make sure this is the correct relationship for fetching jenis pakaian
-
-    // Pass mitra, ulasan, and jenisPakaianList to the view
     return view('katalog.detail', compact('mitra', 'ulasan', 'jenisPakaianList'));
 }
 
