@@ -93,8 +93,20 @@ Route::get('/laundry/{pesanan}/orderConfirmation', [KatalogController::class, 'o
 
 // Route::get('/lacak-pesanan', [PesananController::class, 'index'])->name('lacak.pesanan');
 Route::get('kelola-pesanan', [MitraController::class, 'kelolaPesanan'])->name('mitra.kelolaPesanan');
+// Rute untuk mengupdate identitas
+Route::put('/mitra/{id}/update-identitas', [MitraController::class, 'updateIdentitas'])->name('mitra.updateIdentitas');
 
-// Group route khusus mitra dengan autentikasi
+// Rute untuk mengupdate informasi toko
+Route::put('/mitra/{id}/update-informasi', [MitraController::class, 'updateInformasiToko'])->name('mitra.updateInformasiToko');
+
+// Rute untuk mengupdate produk
+Route::put('/mitra/{id}/update-produk', [MitraController::class, 'updateProduk'])->name('mitra.updateProduk');
+
+Route::put('/mitra/{mitraId}/update-harga-jenis-pakaian', [MitraController::class, 'updateHargaJenisPakaian'])->name('mitra.updateHargaJenisPakaian');
+// Route untuk mengupdate daftar jenis pakaian berdasarkan paket
+Route::get('/mitra/{mitraId}/jenis-pakaian/{paketId}', [MitraController::class, 'getJenisPakaianByPaket']);
+
+
 Route::get('/mitra/payment', [MitraController::class, 'pembayaran'])->name('mitra.pembayaran');
 Route::post('/mitra/payment/confirm/{id}', [MitraController::class, 'konfirmasiPembayaran'])->name('mitra.konfirmasiPembayaran');
 Route::get('/mitra/payment/confirm/{id}', [MitraController::class, 'showKonfirmasiPembayaran'])->name('mitra.showKonfirmasiPembayaran');

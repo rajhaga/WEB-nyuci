@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\PesananItem;
 use App\Models\Ulasan;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Storage;  // Import Storage jika menggunakan Storage untuk menyimpan file
+use Illuminate\Support\Facades\Log; // Import Log untuk debugging
 
 class MitraController extends Controller
 {
@@ -264,20 +265,20 @@ public function updatePrice(Request $request, $mitraId)
 {
     $request->validate([
         'jenis_pakaian' => 'required|array',
-        'jenis_pakaian.*.id' => 'required|exists:jenis_pakaian,id',  // Pastikan ID jenis pakaian valid
-        'jenis_pakaian.*.price' => 'required|numeric|min:0',  // Validasi harga
+        'jenis_pakaian.*.id' => 'required|exists:jenis_pakaian,id',
+        'jenis_pakaian.*.price' => 'required|numeric|min:0',
     ]);
 
     $mitra = Mitra::findOrFail($mitraId);
 
-    // Update harga untuk setiap jenis pakaian yang terkait dengan mitra
     foreach ($request->jenis_pakaian as $item) {
         $mitra->jenisPakaian()->updateExistingPivot($item['id'], [
             'price' => $item['price']
         ]);
     }
 
-    return redirect()->route('mitra.pengaturan', $mitra->id)->with('success', 'Harga jenis pakaian berhasil diperbarui');
+    return redirect()->route('mitra.pengaturan', $mitraId)
+        ->with('success', 'Harga Jenis Pakaian berhasil diperbarui.');
 }
 
 public function pembayaran()
@@ -340,63 +341,202 @@ public function updateStatus(Request $request, $id)
 
 public function edit($id)
 {
-    $mitra = Mitra::findOrFail($id);
-    return view('mitra.pengaturan', compact('mitra'));
+    $mitra = Mitra::with(['paketPakaian.jenisPakaian'])->findOrFail($id);
+    
+    foreach ($mitra->jenisPakaian as $jenisPakaian) {
+        echo $jenisPakaian->pivot->harga;  // Mengakses harga dari pivot
+    }
+    // Pass the mitra object and available paketPakaian options
+    $paketPakaianOptions = PaketPakaian::all();
+
+    return view('mitra.pengaturan', compact('mitra', 'paketPakaianOptions'));
 }
 
-public function update(Request $request, $id)
+public function updateIdentitas(Request $request, $id)
 {
+    // Validasi data yang diterima
     $request->validate([
-        'nama_pemilik' => 'required|string|max:255',
-        'nomor_hp' => 'required|string|max:15',
-        'nama_laundry' => 'required|string|max:255',
-        'alamat' => 'required|string',
-        'foto_tempat' => 'nullable|image|mimes:jpg,jpeg,png,gif',
-        'metode_pembayaran' => 'required|string',
-        'paket' => 'required|array',
-        'paket.*.nama' => 'required|string|max:255',
-        'paket.*.harga' => 'required|numeric|min:0',
+        'nama_lengkap' => 'required|string|max:255',
+        'email' => 'required|email',
+        'nomor_telepon' => 'required|string|max:15',
+        'password' => 'nullable|string|min:8|confirmed',
     ]);
 
+    // Mencari data mitra berdasarkan ID
     $mitra = Mitra::findOrFail($id);
 
-    // Update mitra data
-    $mitra->nama_pemilik = $request->nama_pemilik;
-    $mitra->nomor_hp = $request->nomor_hp;
-    $mitra->nama_laundry = $request->nama_laundry;
-    $mitra->alamat = $request->alamat;
-    $mitra->metode_pembayaran = $request->metode_pembayaran;
+    // Update data identitas mitra
+    $mitra->update([
+        'nama_pemilik' => $request->nama_lengkap,
+        'nomor_hp' => $request->nomor_telepon,
+    ]);
 
-    // Handle foto tempat upload
-    if ($request->hasFile('foto_tempat')) {
-        // Delete old photo
-        if ($mitra->foto_tempat) {
-            Storage::delete($mitra->foto_tempat);
-        }
-        $mitra->foto_tempat = $request->file('foto_tempat')->store('foto_mitra');
+    // Update email dan password jika ada perubahan
+    $user = $mitra->user;
+    if ($request->email) {
+        $user->email = $request->email;
     }
-
-    $mitra->save();
-
-    // Update harga dan nama paket pakaian (Sync paket_pakaian)
-    foreach ($request->paket as $paketId => $paketData) {
-        $paket = PaketPakaian::find($paketId);
-        if ($paket) {
-            // Update paket data
-            $paket->update([
-                'nama' => $paketData['nama'],
-                'harga' => $paketData['harga']
-            ]);
-        }
+    if ($request->password) {
+        $user->password = bcrypt($request->password); // Pastikan password dienkripsi
     }
+    $user->save(); // Simpan perubahan
 
-    // Sync paket pakaian jika ada perubahan
-    if ($request->has('paket_pakaian')) {
-        $mitra->paketPakaian()->sync($request->paket_pakaian);
-    }
-
-    return redirect()->route('mitra.pengaturan', $mitra->id)->with('success', 'Pengaturan Mitra berhasil diperbarui');
+    return redirect()->route('mitra.pengaturan', $mitra->id)
+        ->with('success', 'Identitas Mitra berhasil diperbarui.');
 }
+
+public function updateInformasiToko(Request $request, $id)
+{
+    // Validasi data yang diterima
+    $request->validate([
+        'nama_laundry' => 'required|string|max:255',
+        'alamat_laundry' => 'required|string',
+        'latitude' => 'nullable|numeric',
+        'longitude' => 'nullable|numeric',
+        'deskripsi' => 'required|string',
+        'gambar_tempat' => 'nullable|image|mimes:jpg,jpeg,png,gif',
+    ]);
+
+    // Mencari data mitra berdasarkan ID
+    $mitra = Mitra::findOrFail($id);
+
+    // Update data informasi toko
+    $mitra->update([
+        'nama_laundry' => $request->nama_laundry,
+        'alamat' => $request->alamat_laundry,
+        'latitude' => $request->latitude,
+        'longitude' => $request->longitude,
+        'deskripsi' => $request->deskripsi,
+    ]);
+
+    // Update foto tempat jika ada
+    if ($request->hasFile('gambar_tempat')) {
+        if ($mitra->foto_tempat) {
+            Storage::delete($mitra->foto_tempat); // Hapus foto lama jika ada
+        }
+        $mitra->foto_tempat = $request->file('gambar_tempat')->store('foto_mitra'); // Upload foto baru
+    }
+
+    return redirect()->route('mitra.pengaturan', $mitra->id)
+        ->with('success', 'Informasi Toko berhasil diperbarui.');
+}
+public function updateProduk(Request $request, $id)
+{
+    // Validasi data yang diterima
+    $request->validate([
+        'kategori_layanan' => 'required|string|in:cuci,setrika,cuci & setrika',
+        'paket_laundry' => 'required|string',
+        'jenis_pakaian' => 'required|array',
+        'jenis_pakaian.*.id' => 'required|exists:jenis_pakaian,id',
+        'jenis_pakaian.*.price' => 'required|numeric|min:0',
+    ]);
+
+    // Mencari data mitra berdasarkan ID
+    $mitra = Mitra::findOrFail($id);
+
+    // Update kategori layanan
+    $mitra->update([
+        'kategori_layanan' => $request->kategori_layanan,
+    ]);
+
+    // Update paket pakaian
+    $paket = PaketPakaian::where('nama', $request->paket_laundry)->first();
+    if ($paket) {
+        $mitra->paketPakaian()->sync([$paket->id]); // Sync paket dengan mitra
+    }
+
+    // Proses update harga untuk jenis pakaian
+    $jenisPakaianData = [];
+    foreach ($request->jenis_pakaian as $item) {
+        $jenisPakaianData[$item['id']] = ['price' => $item['price']];
+    }
+
+    // Sync data jenis pakaian dengan harga
+    $mitra->jenisPakaian()->sync($jenisPakaianData);
+
+    return redirect()->route('mitra.pengaturan', $mitra->id)
+        ->with('success', 'Produk berhasil diperbarui.');
+}
+
+public function addBarang(Request $request, $mitraId)
+{
+    // Validasi data yang diterima
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'harga' => 'required|numeric|min:0',
+    ]);
+
+    // Mencari mitra berdasarkan ID
+    $mitra = Mitra::findOrFail($mitraId);
+
+    // Membuat jenis pakaian baru
+    $jenisPakaian = JenisPakaian::create([
+        'nama' => $request->nama,
+    ]);
+
+    // Menambahkan jenis pakaian ke mitra tertentu dengan harga
+    $mitra->jenisPakaian()->syncWithoutDetaching([
+        $jenisPakaian->id => ['price' => $request->harga]
+    ]);
+
+    return redirect()->route('mitra.pengaturan', $mitra->id)
+        ->with('success', 'Barang (Jenis Pakaian) berhasil ditambahkan.');
+}
+
+public function updateHargaJenisPakaian(Request $request, $mitraId)
+{
+    // Validasi input
+    $request->validate([
+        'paket_laundry' => 'required|exists:paket_pakaians,id', // Validasi paket pakaian yang dipilih
+        'jenis_pakaian' => 'required|array', // Pastikan jenis pakaian disertakan
+        'jenis_pakaian.*.price' => 'required|numeric|min:0', // Validasi harga setiap jenis pakaian
+        'jenis_pakaian.*.id' => 'required|exists:jenis_pakaian,id', // Validasi ID jenis pakaian yang dipilih
+    ]);
+
+    // Cari mitra berdasarkan ID
+    $mitra = Mitra::findOrFail($mitraId);
+
+    // Ambil data paket pakaian yang dipilih
+    $paket = PaketPakaian::find($request->paket_laundry);
+
+    // Sync paket pakaian yang dipilih dengan mitra
+    $mitra->paketPakaian()->sync([$paket->id]);
+
+    // Update harga jenis pakaian pada pivot table 'paket_jenis_pakaian'
+    foreach ($request->jenis_pakaian as $jenis) {
+        // Perbarui harga pada pivot tabel
+        $mitra->paketPakaian()
+            ->wherePivot('paket_pakaian_id', $paket->id)  // Menyaring paket yang dipilih
+            ->wherePivot('jenis_pakaian_id', $jenis['id']) // Menyaring jenis pakaian yang dipilih
+            ->updateExistingPivot($jenis['id'], ['price' => $jenis['price']]);
+    }
+
+    return redirect()->route('mitra.dashboard')->with('success', 'Produk berhasil diperbarui');
+}
+
+
+// Controller Method
+public function getJenisPakaianByPaket($mitraId, $paketId)
+{
+    // Temukan mitra berdasarkan ID
+    $mitra = Mitra::with(['paketPakaian.jenisPakaian'])->findOrFail($mitraId);
+    
+    // Cari paket berdasarkan ID dan ambil jenis pakaian yang terkait
+    $paket = PaketPakaian::with('jenisPakaian')->findOrFail($paketId);
+
+    // Kembalikan daftar jenis pakaian dalam bentuk HTML untuk dimasukkan ke halaman
+    $output = '';
+    foreach ($paket->jenisPakaian as $jenis) {
+        $output .= '<div class="flex items-center space-x-3" id="jenis-pakaian-' . $jenis->id . '">
+                        <input type="hidden" name="jenis_pakaian[' . $jenis->id . '][id]" value="' . $jenis->id . '">
+                        <input type="text" value="' . $jenis->nama . '" class="flex-1 p-3 border border-gray-300 rounded-lg" readonly>
+                        <input type="number" name="jenis_pakaian[' . $jenis->id . '][price]" value="' . $jenis->pivot->price . '" class="w-32 p-3 border border-gray-300 rounded-lg">
+                    </div>';
+    }
+
+    return response()->json(['output' => $output]);
+}
+
 
 }
 

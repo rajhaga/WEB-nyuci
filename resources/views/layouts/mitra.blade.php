@@ -6,6 +6,8 @@
     <title>Dashboard Mitra - Nyuci</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
 </head>
 <body class="bg-gray-100">
     <!-- Navbar -->

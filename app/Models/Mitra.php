@@ -32,10 +32,18 @@ class Mitra extends Model
 
     // Relasi Many-to-Many dengan JenisPakaian
     public function jenisPakaian()
-{
-    return $this->belongsToMany(JenisPakaian::class, 'paket_jenis_pakaian', 'paket_pakaian_id', 'jenis_pakaian_id')
-                ->withPivot('price'); // Include price in the pivot table
-}
+    {
+        return $this->belongsToMany(JenisPakaian::class, 'paket_jenis_pakaian', 'paket_pakaian_id', 'jenis_pakaian_id')
+                    ->withPivot('price'); // Include price in the pivot table
+    }
+
+    public function mitraJenisPakaian()
+    {
+        return $this->belongsToMany(Mitra::class, 'mitra_jenis_pakaian', 'jenis_pakaian_id', 'mitra_id')
+                    ->withPivot('harga'); // Menyertakan harga di pivot table
+    }
+
+
 
 
 }

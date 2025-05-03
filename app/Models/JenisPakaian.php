@@ -22,15 +22,22 @@ class JenisPakaian extends Model
     
     public function mitra()
 {
-    return $this->belongsToMany(Mitra::class, 'paket_jenis_pakaian', 'jenis_pakaian_id', 'paket_pakaian_id')
+    return $this->belongsToMany(Mitra::class, 'paket_jenis_pakaian', 'jenis_pakaian_id', 'paket_pakaian_id',)
                 ->withPivot('price'); // Include price in the pivot table
 }
-
+    public function mitras()
+    {
+        return $this->belongsToMany(Mitra::class, 'mitra_jenis_pakaian', 'jenis_pakaian_id', 'mitra_id')
+                    ->withPivot('harga');  // Menyertakan harga di pivot table
+    }
 public function pesananItems()
     {
         return $this->hasMany(PesananItem::class, 'item_id');
     }
 
-    
+    public function paketPakaian()
+{
+    return $this->belongsTo(PaketPakaian::class);
+}
 
 }
