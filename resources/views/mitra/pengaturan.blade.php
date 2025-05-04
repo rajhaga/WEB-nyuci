@@ -173,10 +173,10 @@
                 </div>
                 <input type="hidden" id="mitra_id" value="{{ $mitra->id }}">
 
-                <!-- Tombol Tambah Jenis Pakaian -->
+                {{-- <!-- Tombol Tambah Jenis Pakaian -->
                 <div class="pt-4">
                     <button type="button" id="add-jenis-pakaian-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-all" onclick="addBarang()">+ Tambah Jenis Pakaian</button>
-                </div>
+                </div> --}}
             </div>
     
             <!-- Tombol Batal dan Simpan -->
