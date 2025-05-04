@@ -193,6 +193,14 @@ public function konfirmasiPembayaran(Pesanan $pesanan)
                     'paid_at' => now()
                 ]);
                 
+                // Update the admin's income after payment confirmation
+                $admin = Admin::where('user_id', $pesanan->user_id)->first();
+                if ($admin) {
+                    // Directly update pendapatan by adding 8000
+                    $admin->pendapatan += 8000;
+                    $admin->save(); // Save the updated pendapatan
+                }
+
                 // Redirect to admin dashboard after payment confirmation
                 return redirect()->route('mitra.dashboard')->with('success', 'Pembayaran berhasil dikonfirmasi');
             }
@@ -202,6 +210,14 @@ public function konfirmasiPembayaran(Pesanan $pesanan)
                 'status' => 'Diproses'
             ]);
 
+            // Update the admin's income after payment confirmation
+            $admin = Admin::where('user_id', $pesanan->user_id)->first();
+            if ($admin) {
+                // Directly update pendapatan by adding 8000
+                $admin->pendapatan += 8000;
+                $admin->save(); // Save the updated pendapatan
+            }
+
             // Redirect to admin dashboard after payment confirmation
             return redirect()->route('mitra.dashboard')->with('success', 'Pembayaran telah dikonfirmasi dan pesanan sedang diproses');
         }
@@ -209,6 +225,14 @@ public function konfirmasiPembayaran(Pesanan $pesanan)
         // Default case if not QRIS or COD
         $pesanan->update(['status' => 'Diproses']);
         
+        // Update the admin's income after payment confirmation
+        $admin = Admin::where('user_id', $pesanan->user_id)->first();
+        if ($admin) {
+            // Directly update pendapatan by adding 8000
+            $admin->pendapatan += 8000;
+            $admin->save(); // Save the updated pendapatan
+        }
+
         // Redirect to admin dashboard after payment confirmation
         return redirect()->route('mitra.dashboard')->with('success', 'Pesanan sedang diproses');
         
@@ -221,6 +245,7 @@ public function konfirmasiPembayaran(Pesanan $pesanan)
         return redirect()->route('mitra.dashboard')->with('error', 'Pesanan sedang diproses, tetapi terjadi kesalahan verifikasi pembayaran');
     }
 }
+
 
 public function showCOD(Pesanan $pesanan)
 {
