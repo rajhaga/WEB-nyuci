@@ -3,9 +3,15 @@
 @section('mitracontent')
 <section class="p-2 min-h-screen space-y-6">
     <div class="mb-4 flex justify-between items-center">
-        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            🔍 Filter Tanggal
-        </button>
+        <form method="GET" action="{{ route('mitra.dashboard') }}">
+            <div class="flex space-x-4">
+                <input type="date" name="start_date" value="{{ request('start_date') }}" class="px-4 py-2 border rounded" />
+                <input type="date" name="end_date" value="{{ request('end_date') }}" class="px-4 py-2 border rounded" />
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    🔍 Filter Tanggal
+                </button>
+            </div>
+        </form>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">

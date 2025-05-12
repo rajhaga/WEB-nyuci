@@ -16,9 +16,15 @@ class UlasanController extends Controller
             return redirect()->route('home')->with('error', 'Pesanan belum selesai.');
         }
 
-        // Pass the pesanan to the view
-        return view('mitra.ulasan');
+        // Fetch Mitra and calculate ratings
+        $mitra = Mitra::find($pesanan->mitra_id);
+        $averageRating = Ulasan::where('mitra_id', $mitra->id)->avg('rating');
+        $totalReviews = Ulasan::where('mitra_id', $mitra->id)->count();
+
+        // Pass the pesanan and additional data to the view
+        return view('mitra.ulasan', compact('pesanan', 'mitra', 'averageRating', 'totalReviews'));
     }
+
 
     public function storeReview(Request $request, Pesanan $pesanan)
 {
@@ -49,6 +55,7 @@ class UlasanController extends Controller
 
     return redirect()->route('home')->with('success', 'Ulasan berhasil dikirim');
 }
+
 
 
     public function showReport()

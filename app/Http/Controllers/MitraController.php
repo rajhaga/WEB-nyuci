@@ -17,22 +17,24 @@ use Illuminate\Support\Facades\Log; // Import Log untuk debugging
 class MitraController extends Controller
 {
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         // Ambil data mitra yang login (misalnya berdasarkan user yang sedang login)
         $mitra = Mitra::where('user_id', auth()->id())->first();
+        // Get selected date range from request (if available)
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : Carbon::now()->startOfMonth();
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : Carbon::now()->endOfMonth();
 
-        // Total saldo bulan ini
-        $totalSaldoBulanIni = Pesanan::where('mitra_id', 3)
-            ->whereIn('status', ['Diproses', 'Selesai'])  // Memastikan status adalah Diproses atau Selesai
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)  // Memastikan tahun sama dengan tahun sekarang
+        // Total saldo berdasarkan tanggal yang dipilih
+        $totalSaldoBulanIni = Pesanan::where('mitra_id', $mitra->id)
+            ->whereIn('status', ['Diproses', 'Selesai'])
+            ->whereBetween('created_at', [$startDate, $endDate])  // Filter berdasarkan tanggal
             ->sum('total_harga');
 
-        // Total saldo bulan lalu
+        // Total saldo bulan sebelumnya berdasarkan tanggal yang dipilih
         $totalSaldoBulanLalu = Pesanan::where('mitra_id', $mitra->id)
-            ->whereIn('status', ['Diproses', 'Selesai'])  // Status untuk pesanan yang sudah dibayar atau diterima
-            ->whereMonth('created_at', Carbon::now()->subMonth()->month)
+            ->whereIn('status', ['Diproses', 'Selesai'])
+            ->whereBetween('created_at', [$startDate->subMonth(), $endDate->subMonth()])  // Filter berdasarkan bulan lalu
             ->sum('total_harga');
 
         // Menghitung persentase perubahan
