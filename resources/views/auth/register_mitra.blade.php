@@ -206,12 +206,18 @@
                                         <label for="nama_pemilik" class="block font-medium">Nama Pemilik</label>
                                         <input type="text" name="nama_pemilik" class="w-full p-2 border rounded-md" 
                                                value="{{ Auth::check() ? Auth::user()->nama : '' }}" required>
+                                        @error('nama_pemilik')
+                                                <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div>
                                         <label for="nomor_hp" class="block font-medium">Nomor HP/WhatsApp</label>
                                         <input type="tel" name="nomor_hp" class="w-full p-2 border rounded-md" 
                                                value="{{ Auth::check() ? Auth::user()->phone : '' }}" 
                                                pattern="[0-9]{10,15}" required>
+                                               @error('nomor_hp')
+                                               <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                                           @enderror
                                     </div>
                                 </div>
                                 
@@ -227,11 +233,17 @@
                                     <div>
                                         <label for="nama_laundry" class="block font-medium">Nama Laundry</label>
                                         <input type="text" name="nama_laundry" class="w-full p-2 border rounded-md" required>
+                                        @error('nama_laundry')
+                                            <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div>
                                         <label for="alamat" class="block font-medium">Alamat Lengkap</label>
                                         <input type="text" name="alamat" class="w-full p-2 border rounded-md" required>
                                     </div>
+                                    @error('alamat')
+                                        <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">

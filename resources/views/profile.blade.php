@@ -37,7 +37,6 @@
     </aside>
 
     <!-- Main Content -->
-    <!-- Main Content -->
     <main class="flex-1 bg-white rounded-xl p-6 md:p-10 shadow-md">
         <h1 class="text-3xl font-bold text-blue-500 mb-6">Profil</h1>
 
@@ -89,6 +88,34 @@
             </div>
         </div>
 
+        <!-- Menampilkan Data Mitra jika status Pending -->
+        @if($mitra && Auth::user()->status == 'pending')
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+                <h3 class="text-xl font-semibold text-blue-600 mb-4">Data Mitra Anda</h3>
+
+                <div class="flex items-center space-x-6">
+                    <!-- Gambar Tempat -->
+                    <div class="w-32 h-32 flex-shrink-0">
+                        <img src="{{ asset('storage/' . $mitra->foto_tempat) }}" class="w-full h-full rounded-lg object-cover shadow-md">
+                    </div>
+
+                    <!-- Data Mitra -->
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500"><strong>Nama Laundry:</strong> <span class="font-medium text-gray-800">{{ $mitra->nama_laundry }}</span></p>
+                        <p class="text-sm text-gray-500"><strong>Alamat:</strong> <span class="font-medium text-gray-800">{{ $mitra->alamat }}</span></p>
+                        <p class="text-sm text-gray-500"><strong>Rating:</strong> <span class="font-medium text-gray-800">{{ $mitra->rating }}</span></p>
+                        <p class="text-sm text-gray-500"><strong>Harga:</strong> <span class="font-medium text-gray-800">{{ $mitra->harga }}</span></p>
+                        <p class="text-sm text-gray-500"><strong>Status:</strong> <span class="font-medium text-gray-800">{{ $mitra->user->status }}</span></p>
+                    </div>
+                </div>
+
+                <!-- Pesan Peringatan -->
+                <div class="mt-4 text-sm text-red-600">
+                    <p><strong>Perhatian:</strong> Jika data ini hilang atau tidak lengkap, Anda akan ditolak untuk menjadi mitra kami. Pastikan semua informasi Anda sudah terisi dengan benar.</p>
+                </div>
+            </div>
+        @endif
+
         <!-- Edit Mode -->
         <form x-show="isEditing" x-transition action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="grid gap-6 max-w-3xl mx-auto mt-6">
             @csrf
@@ -126,7 +153,6 @@
             </div>
         </form>
     </main>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

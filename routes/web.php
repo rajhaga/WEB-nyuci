@@ -37,9 +37,7 @@ Route::get('register', [AuthController::class, 'showRegisterForm']);
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::get('/', [AuthController::class, 'home'])->name('home');
 
@@ -73,13 +71,20 @@ Route::get('/catalog', [MitraController::class, 'catalog'])->name('catalog');
 // Di routes/web.php
 Route::get('/download-invoice/{id}', [InvoiceController::class, 'downloadInvoice'])->name('download.invoice');
 
+Route::prefix('mitra')->name('mitra.')->group(function () {
+    // Route for updating Jenis Laundry & Paket Pakaian
+    Route::put('/update-laundry-paket/{id}', [MitraController::class, 'updateLaundryPaket'])->name('updateLaundryPaket');
+
+    // Route for updating Jenis Pakaian Prices
+    Route::put('/update-jenis-pakaian/{id}', [MitraController::class, 'updateJenisPakaian'])->name('updateJenisPakaian');
+});
+
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/approve/{id}', [AdminController::class, 'approveUser'])->name('admin.approve');
     Route::get('admin/reject/{id}', [AdminController::class, 'rejectUser'])->name('admin.reject');
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('/admin/mitra/verifikasi/{id}', [MitraController::class, 'verifikasi'])->name('admin.mitra.verifikasi');
-
+    Route::post('/admin/mitra/verifikasi/{id}', [AdminController::class, 'verifikasi'])->name('admin.verifikasi');
 });
    
 Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');

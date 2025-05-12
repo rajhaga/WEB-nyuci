@@ -15,8 +15,12 @@ class ProfileController extends Controller
         $user = Auth::user();
         $mitra = auth()->user()->mitra;
         $jenisPakaian = $mitra ? $mitra->jenisPakaian : [];
-        return view('profile', compact('user'));
-        return view('profile', compact('jenisPakaian'));
+        // Jika pengguna memiliki mitra dan statusnya adalah pending, tampilkan mitra tersebut
+        if ($mitra && $user->status === 'pending') {
+            // Tampilkan data mitra
+            return view('profile', compact('user', 'mitra','jenisPakaian'));
+        }
+        return view('profile', compact('user', 'mitra','jenisPakaian'));
 
     }
 

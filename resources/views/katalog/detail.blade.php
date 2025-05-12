@@ -201,40 +201,56 @@
                 @csrf
                 <div class="space-y-6">
                     @foreach($mitra->paketPakaian as $paket)
-                    <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors duration-200">
-                        <h4 class="text-lg font-semibold text-blue-800 mb-3">{{ $paket->nama }}</h4>
-                        <p class="text-blue-600 font-bold mb-3">Rp{{ number_format($paket->harga, 0, ',', '.') }}</p>
-                        
-                        <div class="space-y-3">
-                            @foreach($jenisPakaianList as $jenisPakaian)
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="font-medium">{{ $jenisPakaian->nama }}</p>
-                                        <p class="text-sm text-blue-600">Rp{{ number_format($jenisPakaian->pivot->price, 0, ',', '.') }}/item</p>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        <button type="button" 
-                                                class="quantity-btn decrease bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-200 transition-all duration-200"
-                                                data-id="{{ $jenisPakaian->id }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                        <span class="quantity-{{ $jenisPakaian->id }} w-8 text-center">0</span>
-                                        <button type="button" 
-                                                class="quantity-btn increase bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-700 transition-all duration-200"
-                                                data-id="{{ $jenisPakaian->id }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                        <input type="hidden" name="quantities[{{ $mitra->id }}][{{ $jenisPakaian->id }}]" value="0" class="quantity-input-{{ $jenisPakaian->id }}">
-                                    </div>
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors duration-200">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-lg font-semibold text-blue-800 mb-1">{{ $paket->nama }}</h4>
+                                    <p class="text-sm text-gray-500">Estimasi: {{ $paket->estimasi_waktu }} jam</p>
                                 </div>
-                            @endforeach
+                                <span class="text-blue-600 font-bold">Rp{{ number_format($paket->harga, 0, ',', '.') }}</span>
+                            </div>
 
+                            <div class="mt-4 space-y-3">
+                                @foreach($jenisPakaianList->where('pivot.paket_pakaian_id', $paket->id) as $jenisPakaian)
+                                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                        <div>
+                                            <p class="font-medium">{{ $jenisPakaian->nama }}</p>
+                                            <p class="text-sm text-blue-600">Rp{{ number_format($jenisPakaian->pivot->price, 0, ',', '.') }}/item</p>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Quantity Input Fields -->
+                                            <button type="button" 
+                                                    class="quantity-btn decrease bg-blue-100 text-blue-800 w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-200 transition-all duration-200"
+                                                    data-id="{{ $jenisPakaian->id }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                            <span class="quantity-{{ $jenisPakaian->id }} w-8 text-center">0</span>
+                                            <button type="button" 
+                                                    class="quantity-btn increase bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-700 transition-all duration-200"
+                                                    data-id="{{ $jenisPakaian->id }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+
+                                            <!-- Hidden Input for Quantity -->
+                                            <input type="hidden" 
+                                                name="quantities[{{ $paket->id }}][{{ $jenisPakaian->id }}]" 
+                                                value="0" 
+                                                class="quantity-input-{{ $jenisPakaian->id }}">
+                                            <input type="hidden" 
+                                                name="items[{{ $jenisPakaian->id }}][jenis_pakaian_id]" 
+                                                value="{{ $jenisPakaian->id }}">
+                                            <input type="hidden" 
+                                                name="items[{{ $jenisPakaian->id }}][price]" 
+                                                value="{{ $jenisPakaian->pivot->price }}">
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
                     @endforeach
                 </div>
 

@@ -183,22 +183,33 @@ class AdminController extends Controller
     }
     
     
-    public function verify($id)
+    public function verifikasi($id)
     {
+        // Find the Mitra by its ID
         $mitra = Mitra::findOrFail($id);
+        // Find the associated user of this mitra
+        $user = $mitra->user;
 
-        // Example verification logic: change the status to 'verified'
-        if ($mitra->status != 'verified') {
-            $mitra->status = 'verified'; // Update status
-            $mitra->save();
+        // Check if the user's status is not already verified
+        if ($user->status != 'verifiedf') {
+           
+            // Update associated User status to 'verified'
+            $user->status = 'verified'; // Set User status to 'verified'
+            $user->role = 'mitra'; // Set User status to 'mitra'
 
-            return redirect()->route('admin.verifikasiMitraDetail', $mitra->id)
-                ->with('success', 'Mitra successfully verified');
+            $user->save();  // Save User status
+
+            // Redirect to the Mitra Detail page with success message
+            return redirect()->route('admin.dashboard', $mitra->id)
+                ->with('success', 'Mitra and User successfully verified');
         }
 
-        return redirect()->route('admin.verifikasiMitraDetail', $mitra->id)
-            ->with('error', 'Mitra is already verified');
+        // If the Mitra or User is already verified, return an error message
+        return redirect()->route('admin.dashboard', $mitra->id)
+            ->with('error', 'Mitra and User are already verified');
     }
+
+
 
     public function deleteMitra($id)
 {

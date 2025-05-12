@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Nyuci</title>
+    
     {{-- Tailwind CSS --}}
     <script src="https://cdn.tailwindcss.com"></script>
+    
     {{-- Chart.js library (global) --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -23,7 +25,12 @@
                 </button>
                 <ul id="dropdown-menu" class="absolute right-0 mt-2 bg-white text-black rounded shadow-md hidden">
                     <li><a href="/profile" class="block px-4 py-2 hover:bg-gray-200 transition duration-200">Profile</a></li>
-                    <li><a href="/logout" class="block px-4 py-2 hover:bg-gray-200 transition duration-200">Logout</a></li>
+                    <li>
+                        <form action="{{ url('/logout') }}" method="POST" class="block px-4 py-2 hover:bg-gray-200 transition duration-200">
+                            @csrf
+                            <button type="submit" class="w-full text-left">Logout</button>
+                        </form>                        
+                    </li>
                 </ul>
             </div>
         </div>
@@ -59,6 +66,7 @@
         // Toggle Dropdown Menu
         function toggleDropdown() {
             const dropdown = document.getElementById('dropdown-menu');
+            console.log(dropdown.classList.contains('hidden')); // Check visibility
             dropdown.classList.toggle('hidden');
         }
     </script>

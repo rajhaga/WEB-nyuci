@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
 </head>
 <body class="bg-gray-100">
     <!-- Navbar -->
@@ -23,11 +22,28 @@
                 </button>
                 <ul id="dropdown-menu" class="absolute right-0 mt-2 bg-white text-black rounded shadow-md hidden">
                     <li><a class="block px-4 py-2 hover:bg-gray-200 transition duration-200" href="/profile">Profile</a></li>
-                    <li><a class="block px-4 py-2 hover:bg-gray-200 transition duration-200" href="/logout">Logout</a></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST" class="block px-4 py-2 hover:bg-gray-200 transition duration-200">
+                            @csrf
+                            <button type="submit" class="w-full text-left">Logout</button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
+<!-- Display success or error notifications -->
+    @if(session('success'))
+        <div class="alert alert-success text-green-600 p-4 mb-4 rounded bg-green-100">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger text-red-600 p-4 mb-4 rounded bg-red-100">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <!-- Dashboard -->
     <div class="container mx-auto mt-6 flex">
@@ -43,7 +59,7 @@
                 </a>
 
                 <a href="{{ route('mitra.kelolaPesanan') }}" class="block p-3 rounded-lg transition duration-300 border-l-4 {{
-                    Route::currentRouteNamed('mitra.kelolaPesanan') 
+                    request()->routeIs('mitra.kelolaPesanan') 
                     ? 'border-blue-500 bg-blue-50 text-blue-600' 
                     : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800'
                 }}">
@@ -68,7 +84,7 @@
 
                 @if(isset($mitra) && $mitra->id)
                 <a href="{{ route('mitra.pengaturan', $mitra->id) }}" class="block p-3 rounded-lg transition duration-300 border-l-4 {{
-                    Route::currentRouteNamed('mitra.pengaturan') 
+                    request()->routeIs('mitra.pengaturan') 
                     ? 'border-blue-500 bg-blue-50 text-blue-600' 
                     : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-800'
                 }}">
@@ -99,4 +115,3 @@
     </script>
 </body>
 </html>
-

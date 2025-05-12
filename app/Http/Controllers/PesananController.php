@@ -69,6 +69,7 @@ class PesananController extends Controller
             DB::transaction(function() use ($pesanan, $params, $totalPembayaran, $adminFeePerOrder) {
                 // charge via Midtrans
                 $response = CoreApi::charge($params);
+                Log::info('Midtrans QRIS Response: ', ['response' => $response]);  // Debugging the response
 
                 // generate & simpan QR code
                 $qrPath = 'qris/' . $pesanan->id . '.png';
@@ -89,8 +90,7 @@ class PesananController extends Controller
                 ]);
 
                 // catat fee ke tabel admins
-                // ganti '1' dengan user_id admin yang sesuai
-                $adminUserId = 1;
+                $adminUserId = 1;  // replace with actual user ID
                 Admin::firstOrCreate(
                     ['user_id' => $adminUserId],
                     ['pendapatan' => 0]
@@ -102,6 +102,7 @@ class PesananController extends Controller
             abort(500, 'Gagal generate QRIS');
         }
     }
+
     public function handleWebhook(Request $request)
     {
         $payload = $request->all();
@@ -179,7 +180,6 @@ public function konfirmasiPembayaran(Pesanan $pesanan)
     $this->authorize('update', $pesanan);
 
     try {
-        // Check if the payment is done via QRIS or COD
         if ($pesanan->metode_pembayaran === 'qris') {
             // Verifying the payment via Midtrans for QRIS
             Config::$serverKey = config('services.midtrans.server_key');
@@ -192,59 +192,43 @@ public function konfirmasiPembayaran(Pesanan $pesanan)
                     'status' => 'paid',
                     'paid_at' => now()
                 ]);
-                
-                // Update the admin's income after payment confirmation
-                $admin = Admin::where('user_id', $pesanan->user_id)->first();
-                if ($admin) {
-                    // Directly update pendapatan by adding 8000
-                    $admin->pendapatan += 8000;
-                    $admin->save(); // Save the updated pendapatan
-                }
+
+                // Add success message to session
+                session()->flash('success', 'Pembayaran berhasil dikonfirmasi');
 
                 // Redirect to admin dashboard after payment confirmation
-                return redirect()->route('mitra.dashboard')->with('success', 'Pembayaran berhasil dikonfirmasi');
+                return redirect()->route('mitra.dashboard');
             }
         } else if ($pesanan->metode_pembayaran === 'cash' || $pesanan->metode_pembayaran === 'cod') {
-            // If COD, directly update the status to "Diproses"
-            $pesanan->update([
-                'status' => 'Diproses'
-            ]);
+            // Update the status to "Diproses"
+            $pesanan->update(['status' => 'Diproses']);
 
-            // Update the admin's income after payment confirmation
-            $admin = Admin::where('user_id', $pesanan->user_id)->first();
-            if ($admin) {
-                // Directly update pendapatan by adding 8000
-                $admin->pendapatan += 8000;
-                $admin->save(); // Save the updated pendapatan
-            }
+            // Add success message to session
+            session()->flash('success', 'Pembayaran telah dikonfirmasi dan pesanan sedang diproses (tab kelola pesanan)');
 
             // Redirect to admin dashboard after payment confirmation
-            return redirect()->route('mitra.dashboard')->with('success', 'Pembayaran telah dikonfirmasi dan pesanan sedang diproses');
+            return redirect()->route('mitra.dashboard');
         }
         
-        // Default case if not QRIS or COD
+        // Default case for other payment methods
         $pesanan->update(['status' => 'Diproses']);
         
-        // Update the admin's income after payment confirmation
-        $admin = Admin::where('user_id', $pesanan->user_id)->first();
-        if ($admin) {
-            // Directly update pendapatan by adding 8000
-            $admin->pendapatan += 8000;
-            $admin->save(); // Save the updated pendapatan
-        }
+        // Add success message to session
+        session()->flash('success', 'Pesanan sedang diproses (tab kelola pesanan)');
 
-        // Redirect to admin dashboard after payment confirmation
-        return redirect()->route('mitra.dashboard')->with('success', 'Pesanan sedang diproses');
+        return redirect()->route('mitra.dashboard');
         
     } catch (\Exception $e) {
         // Handle exception if any error occurs
-        $pesanan->update(['status' => 'Diproses']);
         Log::error('Konfirmasi Error: ' . $e->getMessage());
+
+        // Add error message to session
+        session()->flash('error', 'Pesanan sedang diproses, tetapi terjadi kesalahan verifikasi pembayaran');
         
-        // Redirect to admin dashboard with error message
-        return redirect()->route('mitra.dashboard')->with('error', 'Pesanan sedang diproses, tetapi terjadi kesalahan verifikasi pembayaran');
+        return redirect()->route('mitra.dashboard');
     }
 }
+
 
 
 public function showCOD(Pesanan $pesanan)

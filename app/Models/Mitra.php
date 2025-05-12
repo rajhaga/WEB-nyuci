@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +24,10 @@ class Mitra extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
+    public function ulasan()
+    {
+        return $this->hasMany(Ulasan::class);
+    }
     // Relasi Many-to-Many dengan PaketPakaian
     public function paketPakaian()
     {
@@ -33,17 +37,9 @@ class Mitra extends Model
     // Relasi Many-to-Many dengan JenisPakaian
     public function jenisPakaian()
     {
-        return $this->belongsToMany(JenisPakaian::class, 'paket_jenis_pakaian', 'paket_pakaian_id', 'jenis_pakaian_id')
-                    ->withPivot('price'); // Include price in the pivot table
+        return $this->belongsToMany(JenisPakaian::class, 'mitra_jenis_pakaian','mitra_id', 'jenis_pakaian_id')
+                    ->withPivot('price', 'paket_pakaian_id')
+                    ->using(MitraJenisPakaian::class); // Buat model pivot jika perlu
+; // Include price in the pivot table
     }
-
-    public function mitraJenisPakaian()
-    {
-        return $this->belongsToMany(Mitra::class, 'mitra_jenis_pakaian', 'jenis_pakaian_id', 'mitra_id')
-                    ->withPivot('harga'); // Menyertakan harga di pivot table
-    }
-
-
-
-
 }

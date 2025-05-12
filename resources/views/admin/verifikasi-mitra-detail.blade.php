@@ -47,7 +47,7 @@
 
         <!-- Verification Action Button -->
         <div class="mt-6 flex justify-start">
-            <form action="{{ route('admin.verifikasiMitraVerify', $mitra->id) }}" method="POST">
+            <form action="{{ route('admin.verifikasi', $mitra->id) }}" method="POST">
                 @csrf
                 <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition duration-300">
                     Verifikasi Mitra

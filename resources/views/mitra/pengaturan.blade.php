@@ -87,7 +87,7 @@
                 <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $mitra->longitude) }}">
             </div>
     
-            <!-- Upload Gambar -->
+            {{-- <!-- Upload Gambar -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tambah Gambar</label>
                 <div class="flex space-x-4 overflow-x-auto">
@@ -96,7 +96,7 @@
                     </label>
                     <input id="gambar_tempat" name="gambar_tempat[]" type="file" multiple class="hidden" />
                 </div>
-            </div>
+            </div> --}}
     
             <!-- Deskripsi Toko -->
             <div>
@@ -114,26 +114,27 @@
 
     <!-- Produk Tab -->
     <div id="content-produk" class="tab-content hidden">
-        <form method="POST" action="{{ route('mitra.updateProduk', $mitra->id) }}">
+        <!-- Form 1: Jenis Laundry & Paket Pakaian -->
+        <form method="POST" action="{{ route('mitra.updateLaundryPaket', $mitra->id) }}">
             @csrf
             @method('PUT')
     
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Pilih Jenis Laundry -->
+            <!-- Pilih Jenis Laundry -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div class="space-y-3">
                     <label class="block text-sm font-medium text-gray-700">Pilih Jenis Laundry</label>
                     <div class="space-y-2">
                         <label class="flex items-center space-x-2">
                             <input type="radio" name="kategori_layanan" value="cuci" {{ old('kategori_layanan', $mitra->kategori_layanan) == 'cuci' ? 'checked' : '' }}>
-                            <span>Cuci</span>
+                            <span class="text-gray-700">Cuci</span>
                         </label>
                         <label class="flex items-center space-x-2">
-                            <input type="radio" name="kategori_layanan" value="Setrika" {{ old('kategori_layanan', $mitra->kategori_layanan) == 'setrika' ? 'checked' : '' }}>
-                            <span>Setrika</span>
+                            <input type="radio" name="kategori_layanan" value="setrika" {{ old('kategori_layanan', $mitra->kategori_layanan) == 'setrika' ? 'checked' : '' }}>
+                            <span class="text-gray-700">Setrika</span>
                         </label>
                         <label class="flex items-center space-x-2">
-                            <input type="radio" name="kategori_layanan" value="cuci & Setrika" {{ old('kategori_layanan', $mitra->kategori_layanan) == 'cuci & setrika' ? 'checked' : '' }}>
-                            <span>Cuci & Setrika</span>
+                            <input type="radio" name="kategori_layanan" value="cuci & setrika" {{ old('kategori_layanan', $mitra->kategori_layanan) == 'cuci & setrika' ? 'checked' : '' }}>
+                            <span class="text-gray-700">Cuci & Setrika</span>
                         </label>
                     </div>
                 </div>
@@ -141,50 +142,70 @@
                 <!-- Pilih Paket Pakaian -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Paket Pakaian</label>
-                    <div class="space-y-2">
-                        <!-- Pilih Paket Pakaian -->
-                        <select name="paket_laundry" id="paket_laundry" class="w-full p-3 border border-gray-300 rounded-lg">
-                            @foreach($paketPakaianOptions as $paket)
-                                <option value="{{ $paket->id }}" 
-                                        {{ old('paket_laundry', $mitra->paketPakaian->contains($paket) ? 'selected' : '') }}>
-                                    {{ $paket->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <select name="paket_laundry" id="paket_laundry" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @foreach($paketPakaianOptions as $paket)
+                            <option value="{{ $paket->id }}" 
+                                {{ $mitra->paketPakaian->contains($paket->id) ? 'selected' : '' }}>
+                                {{ $paket->nama }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
     
-            <!-- Daftar Harga Jenis Pakaian -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Daftar Harga Jenis Pakaian</label>
-                <div id="jenis-pakaian-list" class="space-y-4">
-                    @foreach($mitra->paketPakaian as $paket)
-                        <div id="jenis-pakaian-{{ $paket->id }}" class="space-y-2">
+            <!-- Save Button for Jenis Laundry & Paket Pakaian -->
+            <div class="flex flex-col md:flex-row gap-4 pt-6">
+                <button type="submit" class="w-full md:w-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-8 rounded-lg transition-all">Simpan Jenis Laundry & Paket Pakaian</button>
+            </div>
+        </form>
+    
+        <!-- Form 2: Jenis Pakaian Prices -->
+        <form method="POST" action="{{ route('mitra.updateJenisPakaian', $mitra->id) }}" class="mt-8">
+                @csrf
+                @method('PUT')
+                
+                <h3 class="text-lg font-semibold mb-4">Daftar Harga</h3>
+                
+                @foreach($mitra->paketPakaian as $paket)
+                    <div class="paket-group border p-4 rounded-lg mb-6">
+                        <h4 class="font-medium text-blue-600 mb-3">{{ $paket->nama }}</h4>
+                        
+                        <div class="space-y-4">
                             @foreach($paket->jenisPakaian as $jenis)
-                                <div class="flex items-center space-x-3" id="jenis-pakaian-{{ $jenis->id }}">
-                                    <input type="hidden" name="jenis_pakaian[{{ $jenis->id }}][id]" value="{{ $jenis->id }}">
-                                    <input type="text" value="{{ $jenis->nama }}" class="flex-1 p-3 border border-gray-300 rounded-lg" readonly>
-                                    <input type="number" name="jenis_pakaian[{{ $jenis->id }}][price]" value="{{ $jenis->pivot->price }}" class="w-32 p-3 border border-gray-300 rounded-lg">
+                                @php
+                                    // Cari harga untuk jenis pakaian ini di pivot table
+                                    $harga = $mitra->jenisPakaian->firstWhere('id', $jenis->id)?->pivot->price ?? null;
+                                @endphp
+                                
+                                <div class="item-group flex items-center justify-between border-b pb-3">
+                                    <span class="font-medium">{{ $jenis->nama }}</span>
+                                    
+                                    <div class="flex items-center space-x-3">
+                                        <input type="hidden" 
+                                            name="jenis_pakaian[{{ $jenis->id }}][id]" 
+                                            value="{{ $jenis->id }}">
+                                        <input type="hidden" 
+                                            name="jenis_pakaian[{{ $jenis->id }}][paket_id]" 
+                                            value="{{ $paket->id }}">
+                                        <input type="number" 
+                                            name="jenis_pakaian[{{ $jenis->id }}][price]" 
+                                            value="{{ $harga ?? 0 }}"
+                                            class="w-32 p-2 border rounded"
+                                            min="0"
+                                            step="1000"
+                                            required>
+                                        <span class="text-gray-500">/item</span>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
-                    @endforeach
-                </div>
-                <input type="hidden" id="mitra_id" value="{{ $mitra->id }}">
-
-                {{-- <!-- Tombol Tambah Jenis Pakaian -->
-                <div class="pt-4">
-                    <button type="button" id="add-jenis-pakaian-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-all" onclick="addBarang()">+ Tambah Jenis Pakaian</button>
-                </div> --}}
-            </div>
-    
-            <!-- Tombol Batal dan Simpan -->
-            <div class="flex flex-col md:flex-row gap-4 pt-4">
-                <a href="{{ route('mitra.dashboard') }}" class="w-full md:w-1/2 border border-blue-600 text-blue-600 py-3 px-8 rounded-lg hover:bg-blue-50 transition-all text-center">Batal</a>
-                <button type="submit" class="w-full md:w-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-8 rounded-lg transition-all">Simpan</button>
-            </div>
-        </form>
+                    </div>
+                @endforeach
+                
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded mt-4">
+                    Simpan Harga
+                </button>
+            </form>       
     </div>    
 </div>
 
@@ -248,52 +269,52 @@
         }
     }
 
-// Anggap data latitude dan longitude mitra datang dari variabel PHP
-var mitraLat = {{ $mitra->latitude }};   // Latitude mitra
-var mitraLng = {{ $mitra->longitude }};
-// Initialize Leaflet Map
-document.addEventListener("DOMContentLoaded", function () {
-    var map = L.map('map').setView([-6.200000, 106.816666], 13); // Jakarta default
+    var mitraLat = {{ $mitra->latitude }};   // Latitude mitra
+    var mitraLng = {{ $mitra->longitude }};  // Longitude mitra
 
-    // Add OpenStreetMap Tile Layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    document.addEventListener("DOMContentLoaded", function () {
+        var map = L.map('map').setView([mitraLat, mitraLng], 13); // Set map view to mitra's coordinates
 
-    var marker = L.marker([-6.200000, 106.816666], { draggable: true }).addTo(map);
-    marker.bindPopup("<b>Lokasi Laundry Anda</b>").openPopup();
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-    marker.on('dragend', function (event) {
-        var position = marker.getLatLng();
-        updatePositionInputs(position.lat, position.lng);
-    });
+        var marker = L.marker([mitraLat, mitraLng], { draggable: true }).addTo(map);
+        marker.bindPopup("<b>Lokasi Laundry Anda</b>").openPopup();
 
-    updatePositionInputs(mitraLat, mitraLng); // Set default position dengan data mitra
+        marker.on('dragend', function (event) {
+            var position = marker.getLatLng();
+            updatePositionInputs(position.lat, position.lng);
+        });
 
-    function updatePositionInputs(lat, lng) {
-        document.getElementById('latitude').value = lat.toFixed(6);
-        document.getElementById('longitude').value = lng.toFixed(6);
-    }
+        updatePositionInputs(mitraLat, mitraLng); // Set initial position with mitra's coordinates
 
-    document.getElementById('locate-me').addEventListener('click', function () {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                var userLocation = [position.coords.latitude, position.coords.longitude];
-                map.setView(userLocation, 15);
-                marker.setLatLng(userLocation);
-                updatePositionInputs(userLocation[0], userLocation[1]);
-            }, function (error) {
-                alert('Tidak dapat mendapatkan lokasi Anda: ' + error.message);
-            });
-        } else {
-            alert('Geolocation tidak didukung oleh browser Anda.');
+        function updatePositionInputs(lat, lng) {
+            console.log("Updating position: ", lat, lng);
+            document.getElementById('latitude').value = lat.toFixed(6);
+            document.getElementById('longitude').value = lng.toFixed(6);
         }
-    });
 
-    map.on('click', function (e) {
-        marker.setLatLng(e.latlng);
-        updatePositionInputs(e.latlng.lat, e.latlng.lng);
+        document.getElementById('locate-me').addEventListener('click', function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    console.log('User Location:', position.coords.latitude, position.coords.longitude);
+                    var userLocation = [position.coords.latitude, position.coords.longitude];
+                    map.setView(userLocation, 15);
+                    marker.setLatLng(userLocation);
+                    updatePositionInputs(userLocation[0], userLocation[1]);
+                }, function (error) {
+                    alert('Tidak dapat mendapatkan lokasi Anda: ' + error.message);
+                });
+            } else {
+                alert('Geolocation tidak didukung oleh browser Anda.');
+            }
+        });
+
+        map.on('click', function (e) {
+            marker.setLatLng(e.latlng);
+            updatePositionInputs(e.latlng.lat, e.latlng.lng);
+        });
     });
-});
 </script>
 @endsection

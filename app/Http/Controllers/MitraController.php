@@ -9,6 +9,7 @@ use App\Models\PaketPakaian;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PesananItem;
 use App\Models\Ulasan;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;  // Import Storage jika menggunakan Storage untuk menyimpan file
 use Illuminate\Support\Facades\Log; // Import Log untuk debugging
@@ -107,30 +108,42 @@ class MitraController extends Controller
 
     
 
-public function kelolaPesanan(Request $request)
+    public function kelolaPesanan(Request $request)
 {
-    // Ambil data mitra berdasarkan ID pengguna yang login
+    // Retrieve mitra based on logged-in user
     $mitra = Mitra::where('user_id', Auth::id())->first();
 
-    // Jika mitra tidak ditemukan, arahkan ke halaman utama
+    // If mitra not found, redirect to home page
     if (!$mitra) {
         return redirect()->route('home')->with('error', 'Mitra tidak ditemukan.');
     }
 
-    // Filter berdasarkan status jika ada
+    // Capture the search and status from the request
+    $search = $request->get('search');
     $status = $request->status;
 
-    // Ambil pesanan berdasarkan mitra dan status
+    // Retrieve orders based on mitra, status, and search query
     $orders = Pesanan::where('mitra_id', $mitra->id)
-                     ->whereNotIn('status', ['Menunggu', 'Diterima']) // Filter pesanan yang tidak "Menunggu" atau "Diterima"
+                     ->whereNotIn('status', ['Menunggu', 'Diterima']) // Exclude "Menunggu" and "Diterima"
                      ->when($status, function($query) use ($status) {
-                         return $query->where('status', $status); // Filter pesanan berdasarkan status jika ada
+                         return $query->where('status', $status); // Filter by status if provided
+                     })
+                     ->when($search, function($query) use ($search) {
+                         // Search by order reference code or by customer name
+                         return $query->where('kode_referral', 'like', '%' . $search . '%')
+                                      ->orWhereHas('pembeli', function($query) use ($search) {  // Filter by user (customer) name
+                                          $query->where('nama', 'like', '%' . $search . '%');
+                                      });
                      })
                      ->orderBy('created_at', 'desc')
-                     ->paginate(12); // Sesuaikan jumlah item per halaman
+                     ->paginate(12);
 
-    return view('mitra.kelola-pesanan', compact('orders','mitra'));
+    // Pass orders and mitra to the view
+    return view('mitra.kelola-pesanan', compact('orders', 'mitra'));
 }
+
+
+    
 
 public function registerMitra(Request $request)
 {
@@ -224,38 +237,46 @@ public function showRegisterMitraForm()
     }
     
     public function catalog(Request $request)
-{
-     // Pastikan pengguna sudah login
-     if (!auth()->check()) {
-        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
-    }
-    // Query untuk mengambil data mitra dengan relasi
-    $query = Mitra::query()->with(['paketPakaian', 'jenisPakaian']);
-
-    // Filter berdasarkan kategori layanan jika ada
-    if ($request->filled('kategori_layanan') && $request->kategori_layanan !== 'semua') {
-        $query->where('kategori_layanan', $request->kategori_layanan);
-    }
-
-    // Filter berdasarkan paket layanan jika ada
-    if ($request->filled('paket_layanan') && $request->paket_layanan !== 'semua') {
-        $query->whereHas('paketPakaian', function ($q) use ($request) {
-            $q->where('nama', $request->paket_layanan);
+    {
+        // Pastikan pengguna sudah login
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+    
+        // Query untuk mengambil data mitra dengan relasi
+        $query = Mitra::query()
+                      ->with(['paketPakaian', 'jenisPakaian', 'user']); // pastikan relasi user ditambahkan
+    
+        // Filter berdasarkan kategori layanan jika ada
+        if ($request->filled('kategori_layanan') && $request->kategori_layanan !== 'semua') {
+            $query->where('kategori_layanan', $request->kategori_layanan);
+        }
+    
+        // Filter berdasarkan paket layanan jika ada
+        if ($request->filled('paket_layanan') && $request->paket_layanan !== 'semua') {
+            $query->whereHas('paketPakaian', function ($q) use ($request) {
+                $q->where('nama', $request->paket_layanan);
+            });
+        }
+    
+        // Filter berdasarkan status pengguna, kecuali status pending
+        $query->whereHas('user', function ($q) {
+            $q->where('status', '!=', 'pending');
         });
+    
+        // Ambil mitra yang sudah difilter dan dipaginasi
+        $mitras = $query->orderBy('kategori_layanan', 'asc')
+                        ->paginate(10)
+                        ->withQueryString();  // Menyertakan query string pada link pagination
+    
+        // Mengembalikan view dengan data mitra dan filter yang dipilih
+        return view('katalog.catalog', [
+            'mitras' => $mitras,
+            'kategori_layanan_selected' => $request->kategori_layanan ?? 'semua',  // Menyimpan nilai kategori_layanan yang dipilih
+            'paket_layanan_selected' => $request->paket_layanan ?? 'semua',        // Menyimpan nilai paket_layanan yang dipilih
+        ]);
     }
-
-    // Ambil mitra yang sudah difilter dan dipaginasi
-    $mitras = $query->orderBy('kategori_layanan', 'asc')
-                    ->paginate(10)
-                    ->withQueryString();  // Menyertakan query string pada link pagination
-
-    // Mengembalikan view dengan data mitra dan filter yang dipilih
-    return view('katalog.catalog', [
-        'mitras' => $mitras,
-        'kategori_layanan_selected' => $request->kategori_layanan ?? 'semua',  // Menyimpan nilai kategori_layanan yang dipilih
-        'paket_layanan_selected' => $request->paket_layanan ?? 'semua',        // Menyimpan nilai paket_layanan yang dipilih
-    ]);
-}
+    
 
 
 
@@ -341,12 +362,14 @@ public function updateStatus(Request $request, $id)
 
 public function edit($id)
 {
-    $mitra = Mitra::with(['paketPakaian.jenisPakaian'])->findOrFail($id);
-    
-    foreach ($mitra->jenisPakaian as $jenisPakaian) {
-        echo $jenisPakaian->pivot->harga;  // Mengakses harga dari pivot
-    }
-    // Pass the mitra object and available paketPakaian options
+    // Load mitra dengan relasi yang diperlukan
+    $mitra = Mitra::with([
+        'paketPakaian.jenisPakaian',
+        'jenisPakaian' => function($query) use ($id) {
+            $query->withPivot('price', 'paket_pakaian_id');
+        }
+    ])->findOrFail($id);
+
     $paketPakaianOptions = PaketPakaian::all();
 
     return view('mitra.pengaturan', compact('mitra', 'paketPakaianOptions'));
@@ -420,42 +443,86 @@ public function updateInformasiToko(Request $request, $id)
     return redirect()->route('mitra.pengaturan', $mitra->id)
         ->with('success', 'Informasi Toko berhasil diperbarui.');
 }
-public function updateProduk(Request $request, $id)
+
+public function updateLaundryPaket(Request $request, $id)
 {
-    // Validasi data yang diterima
+    // Validate the data
     $request->validate([
         'kategori_layanan' => 'required|string|in:cuci,setrika,cuci & setrika',
-        'paket_laundry' => 'required|string',
-        'jenis_pakaian' => 'required|array',
-        'jenis_pakaian.*.id' => 'required|exists:jenis_pakaian,id',
-        'jenis_pakaian.*.price' => 'required|numeric|min:0',
+        'paket_laundry' => 'required|exists:paket_pakaians,id',
     ]);
 
-    // Mencari data mitra berdasarkan ID
+    // Find the mitra by ID
     $mitra = Mitra::findOrFail($id);
 
-    // Update kategori layanan
+    // Update Jenis Laundry and Paket Pakaian
     $mitra->update([
         'kategori_layanan' => $request->kategori_layanan,
     ]);
 
-    // Update paket pakaian
-    $paket = PaketPakaian::where('nama', $request->paket_laundry)->first();
+    $paket = PaketPakaian::find($request->paket_laundry);
     if ($paket) {
-        $mitra->paketPakaian()->sync([$paket->id]); // Sync paket dengan mitra
+        $mitra->paketPakaian()->sync([$paket->id]);
     }
-
-    // Proses update harga untuk jenis pakaian
-    $jenisPakaianData = [];
-    foreach ($request->jenis_pakaian as $item) {
-        $jenisPakaianData[$item['id']] = ['price' => $item['price']];
-    }
-
-    // Sync data jenis pakaian dengan harga
-    $mitra->jenisPakaian()->sync($jenisPakaianData);
 
     return redirect()->route('mitra.pengaturan', $mitra->id)
-        ->with('success', 'Produk berhasil diperbarui.');
+        ->with('success', 'Jenis Laundry & Paket Pakaian berhasil diperbarui.');
+}
+
+
+// public function updateJenisPakaian(Request $request, $id)
+// {
+//     // Validasi input
+//     $request->validate([
+//         'jenis_pakaian' => 'required|array',
+//         'jenis_pakaian.*.id' => 'required|exists:jenis_pakaian,id',
+//         'jenis_pakaian.*.price' => 'required|numeric|min:0',
+//         'jenis_pakaian.*.paket_pakaian_id' => 'required|exists:paket_pakaians,id',
+//     ]);
+
+//     // Temukan mitra berdasarkan ID
+//     $mitra = Mitra::findOrFail($id);
+
+//     // Update atau create setiap record pivot
+//     foreach ($request->jenis_pakaian as $item) {
+//         $mitra->jenisPakaian()->syncWithoutDetaching([
+//             $item['id'] => [
+//                 'price' => $item['price'],
+//                 'paket_pakaian_id' => $item['paket_pakaian_id']
+//             ]
+//         ]);
+//     }
+
+//     return redirect()->route('mitra.pengaturan', $mitra->id)
+//         ->with('success', 'Harga Jenis Pakaian berhasil diperbarui.');
+// }
+
+
+public function updateJenisPakaian(Request $request, $id)
+{
+    // Validasi input
+    $request->validate([
+        'jenis_pakaian' => 'required|array',
+        'jenis_pakaian.*.id' => 'required|exists:jenis_pakaian,id',
+        'jenis_pakaian.*.price' => 'required|numeric|min:0',
+        'jenis_pakaian.*.paket_id' => 'required|exists:paket_pakaians,id',
+    ]);
+
+    $mitra = Mitra::findOrFail($id);
+
+    // Persiapkan data untuk sync
+    $jenisPakaianData = [];
+    foreach ($request->jenis_pakaian as $item) {
+        $jenisPakaianData[$item['id']] = [
+            'price' => $item['price'],
+            'paket_pakaian_id' => $item['paket_id']
+        ];
+    }
+
+    // Gunakan sync tanpa menghapus relasi lain
+    $mitra->jenisPakaian()->syncWithoutDetaching($jenisPakaianData);
+
+    return redirect()->back()->with('success', 'Harga berhasil diperbarui!');
 }
 
 public function addBarang(Request $request, $mitraId)

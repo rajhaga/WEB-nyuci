@@ -24,10 +24,19 @@ class AuthController extends Controller
         $user = Auth::user();
         $jenis_pakaian = JenisPakaian::all();
         $paket_pakaian = PaketPakaian::all();
-        $rekomendasi = DB::table('mitras')->orderByDesc('rating')->limit(5)->get();
+        
+        // Rekomendasi Default: Ambil 5 mitra dengan rating tertinggi
+        $rekomendasi = DB::table('mitras as m')
+            ->join('pengguna as u', 'm.user_id', '=', 'u.id')  // Bergabung dengan tabel pengguna
+            ->where('u.status', 'verified')  // Filter hanya mitra yang statusnya verified
+            ->orderByDesc('m.rating')
+            ->limit(5)
+            ->get();
+    
         $kategoriFavorit = null;
-
+    
         if ($user) {
+            // Ambil kategori favorit berdasarkan pesanan yang pernah dilakukan pengguna
             $kategoriFavorit = DB::table('pesanan_item as pi')
                 ->join('jenis_pakaian as jp', 'pi.item_id', '=', 'jp.id')
                 ->join('pesanan as p', 'pi.pesanan_id', '=', 'p.id')
@@ -37,26 +46,29 @@ class AuthController extends Controller
                 ->orderByDesc('total_dipesan')
                 ->limit(1)
                 ->first();
-        
+            
+            // Jika ada kategori favorit, cari mitra berdasarkan kategori pakaian tersebut
             if ($kategoriFavorit) {
                 $rekomendasiFavorit = DB::table('mitras as m')
                     ->join('mitra_paket_pakaian as mp', 'm.id', '=', 'mp.mitra_id')
                     ->join('paket_jenis_pakaian as pjp', 'mp.paket_pakaian_id', '=', 'pjp.paket_pakaian_id')
+                    ->join('pengguna as u', 'm.user_id', '=', 'u.id')  // Bergabung dengan tabel pengguna untuk status
                     ->where('pjp.jenis_pakaian_id', $kategoriFavorit->item_id)
+                    ->where('u.status', 'verified')  // Filter hanya mitra yang statusnya verified
                     ->orderByDesc('m.rating')
                     ->limit(5)
-                    ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating','m.alamat','m.harga']);
-        
+                    ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating', 'm.alamat', 'm.harga']);
+            
+                // Jika ada rekomendasi berdasarkan kategori favorit, ganti rekomendasi default
                 if ($rekomendasiFavorit->isNotEmpty()) {
                     $rekomendasi = $rekomendasiFavorit;
                 }
-                // kalau kosong, tetap pakai rekomendasi default (rating tertinggi)
             }
         }
         
         return view('home', compact('jenis_pakaian', 'paket_pakaian', 'rekomendasi', 'kategoriFavorit'));
     }
-
+        
     // Proses register pembeli
     public function register(Request $request)
     {
@@ -79,6 +91,7 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', 'Registrasi berhasil!');  // Redirect to profile page
     }
+
 
 
     // Menampilkan form login

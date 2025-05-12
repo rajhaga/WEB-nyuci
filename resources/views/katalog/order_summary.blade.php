@@ -61,16 +61,17 @@
         
         <div class="space-y-4">
             @foreach($items as $item)
-            <div class="flex justify-between items-center border-b border-gray-100 pb-4 last:border-0">
-                <div>
-                    <p class="font-medium text-gray-800">{{ $item['jenis'] }}</p>
-                    <p class="text-sm text-gray-500">{{ $item['quantity'] }} item</p>
+                <div class="flex justify-between items-center border-b border-gray-100 pb-4 last:border-0">
+                    <div>
+                        <p class="font-medium text-gray-800">{{ $item['jenis'] }}</p>
+                        <p class="text-sm text-gray-500">{{ $item['quantity'] }} item</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-medium text-blue-600">Rp{{ number_format($item['cost'], 0, ',', '.') }}</p>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <p class="font-medium text-blue-600">Rp{{ number_format($item['cost'], 0, ',', '.') }}</p>
-                </div>
-            </div>
             @endforeach
+
             
             <!-- Added Layanan Aplikasi -->
             <div class="flex justify-between items-center border-b border-gray-100 pb-4 last:border-0">

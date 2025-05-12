@@ -24,10 +24,10 @@ class Handler extends ExceptionHandler
             return response()->view('errors.404', [], 404);
         }
 
-        // Handle 500 error (Server Error) - Database query issue
-        if ($exception instanceof QueryException) {
-            return response()->view('errors.500', [], 500);
-        }
+        // // Handle 500 error (Server Error) - Database query issue
+        // if ($exception instanceof QueryException) {
+        //     return response()->view('errors.500', [], 500);
+        // }
 
         // Handle Connection Exception (offline or database connection error)
         if ($exception instanceof ConnectionException) {
