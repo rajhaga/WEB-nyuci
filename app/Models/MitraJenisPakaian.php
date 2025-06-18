@@ -14,4 +14,13 @@ class MitraJenisPakaian extends Pivot
         'paket_pakaian_id',
         'price'
     ];
+    public function paketPakaian()
+    {
+        return $this->belongsTo(PaketPakaian::class, 'paket_pakaian_id');
+    }
+
+    public function jenisPakaian()
+    {
+        return $this->belongsTo(JenisPakaian::class, 'jenis_pakaian_id');
+    }
 }

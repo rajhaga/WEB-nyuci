@@ -22,7 +22,7 @@
                 @enderror
                 
                 <div class="mb-3">
-                    <label class="form-label">Nama</label>
+                    <label class="form-label">Username</label>
                     <input type="text" name="nama" class="form-control" placeholder="Nama Lengkap" value="{{ old('nama') }}" required>
                 </div>
 
@@ -65,7 +65,7 @@
                 <button type="submit" class="btn btn-primary w-100">Daftar</button>
             </form>
             
-            <p class="mt-3">Sudah punya akun? <a href="#" class="text-primary">Login</a></p>
+            <p class="mt-3">Sudah punya akun? <a href="/login" class="text-primary">Login</a></p>
         </div>
     </div>
 

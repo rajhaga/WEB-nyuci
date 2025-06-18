@@ -1,177 +1,262 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Pesanan;
-use Illuminate\Support\Facades\{Auth, Storage, Log, DB};
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use App\Notifications\NewOrderNotification;
 use Midtrans\Config;
-use Midtrans\Transaction;
 use Midtrans\CoreApi;
-use App\Models\Admin;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Midtrans\Transaction;
 
 class PesananController extends Controller
 {
-    public function index(Request $request)
-    {
-        $pesanan = Pesanan::with(['mitra', 'pesananItems.jenisPakaian'])
-                         ->where('pembeli_id', Auth::id())
-                         ->when($request->status, fn($q, $status) => $q->where('status', $status))
-                         ->latest()
-                         ->get();
-
-        return view('pesanan.index', compact('pesanan'));
-    }
-
+    // Tampilkan QRIS
     public function showQRIS(Pesanan $pesanan)
     {
         $this->authorize('view', $pesanan);
 
-        if (!$pesanan->midtrans_transaction_id) {
-            $this->generateQRIS($pesanan);
-            $pesanan->refresh();
+        // Jika belum ada transaksi atau sudah expired, generate baru
+        if (!$pesanan->midtrans_transaction_id || $pesanan->isExpired()) {
+            try {
+                $this->generateQRIS($pesanan);
+                $pesanan->refresh();
+            } catch (\Exception $e) {
+                return back()->with('error', 'Gagal memproses pembayaran: ' . $e->getMessage());
+            }
         }
+        // // Generate unique order ID
+        // $orderId = 'LAUNDRY-' . $pesanan->id . '-' . now()->format('YmdHis');
+        
+        // // Pastikan minimal amount Rp10.000 (syarat QRIS)
+        // $totalPembayaran = max($pesanan->total_harga , 10000);
+        // $params = [
+        //     'payment_type' => 'qris',
+        //     'transaction_details' => [
+        //         'order_id' => $orderId,
+        //         'gross_amount' => $totalPembayaran,
+        //     ],
+        //     'customer_details' => [
+        //         'first_name' => substr($pesanan->pembeli->nama, 0, 50),
+        //         'email' => $pesanan->pembeli->email,
+        //         'phone' => $pesanan->pembeli->phone,
+        //     ],
+        //     'qris' => [
+        //         'acquirer' => 'gopay' // bisa diganti dengan bank tertentu
+        //     ],
+        //     'custom_expiry' => [
+        //         'expiry_duration' => 24,
+        //         'unit' => 'hour'
+        //     ]
+        // ];
+        // dd($params);
 
-        return view('pesanan.qris', compact('pesanan'));
+        return view('pesanan.qris', [
+            'pesanan' => $pesanan,
+            'qr_code' => $pesanan->getQrCodeImageAttribute()
+        ]);
     }
-
 
     protected function generateQRIS(Pesanan $pesanan)
     {
-        // konfigurasi Midtrans
-        Config::$serverKey     = config('services.midtrans.server_key');
-        Config::$isProduction  = config('services.midtrans.is_production');
-        Config::$isSanitized   = true;
+        if ($pesanan->isPaid()) {
+            throw new \Exception('Pesanan sudah dibayar');
+        }
 
-        // fee admin per order
-        $adminFeePerOrder = 8000;
-        $totalPembayaran  = $pesanan->total_harga + $adminFeePerOrder;
+        // Konfigurasi Midtrans
+        Config::$serverKey = env('MIDTRANS_SERVER_KEY', 'SB-Mid-server-Oy75m-HUjXpVMmgaDMQ_uJ_3');
+        Config::$isProduction = config('services.midtrans.is_production', false);
+        Config::$isSanitized = true;
+        Config::$is3ds = false;
+
+        // Generate unique order ID
+        $orderId = 'LAUNDRY-' . $pesanan->id . '-' . now()->format('YmdHis');
+        
+        // Pastikan minimal amount Rp10.000 (syarat QRIS)
+        $totalPembayaran = max($pesanan->total_harga , 10000);
 
         $params = [
-            'payment_type'        => 'qris',
+            'payment_type' => 'qris',
             'transaction_details' => [
-                'order_id'     => 'LAUNDRY-' . $pesanan->id . '-' . time(),
+                'order_id' => $orderId,
                 'gross_amount' => $totalPembayaran,
             ],
-            'customer_details'    => [
-                'first_name' => $pesanan->pembeli->nama,
-                'email'      => $pesanan->pembeli->email,
-                'phone'      => $pesanan->pembeli->phone,
+            'customer_details' => [
+                'first_name' => substr($pesanan->pembeli->nama, 0, 50),
+                'email' => $pesanan->pembeli->email,
+                'phone' => $pesanan->pembeli->phone,
             ],
             'qris' => [
-                'acquirer' => 'gopay',
+                'acquirer' => 'gopay' // bisa diganti dengan bank tertentu
             ],
+            'custom_expiry' => [
+                'expiry_duration' => 24,
+                'unit' => 'hour'
+            ]
         ];
 
         try {
-            DB::transaction(function() use ($pesanan, $params, $totalPembayaran, $adminFeePerOrder) {
-                // charge via Midtrans
-                $response = CoreApi::charge($params);
-                Log::info('Midtrans QRIS Response: ', ['response' => $response]);  // Debugging the response
+            $response = CoreApi::charge($params);
 
-                // generate & simpan QR code
-                $qrPath = 'qris/' . $pesanan->id . '.png';
-                Storage::put(
-                    'public/' . $qrPath,
-                    QrCode::format('png')
-                        ->size(300)
-                        ->generate($response->actions[0]->url)
-                );
+            Log::info('Midtrans QRIS Response:', (array)$response);
 
-                // update pesanan
-                $pesanan->update([
-                    'total_harga'            => $totalPembayaran,
-                    'midtrans_order_id'      => $response->order_id,
-                    'midtrans_transaction_id'=> $response->transaction_id,
-                    'qris_image'             => $qrPath,
-                    'status'                 => 'Diproses',
-                ]);
+            if ($response->status_code !== '201') {
+                throw new \Exception($response->status_message ?? 'Transaksi gagal dibuat');
+            }
 
-                // catat fee ke tabel admins
-                $adminUserId = 1;  // replace with actual user ID
-                Admin::firstOrCreate(
-                    ['user_id' => $adminUserId],
-                    ['pendapatan' => 0]
-                )->increment('pendapatan', $adminFeePerOrder);
-            });
+            // Pastikan response mengandung data QRIS
+            if (empty($response->qr_string)) {
+                throw new \Exception('Response QRIS tidak valid');
+            }
+            $qrisUrl = is_object($response->actions[0]) 
+                        ? $response->actions[0]->url 
+                        : $response->actions[0]['url'];
+            $pesanan->update([
+                'midtrans_order_id' => $orderId,
+                'midtrans_transaction_id' => $response->transaction_id,
+                'qris_url' => $qrisUrl,
+                'qris_string' => $response->qr_string,
+                'payment_expiry' => $response->expiry_time ?? now()->addHours(24),
+                'status_pembayaran' => 'pending',
+                'status' => 'Diterima'
+            ]);
 
         } catch (\Exception $e) {
-            Log::error('QRIS Generation Error: ' . $e->getMessage());
-            abort(500, 'Gagal generate QRIS');
+            Log::error('Gagal generate QRIS: ' . $e->getMessage(), [
+                'pesanan_id' => $pesanan->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new \Exception('Pembayaran gagal diproses: ' . $e->getMessage());
         }
     }
 
-    public function handleWebhook(Request $request)
-    {
-        $payload = $request->all();
-        $orderId = $payload['order_id'];
-
-        $pesanan = Pesanan::where('midtrans_order_id', $orderId)->firstOrFail();
-
-        switch ($payload['transaction_status']) {
-            case 'settlement':
-                $pesanan->update(['status' => 'paid', 'paid_at' => now()]);
-                break;
-            case 'expire':
-                $pesanan->update(['status' => 'expired']);
-                break;
-        }
-
-        return response()->json(['status' => 'success']);
-    }
-    protected function checkPaymentStatus(Pesanan $pesanan)
+    // Endpoint untuk menerima notifikasi dari Midtrans
+    // app/Http/Controllers/PembayaranController.php
+public function handleNotification(Request $request)
 {
-    if (!$pesanan->midtrans_transaction_id) {
-        return;
+    // Ambil payload sebagai array
+    $payload = $request->all();
+    
+    // Debug log
+    Log::info('Midtrans Notification Received:', $payload);
+
+    // Verifikasi signature key
+    $serverKey = config('services.midtrans.server_key');
+    $hashed = hash('sha512', 
+        $payload['order_id'] . 
+        $payload['status_code'] . 
+        $payload['gross_amount'] . 
+        $serverKey);
+
+    if ($hashed !== $payload['signature_key']) {
+        Log::error('Invalid signature', [
+            'received' => $payload['signature_key'],
+            'calculated' => $hashed
+        ]);
+        return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 403);
     }
+
+    $orderId = $payload['order_id'];
+    $transactionStatus = strtolower($payload['transaction_status']);
+    $fraudStatus = isset($payload['fraud_status']) ? strtolower($payload['fraud_status']) : null;
+
+    // Cari pesanan dengan logging
+    $pesanan = Pesanan::where('midtrans_order_id', $orderId)->first();
+    
+    if (!$pesanan) {
+        Log::error('Order not found', ['order_id' => $orderId]);
+        return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+    }
+
+    Log::info('Current Order Status:', [
+        'before' => [
+            'status_pembayaran' => $pesanan->status_pembayaran,
+            'status' => $pesanan->status
+        ]
+    ]);
+
+    // Update status
+    switch ($transactionStatus) {
+        case 'capture':
+            if ($fraudStatus === 'accept') {
+                $this->markAsPaid($pesanan);
+            }
+            break;
+            
+        case 'settlement':
+            $this->markAsPaid($pesanan);
+            break;
+            
+        case 'pending':
+            $pesanan->update([
+                'status_pembayaran' => 'pending',
+                'status' => 'Diterima' // Ubah ke 'Diterima' jika pending
+            ]);
+            break;
+            
+        case 'expire':
+            $pesanan->update([
+                'status_pembayaran' => 'expired',
+                'status' => 'Dibatalkan'
+            ]);
+            break;
+            
+        case 'cancel':
+        case 'deny':
+            $pesanan->update([
+                'status_pembayaran' => $transactionStatus,
+                'status' => 'Dibatalkan'
+            ]);
+            break;
+    }
+
+    // Log setelah update
+    Log::info('Order Status Updated:', [
+        'after' => [
+            'status_pembayaran' => $pesanan->fresh()->status_pembayaran,
+            'status' => $pesanan->fresh()->status
+        ]
+    ]);
+
+    return response()->json(['status' => 'success']);
+}
+
+protected function markAsPaid($pesanan)
+{
+    $pesanan->update([
+        'status_pembayaran' => 'paid',
+        'status' => 'Diproses',
+        'tanggal_pembayaran' => now()
+    ]);
+    
+    // // Dispatch event jika diperlukan
+    // event(new PesananPaid($pesanan));
+    
+    Log::info('Pesanan marked as paid:', ['pesanan_id' => $pesanan->id]);
+}
+
+public function checkPayment(Pesanan $pesanan)
+{
+    $this->authorize('view', $pesanan);
 
     try {
-        // Configure Midtrans
         Config::$serverKey = config('services.midtrans.server_key');
         Config::$isProduction = config('services.midtrans.is_production');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
         
-        // PERBAIKAN: Gunakan Transaction::status() bukan CoreApi::status()
         $status = \Midtrans\Transaction::status($pesanan->midtrans_transaction_id);
         
-        // Handle various status cases
-        switch ($status->transaction_status) {
-            case 'settlement':
-            case 'capture':
-                $pesanan->update([
-                    'status' => 'paid',
-                    'paid_at' => now()
-                ]);
-                
-                if (!$pesanan->payment_notified) {
-                    $pesanan->mitra->user->notify(new NewOrderNotification($pesanan));
-                    $pesanan->update(['payment_notified' => true]);
-                }
-                break;
-                
-            case 'pending':
-                // No action needed for pending status
-                break;
-                
-            case 'deny':
-            case 'cancel':
-            case 'expire':
-                $pesanan->update(['status' => 'failed']);
-                break;
-
-            // Tambahkan case untuk status lainnya jika diperlukan
-            case 'refund':
-            case 'partial_refund':
-                $pesanan->update(['status' => 'refunded']);
-                break;
-        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $status,
+            'order_status' => $pesanan->status,
+            'payment_status' => $pesanan->status_pembayaran
+        ]);
         
     } catch (\Exception $e) {
-        Log::error("Payment status check failed for transaction {$pesanan->midtrans_transaction_id}: ".$e->getMessage());
-        // Notifikasi admin atau sistem monitoring
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
     }
 }
 

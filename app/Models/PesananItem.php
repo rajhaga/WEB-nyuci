@@ -21,7 +21,10 @@ class PesananItem extends Model
     {
         return $this->belongsTo(Pesanan::class);
     }
-
+    public function paketPakaian()
+    {
+        return $this->belongsTo(PaketPakaian::class, 'paket_pakaian_id');
+    }
     // Relationship with JenisPakaian (Clothing Item)
     public function jenisPakaian()
     {
@@ -33,4 +36,5 @@ class PesananItem extends Model
     {
         return $this->jumlah * $this->jenisPakaian->pivot->price;  // Assuming price is in the pivot table
     }
+    
 }

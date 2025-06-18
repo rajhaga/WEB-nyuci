@@ -139,6 +139,9 @@ Route::post('midtrans-callback', [PesananController::class, 'handleWebhook'])
  Route::get('/laundry/nearby', [RekomendasiController::class, 'rekomendasiLaundry']);
  Route::get('/pesanan/{pesanan}/cod', [PesananController::class, 'showCOD'])
      ->name('pesanan.cod');
+Route::post('/payment/notification', [PesananController::class, 'handleNotification']);
+// routes/web.php
+Route::get('/pesanan/{pesanan}/check-payment', [PesananController::class, 'checkPayment'])->name('pesanan.check-payment');
 
 
 
@@ -148,6 +151,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mitra/reports', [UlasanController::class, 'showReport'])->name('mitra.reports');
 
 });
+
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');

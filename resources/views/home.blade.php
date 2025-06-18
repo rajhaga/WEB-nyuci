@@ -101,7 +101,7 @@
             
             <div class="bg-white  p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
                 <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
-                    <div class="w-[52px] h-[52px] flex items-center justify-center overflow-hidden">
+                    <div class="w-[50px] h-[60px] flex items-center justify-center overflow-hidden">
                         @include("components.icon-terpercaya")
                     </div>
                 </div>
@@ -111,7 +111,7 @@
             
             <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
                 <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
-                    <div class="w-[52px] h-[52px] flex items-center justify-center overflow-hidden">
+                    <div class="w-[44px] h-[60px] flex items-center justify-center overflow-hidden">
                         @include("components.icon-diantar")
                     </div>
                 </div>

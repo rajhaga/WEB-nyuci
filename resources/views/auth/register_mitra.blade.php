@@ -253,7 +253,8 @@
                                     </div>
                                     <div>
                                         <label for="harga" class="block font-medium">Harga per Kg (Rp)</label>
-                                        <input type="number" name="harga" class="w-full p-2 border rounded-md" min="1000" required>
+                                        <input type="number" name="harga" class="w-full p-2 border rounded-md" min="1001" required>
+                                        <small class="text-sm text-gray-500">*Harga harus lebih dari Rp 1000</small>
                                     </div>
                                 </div>
                         

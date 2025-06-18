@@ -72,23 +72,25 @@ class ProfileController extends Controller
     }
     
     public function history()
-{
-    $user = Auth::user();
-    $currentStatus = request('status'); // Get the status from the query parameter
-    if (!$user) {
-        return redirect()->route('login');  // 'login' is the named route for the login page
+    {
+        $user = Auth::user();
+        $currentStatus = request('status');
+
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $pesanans = Pesanan::where('pembeli_id', $user->id)
+            ->when($currentStatus, fn($q) => $q->where('status', $currentStatus))
+            ->with(['pesananItems.jenisPakaian', 'mitra'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('order_history', compact('pesanans', 'currentStatus'));
     }
-    $pesanans = Pesanan::where('pembeli_id', $user->id)
-                       ->when($currentStatus, function ($query, $currentStatus) {
-                           return $query->where('status', $currentStatus); // Filter based on status
-                       })
-                       ->with('items')
-                       ->paginate(10); // Use pagination
 
+    
 
-    // Pass the status to the view
-    return view('order_history', compact('pesanans', 'currentStatus'));
-}
 public function donehistroryprofile()
 {
     $user = Auth::user();

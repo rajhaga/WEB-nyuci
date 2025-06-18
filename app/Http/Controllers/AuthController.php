@@ -10,7 +10,6 @@ use App\Models\PaketPakaian;
 use Illuminate\Support\Facades\DB;
 
 
-
 class AuthController extends Controller
 {
     // Menampilkan form register pembeli
@@ -20,54 +19,59 @@ class AuthController extends Controller
     }
 
     public function home()
-    {
-        $user = Auth::user();
-        $jenis_pakaian = JenisPakaian::all();
-        $paket_pakaian = PaketPakaian::all();
+{
+    $user = Auth::user();
+    $jenis_pakaian = JenisPakaian::all();
+    $paket_pakaian = PaketPakaian::all();
+
+    // Rekomendasi Default: Ambil 5 mitra dengan rating tertinggi
+    $rekomendasiRating = DB::table('mitras as m')
+        ->join('pengguna as u', 'm.user_id', '=', 'u.id')
+        ->where('u.status', 'verified')
+        ->orderByDesc('m.rating')
+        ->limit(5)
+        ->get(['m.*']); // Ambil semua kolom dari mitras
+
+    $kategoriFavorit = null;
+    $rekomendasiFavorit = collect();
+
+    if ($user) {
+        // Ambil kategori favorit berdasarkan pesanan yang pernah dilakukan pengguna
+        $kategoriFavorit = DB::table('pesanan_item as pi')
+            ->join('jenis_pakaian as jp', 'pi.item_id', '=', 'jp.id')
+            ->join('pesanan as p', 'pi.pesanan_id', '=', 'p.id')
+            ->select('pi.item_id', 'jp.nama', DB::raw('COUNT(*) as total_dipesan'))
+            ->where('p.pembeli_id', $user->id)
+            ->groupBy('pi.item_id', 'jp.nama')
+            ->orderByDesc('total_dipesan')
+            ->limit(1)
+            ->first();
         
-        // Rekomendasi Default: Ambil 5 mitra dengan rating tertinggi
-        $rekomendasi = DB::table('mitras as m')
-            ->join('pengguna as u', 'm.user_id', '=', 'u.id')  // Bergabung dengan tabel pengguna
-            ->where('u.status', 'verified')  // Filter hanya mitra yang statusnya verified
-            ->orderByDesc('m.rating')
-            ->limit(5)
-            ->get();
-    
-        $kategoriFavorit = null;
-    
-        if ($user) {
-            // Ambil kategori favorit berdasarkan pesanan yang pernah dilakukan pengguna
-            $kategoriFavorit = DB::table('pesanan_item as pi')
-                ->join('jenis_pakaian as jp', 'pi.item_id', '=', 'jp.id')
-                ->join('pesanan as p', 'pi.pesanan_id', '=', 'p.id')
-                ->select('pi.item_id', 'jp.nama', DB::raw('COUNT(*) as total_dipesan'))
-                ->where('p.pembeli_id', $user->id)
-                ->groupBy('pi.item_id', 'jp.nama')
-                ->orderByDesc('total_dipesan')
-                ->limit(1)
-                ->first();
-            
-            // Jika ada kategori favorit, cari mitra berdasarkan kategori pakaian tersebut
-            if ($kategoriFavorit) {
-                $rekomendasiFavorit = DB::table('mitras as m')
-                    ->join('mitra_paket_pakaian as mp', 'm.id', '=', 'mp.mitra_id')
-                    ->join('paket_jenis_pakaian as pjp', 'mp.paket_pakaian_id', '=', 'pjp.paket_pakaian_id')
-                    ->join('pengguna as u', 'm.user_id', '=', 'u.id')  // Bergabung dengan tabel pengguna untuk status
-                    ->where('pjp.jenis_pakaian_id', $kategoriFavorit->item_id)
-                    ->where('u.status', 'verified')  // Filter hanya mitra yang statusnya verified
-                    ->orderByDesc('m.rating')
-                    ->limit(5)
-                    ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating', 'm.alamat', 'm.harga']);
-            
-                // Jika ada rekomendasi berdasarkan kategori favorit, ganti rekomendasi default
-                if ($rekomendasiFavorit->isNotEmpty()) {
-                    $rekomendasi = $rekomendasiFavorit;
-                }
+        // Jika ada kategori favorit, cari mitra berdasarkan kategori pakaian tersebut
+        if ($kategoriFavorit) {
+            $rekomendasiFavorit = DB::table('mitras as m')
+                ->join('mitra_paket_pakaian as mp', 'm.id', '=', 'mp.mitra_id')
+                ->join('paket_jenis_pakaian as pjp', 'mp.paket_pakaian_id', '=', 'pjp.paket_pakaian_id')
+                ->join('pengguna as u', 'm.user_id', '=', 'u.id')
+                ->where('pjp.jenis_pakaian_id', $kategoriFavorit->item_id)
+                ->where('u.status', 'verified')
+                ->orderByDesc('m.rating')
+                ->limit(5)
+                ->get(['m.id', 'm.nama_pemilik', 'm.nama_laundry', 'm.foto_tempat', 'm.rating', 'm.alamat', 'm.harga']);
+
             }
-        }
-        
-        return view('home', compact('jenis_pakaian', 'paket_pakaian', 'rekomendasi', 'kategoriFavorit'));
+
     }
+    // Di akhir fungsi sebelum return
+    // dd([
+    //     'rekomendasiRating' => $rekomendasiRating,
+    //     'rekomendasiFavorit' => $rekomendasiFavorit,
+    //     'kategoriFavorit' => $kategoriFavorit
+    // ]);
+
+    return view('home', compact('jenis_pakaian', 'paket_pakaian', 'rekomendasiRating', 'rekomendasiFavorit', 'kategoriFavorit'));
+    // return view('home', compact('jenis_pakaian', 'paket_pakaian', 'rekomendasiRating', 'rekomendasiFavorit', 'kategoriFavorit'));
+}
         
     // Proses register pembeli
     public function register(Request $request)

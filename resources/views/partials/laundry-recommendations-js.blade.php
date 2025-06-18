@@ -125,7 +125,7 @@
                     </p>
                     <div class="flex justify-between items-center">
                         <span class="text-blue-600 font-medium">Rp ${new Intl.NumberFormat().format(laundry.harga)}/kg</span>
-                        <a href="/laundry/${laundry.id}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm transition">
+                        <a href="/katalog/${laundry.id}/detail" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm transition">
                             <i class="fas fa-shopping-cart mr-1"></i> Pesan
                         </a>
                     </div>

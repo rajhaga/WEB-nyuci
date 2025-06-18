@@ -191,7 +191,7 @@ class AdminController extends Controller
         $user = $mitra->user;
 
         // Check if the user's status is not already verified
-        if ($user->status != 'verifiedf') {
+        if ($user->status != 'verified') {
            
             // Update associated User status to 'verified'
             $user->status = 'verified'; // Set User status to 'verified'
